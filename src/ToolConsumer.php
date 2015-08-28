@@ -2,6 +2,8 @@
 
 namespace Franzl\Lti;
 
+use Franzl\Lti\Storage\AbstractStorage;
+
 /**
 * Class to represent a tool consumer
 *
@@ -96,11 +98,11 @@ class ToolConsumer
     public function __construct($key = null, $data_connector = '', $autoEnable = false)
     {
 
-        $this->data_connector = DataConnector::getDataConnector($data_connector);
+        $this->data_connector = AbstractStorage::getDataConnector($data_connector);
         if (!empty($key)) {
             $this->load($key, $autoEnable);
         } else {
-            $this->secret = DataConnector::getRandomString(32);
+            $this->secret = AbstractStorage::getRandomString(32);
         }
 
     }

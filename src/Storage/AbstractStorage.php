@@ -1,6 +1,12 @@
 <?php
 
-namespace Franzl\Lti;
+namespace Franzl\Lti\Storage;
+
+use Franzl\Lti\ToolConsumer;
+use Franzl\Lti\ResourceLinkShareKey;
+use Franzl\Lti\User;
+use Franzl\Lti\ConsumerNonce;
+use Franzl\Lti\ResourceLink;
 
 /**
  * Abstract class to provide a connection to a persistent store for LTI objects
@@ -9,7 +15,7 @@ namespace Franzl\Lti;
  * @version 2.5.00
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3
  */
-abstract class DataConnector
+abstract class AbstractStorage
 {
 
     /**
@@ -213,7 +219,7 @@ abstract class DataConnector
      * @param mixed $db A database connection object or string (optional)
      * @param string $type The type of data connector (optional)
      *
-     * @return DataConnector Data connector object
+     * @return AbstractStorage Data connector object
      */
     public static function getDataConnector($data_connector, $db = null, $type = null)
     {

@@ -2,6 +2,8 @@
 
 namespace Franzl\Lti;
 
+use Franzl\Lti\Storage\AbstractStorage;
+
 /**
  * Class to represent a tool consumer resource link share key
  *
@@ -59,7 +61,7 @@ class ResourceLinkShareKey
      */
     private $id = null;
     /**
-     * @var DataConnector Data connector.
+     * @var AbstractStorage Data connector.
      */
     private $data_connector = null;
 
@@ -120,7 +122,7 @@ class ResourceLinkShareKey
             } else {
                 $this->length = max(min($this->length, self::MAX_SHARE_KEY_LENGTH), self::MIN_SHARE_KEY_LENGTH);
             }
-            $this->id = DataConnector::getRandomString($this->length);
+            $this->id = AbstractStorage::getRandomString($this->length);
         }
 
         return $this->data_connector->resourceLinkShareKeySave($this);

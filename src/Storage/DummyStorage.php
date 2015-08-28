@@ -1,12 +1,12 @@
 <?php
 
-namespace Franzl\Lti;
+namespace Franzl\Lti\Storage;
 
 ###
 ###  Class to represent a dummy LTI Data Connector with no data persistence
 ###
 
-class DataConnectorNone extends DataConnector
+class DummyStorage extends AbstractStorage
 {
 
     ###

@@ -2,6 +2,8 @@
 
 namespace Franzl\Lti;
 
+use Franzl\Lti\Storage\AbstractStorage;
+
 /**
  * Class to represent an LTI Tool Provider
  *
@@ -81,7 +83,7 @@ class ToolProvider
      */
     public $context = null;
     /**
-     * @var DataConnector Data connector object.
+     * @var AbstractStorage Data connector object.
      */
     public $data_connector = null;
     /**
@@ -211,7 +213,7 @@ class ToolProvider
         } else if (!empty($callbackHandler)) {
             $this->callbackHandler['launch'] = $callbackHandler;
         }
-        $this->data_connector = DataConnector::getDataConnector($data_connector);
+        $this->data_connector = AbstractStorage::getDataConnector($data_connector);
         $this->isOK = !is_null($this->data_connector);
 #
 ### Set debug mode
@@ -292,7 +294,7 @@ class ToolProvider
 #
 ### Initialise data connector
 #
-        $this->data_connector = DataConnector::getDataConnector($this->data_connector);
+        $this->data_connector = AbstractStorage::getDataConnector($this->data_connector);
 
         return $this->data_connector->toolConsumerList();
 
