@@ -19,7 +19,7 @@ class ContentItemImage
      * @param int $height Height of image in pixels (optional)
      * @param int $width Width of image in pixels (optional)
      */
-    function __construct($id, $height = null, $width = null)
+    public function __construct($id, $height = null, $width = null)
     {
 
         $this->{'@id'} = $id;

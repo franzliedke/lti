@@ -9,15 +9,15 @@ namespace Franzl\Lti;
 class DataConnectorNone extends DataConnector
 {
 
-###
-###  ToolConsumer methods
-###
+    ###
+    ###  ToolConsumer methods
+    ###
 
-###
-#    Load the tool consumer from the database
-###
-    public function Tool_Consumer_load($consumer)
-{
+    ###
+    #    Load the tool consumer from the database
+    ###
+    public function toolConsumerLoad($consumer)
+    {
 
         $consumer->secret = 'secret';
         $consumer->enabled = true;
@@ -28,10 +28,10 @@ class DataConnectorNone extends DataConnector
 
     }
 
-###
-#    Save the tool consumer to the database
-###
-    public function Tool_Consumer_save($consumer)
+    ###
+    #    Save the tool consumer to the database
+    ###
+    public function toolConsumerSave($consumer)
     {
 
         $consumer->updated = time();
@@ -39,36 +39,36 @@ class DataConnectorNone extends DataConnector
 
     }
 
-###
-#    Delete the tool consumer from the database
-###
-    public function Tool_Consumer_delete($consumer)
-{
+    ###
+    #    Delete the tool consumer from the database
+    ###
+    public function toolConsumerDelete($consumer)
+    {
 
         $consumer->initialise();
         return true;
 
     }
 
-###
-#    Load all tool consumers from the database
-###
-    public function Tool_Consumer_list()
-{
+    ###
+    #    Load all tool consumers from the database
+    ###
+    public function toolConsumerList()
+    {
 
         return [];
 
     }
 
-###
-###  ResourceLink methods
-###
+    ###
+    ###  ResourceLink methods
+    ###
 
-###
-#    Load the resource link from the database
-###
-    public function Resource_Link_load($resource_link)
-{
+    ###
+    #    Load the resource link from the database
+    ###
+    public function resourceLinkLoad($resource_link)
+    {
 
         $now = time();
         $resource_link->created = $now;
@@ -77,120 +77,120 @@ class DataConnectorNone extends DataConnector
 
     }
 
-###
-#    Save the resource link to the database
-###
-    public function Resource_Link_save($resource_link)
-{
+    ###
+    #    Save the resource link to the database
+    ###
+    public function resourceLinkSave($resource_link)
+    {
 
         $resource_link->updated = time();
         return true;
 
     }
 
-###
-#    Delete the resource link from the database
-###
-    public function Resource_Link_delete($resource_link)
-{
+    ###
+    #    Delete the resource link from the database
+    ###
+    public function resourceLinkDelete($resource_link)
+    {
 
         $resource_link->initialise();
         return true;
 
     }
 
-###
-#    Obtain an array of User objects for users with a result sourcedId.  The array may include users from other
-#    resource links which are sharing this resource link.  It may also be optionally indexed by the user ID of a specified scope.
-###
-    public function Resource_Link_getUserResultSourcedIDs($resource_link, $local_only, $id_scope)
-{
+    ###
+    #    Obtain an array of User objects for users with a result sourcedId.  The array may include users from other
+    #    resource links which are sharing this resource link.  It may also be optionally indexed by the user ID of a specified scope.
+    ###
+    public function resourceLinkGetUserResultSourcedIDs($resource_link, $local_only, $id_scope)
+    {
 
         return [];
 
     }
 
-###
-#    Get an array of ResourceLinkShare objects for each resource link which is sharing this resource link
-###
-    public function Resource_Link_getShares($resource_link)
-{
+    ###
+    #    Get an array of ResourceLinkShare objects for each resource link which is sharing this resource link
+    ###
+    public function resourceLinkGetShares($resource_link)
+    {
 
         return [];
 
     }
 
 
-###
-###  Franzl\Lti\ConsumerNonce methods
-###
+    ###
+    ###  Franzl\Lti\ConsumerNonce methods
+    ###
 
-###
-#    Load the consumer nonce from the database
-###
-    public function Consumer_Nonce_load($nonce)
-{
+    ###
+    #    Load the consumer nonce from the database
+    ###
+    public function consumerNonceLoad($nonce)
+    {
 
         return false;  // assume the nonce does not already exist
 
     }
 
-###
-#    Save the consumer nonce in the database
-###
-    public function Consumer_Nonce_save($nonce)
-{
+    ###
+    #    Save the consumer nonce in the database
+    ###
+    public function consumerNonceSave($nonce)
+    {
 
         return true;
 
     }
 
 
-###
-###  ResourceLinkShareKey methods
-###
+    ###
+    ###  ResourceLinkShareKey methods
+    ###
 
-###
-#    Load the resource link share key from the database
-###
-    public function Resource_Link_Share_Key_load($share_key)
-{
-
-        return true;
-
-    }
-
-###
-#    Save the resource link share key to the database
-###
-    public function Resource_Link_Share_Key_save($share_key)
-{
+    ###
+    #    Load the resource link share key from the database
+    ###
+    public function resourceLinkShareKeyLoad($share_key)
+    {
 
         return true;
 
     }
 
-###
-#    Delete the resource link share key from the database
-###
-    public function Resource_Link_Share_Key_delete($share_key)
-{
+    ###
+    #    Save the resource link share key to the database
+    ###
+    public function resourceLinkShareKeySave($share_key)
+    {
+
+        return true;
+
+    }
+
+    ###
+    #    Delete the resource link share key from the database
+    ###
+    public function resourceLinkShareKeyDelete($share_key)
+    {
 
         return true;
 
     }
 
 
-###
-###  User methods
-###
+    ###
+    ###  User methods
+    ###
 
 
-###
-#    Load the user from the database
-###
-    public function User_load($user)
-{
+    ###
+    #    Load the user from the database
+    ###
+    public function userLoad($user)
+    {
 
         $now = time();
         $user->created = $now;
@@ -199,22 +199,22 @@ class DataConnectorNone extends DataConnector
 
     }
 
-###
-#    Save the user to the database
-###
-    public function User_save($user)
-{
+    ###
+    #    Save the user to the database
+    ###
+    public function userSave($user)
+    {
 
         $user->updated = time();
         return true;
 
     }
 
-###
-#    Delete the user from the database
-###
-    public function User_delete($user)
-{
+    ###
+    #    Delete the user from the database
+    ###
+    public function userDelete($user)
+    {
 
         $user->initialise();
         return true;

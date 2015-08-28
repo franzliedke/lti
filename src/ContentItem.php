@@ -24,7 +24,7 @@ class ContentItem
      * @param ContentItemPlacement $placementAdvice  Placement object for item (optional)
      * @param string $id   URL of content-item (optional)
      */
-    function __construct($type, $placementAdvice = null, $id = null)
+    public function __construct($type, $placementAdvice = null, $id = null)
     {
 
         $this->{'@type'} = $type;

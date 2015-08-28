@@ -461,9 +461,10 @@ EOF;
                         case self::EXT_READ:
                             if (!isset($this->ext_nodes['imsx_POXBody']["{$do}Response"]['result']['resultScore']['textString'])) {
                                 break;
-                            } else {
-                                $lti_outcome->setValue($this->ext_nodes['imsx_POXBody']["{$do}Response"]['result']['resultScore']['textString']);
                             }
+
+                            $lti_outcome->setValue($this->ext_nodes['imsx_POXBody']["{$do}Response"]['result']['resultScore']['textString']);
+                            // no break
                         case self::EXT_WRITE:
                         case self::EXT_DELETE:
                             $response = true;
@@ -845,7 +846,7 @@ EOF;
                 try {
                     $this->ext_doc = new DOMDocument();
                     $this->ext_doc->loadXML($http->response);
-                    $this->ext_nodes = $this->domnode_to_array($this->ext_doc->documentElement);
+                    $this->ext_nodes = $this->domNodeToArray($this->ext_doc->documentElement);
                     if (isset($this->ext_nodes['statusinfo']['codemajor']) && ($this->ext_nodes['statusinfo']['codemajor'] == 'Success')) {
                         $ok = true;
                     }
@@ -900,12 +901,12 @@ EOD;
             $params = ['oauth_body_hash' => $hash];
 
 // Add OAuth signature
-            $hmac_method = new OAuthSignatureMethod_HMAC_SHA1();
+            $hmac_method = new OAuthSignatureMethodHmacSha1();
             $consumer = new OAuthConsumer($this->consumer->getKey(), $this->consumer->secret, null);
-            $req = OAuthRequest::from_consumer_and_token($consumer, null, 'POST', $url, $params);
-            $req->sign_request($hmac_method, $consumer, null);
-            $params = $req->get_parameters();
-            $header = $req->to_header();
+            $req = OAuthRequest::fromConsumerAndToken($consumer, null, 'POST', $url, $params);
+            $req->signRequest($hmac_method, $consumer, null);
+            $params = $req->getParameters();
+            $header = $req->toHeader();
             $header .= "\nContent-Type: application/xml";
 // Connect to tool consumer
             $http = new HttpMessage($url, 'POST', $xmlRequest, $header);
@@ -916,7 +917,7 @@ EOD;
                 try {
                     $this->ext_doc = new DOMDocument();
                     $this->ext_doc->loadXML($http->response);
-                    $this->ext_nodes = $this->domnode_to_array($this->ext_doc->documentElement);
+                    $this->ext_nodes = $this->domNodeToArray($this->ext_doc->documentElement);
                     if (isset($this->ext_nodes['imsx_POXHeader']['imsx_POXResponseHeaderInfo']['imsx_statusInfo']['imsx_codeMajor']) &&
                         ($this->ext_nodes['imsx_POXHeader']['imsx_POXResponseHeaderInfo']['imsx_statusInfo']['imsx_codeMajor'] == 'success')) {
                         $ok = true;
@@ -939,7 +940,7 @@ EOD;
      *
      * @return array Array of XML document elements
      */
-    private function domnode_to_array($node)
+    private function domNodeToArray($node)
     {
 
         $output = '';
@@ -951,7 +952,7 @@ EOD;
             case XML_ELEMENT_NODE:
                 for ($i = 0; $i < $node->childNodes->length; $i++) {
                     $child = $node->childNodes->item($i);
-                    $v = $this->domnode_to_array($child);
+                    $v = $this->domNodeToArray($child);
                     if (isset($child->tagName)) {
                         $t = $child->tagName;
                         if (!isset($output[$t])) {

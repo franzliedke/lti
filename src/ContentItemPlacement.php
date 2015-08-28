@@ -20,7 +20,7 @@ class ContentItemPlacement
      * @param string $documentTarget Location to open content in
      * @param string $windowTarget Name of window target
      */
-    function __construct($displayWidth, $displayHeight, $documentTarget, $windowTarget)
+    public function __construct($displayWidth, $displayHeight, $documentTarget, $windowTarget)
     {
 
         if (!empty($displayWidth)) {

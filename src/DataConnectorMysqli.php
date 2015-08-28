@@ -16,11 +16,11 @@ class DataConnectorMysqli extends DataConnector
     private $dbTableNamePrefix = '';
     private $db = null;
 
-###
-#    Class constructor
-###
-    function __construct($db, $dbTableNamePrefix = '')
-{
+    ###
+    #    Class constructor
+    ###
+    public function __construct($db, $dbTableNamePrefix = '')
+    {
 
         $this->db = $db;
         $this->dbTableNamePrefix = $dbTableNamePrefix;
@@ -28,14 +28,14 @@ class DataConnectorMysqli extends DataConnector
     }
 
 
-###
-###  ToolConsumer methods
-###
+    ###
+    ###  ToolConsumer methods
+    ###
 
-###
-#    Load the tool consumer from the database
-###
-    public function Tool_Consumer_load($consumer)
+    ###
+    #    Load the tool consumer from the database
+    ###
+    public function toolConsumerLoad($consumer)
     {
 
         $ok = false;
@@ -95,11 +95,11 @@ class DataConnectorMysqli extends DataConnector
 
     }
 
-###
-#    Save the tool consumer to the database
-###
-    public function Tool_Consumer_save($consumer)
-{
+    ###
+    #    Save the tool consumer to the database
+    ###
+    public function toolConsumerSave($consumer)
+    {
 
         $ok = false;
         if ($consumer->protected) {
@@ -195,14 +195,14 @@ class DataConnectorMysqli extends DataConnector
 
     }
 
-###
-#    Delete the tool consumer from the database
-###
-    public function Tool_Consumer_delete($consumer)
-{
+    ###
+    #    Delete the tool consumer from the database
+    ###
+    public function toolConsumerDelete($consumer)
+    {
 
         $key = $consumer->getKey();
-// Delete any nonce values for this consumer
+        // Delete any nonce values for this consumer
         $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::NONCE_TABLE_NAME . ' WHERE consumer_key = ?';
         $result = $this->db->prepare($sql);
         if ($result) {
@@ -215,7 +215,7 @@ class DataConnectorMysqli extends DataConnector
             $result->close();
         }
 
-// Delete any outstanding share keys for resource links for this consumer
+        // Delete any outstanding share keys for resource links for this consumer
         $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_SHARE_KEY_TABLE_NAME . ' WHERE primary_consumer_key = ?';
         $result = $this->db->prepare($sql);
         if ($result) {
@@ -228,7 +228,7 @@ class DataConnectorMysqli extends DataConnector
             $result->close();
         }
 
-// Delete any users in resource links for this consumer
+        // Delete any users in resource links for this consumer
         $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::USER_TABLE_NAME . ' WHERE consumer_key = ?';
         $result = $this->db->prepare($sql);
         if ($result) {
@@ -241,7 +241,7 @@ class DataConnectorMysqli extends DataConnector
             $result->close();
         }
 
-// Update any resource links for which this consumer is acting as a primary resource link
+        // Update any resource links for which this consumer is acting as a primary resource link
         $sql = "UPDATE {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_TABLE_NAME . ' ' .
            'SET primary_consumer_key = NULL, primary_context_id = NULL, share_approved = NULL ' .
            'WHERE primary_consumer_key = ?';
@@ -256,7 +256,7 @@ class DataConnectorMysqli extends DataConnector
             $result->close();
         }
 
-// Delete any resource links for this consumer
+        // Delete any resource links for this consumer
         $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_TABLE_NAME . ' WHERE consumer_key = ?';
         $result = $this->db->prepare($sql);
         if ($result) {
@@ -269,7 +269,7 @@ class DataConnectorMysqli extends DataConnector
             $result->close();
         }
 
-// Delete consumer
+        // Delete consumer
         $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::CONSUMER_TABLE_NAME . ' WHERE consumer_key = ?';
         $result = $this->db->prepare($sql);
         if ($result) {
@@ -290,11 +290,11 @@ class DataConnectorMysqli extends DataConnector
 
     }
 
-###
-#    Load all tool consumers from the database
-###
-    public function Tool_Consumer_list()
-{
+    ###
+    #    Load all tool consumers from the database
+    ###
+    public function toolConsumerList()
+    {
 
         $consumers = [];
 
@@ -360,15 +360,15 @@ class DataConnectorMysqli extends DataConnector
     }
 
 
-###
-###  ResourceLink methods
-###
+    ###
+    ###  ResourceLink methods
+    ###
 
-###
-#    Load the resource link from the database
-###
-    public function Resource_Link_load($resource_link)
-{
+    ###
+    #    Load the resource link from the database
+    ###
+    public function resourceLinkLoad($resource_link)
+    {
 
         $ok = false;
         $sql = 'SELECT lti_context_id, lti_resource_id, title, settings, primary_consumer_key, primary_context_id, share_approved, created, updated ' .
@@ -414,11 +414,11 @@ class DataConnectorMysqli extends DataConnector
 
     }
 
-###
-#    Save the resource link to the database
-###
-    public function Resource_Link_save($resource_link)
-{
+    ###
+    #    Save the resource link to the database
+    ###
+    public function resourceLinkSave($resource_link)
+    {
 
         $ok = false;
         if (is_null($resource_link->share_approved)) {
@@ -516,17 +516,17 @@ class DataConnectorMysqli extends DataConnector
 
     }
 
-###
-#    Delete the resource link from the database
-###
-    public function Resource_Link_delete($resource_link)
-{
+    ###
+    #    Delete the resource link from the database
+    ###
+    public function resourceLinkDelete($resource_link)
+    {
 
         $ok = false;
 
         $key = $resource_link->getKey();
         $id = $resource_link->getId();
-// Delete any outstanding share keys for resource links for this consumer
+        // Delete any outstanding share keys for resource links for this consumer
         if ($ok) {
             $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_SHARE_KEY_TABLE_NAME . ' ' .
              'WHERE (primary_consumer_key = ?) AND (primary_context_id = ?)';
@@ -542,7 +542,7 @@ class DataConnectorMysqli extends DataConnector
             }
         }
 
-// Delete users
+        // Delete users
         if ($ok) {
             $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::USER_TABLE_NAME . ' ' .
              'WHERE (consumer_key = ?) AND (context_id = ?)';
@@ -558,7 +558,7 @@ class DataConnectorMysqli extends DataConnector
             }
         }
 
-// Update any resource links for which this is the primary resource link
+        // Update any resource links for which this is the primary resource link
         $sql = "UPDATE {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_TABLE_NAME . ' ' .
            'SET primary_consumer_key = NULL, primary_context_id = NULL ' .
            'WHERE (primary_consumer_key = ?) AND (primary_context_id = ?)';
@@ -573,7 +573,7 @@ class DataConnectorMysqli extends DataConnector
             $result->close();
         }
 
-// Delete resource link
+        // Delete resource link
         if ($ok) {
             $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_TABLE_NAME . ' ' .
              'WHERE (consumer_key = ?) AND (context_id = ?)';
@@ -597,12 +597,12 @@ class DataConnectorMysqli extends DataConnector
 
     }
 
-###
-#    Obtain an array of User objects for users with a result sourcedId.  The array may include users from other
-#    resource links which are sharing this resource link.  It may also be optionally indexed by the user ID of a specified scope.
-###
-    public function Resource_Link_getUserResultSourcedIDs($resource_link, $local_only, $id_scope)
-{
+    ###
+    #    Obtain an array of User objects for users with a result sourcedId.  The array may include users from other
+    #    resource links which are sharing this resource link.  It may also be optionally indexed by the user ID of a specified scope.
+    ###
+    public function resourceLinkGetUserResultSourcedIDs($resource_link, $local_only, $id_scope)
+    {
 
         $users = [];
 
@@ -656,11 +656,11 @@ class DataConnectorMysqli extends DataConnector
 
     }
 
-###
-#    Get an array of ResourceLinkShare objects for each resource link which is sharing this resource link.
-###
-    public function Resource_Link_getShares($resource_link)
-{
+    ###
+    #    Get an array of ResourceLinkShare objects for each resource link which is sharing this resource link.
+    ###
+    public function resourceLinkGetShares($resource_link)
+    {
 
         $shares = [];
 
@@ -698,19 +698,19 @@ class DataConnectorMysqli extends DataConnector
     }
 
 
-###
-###  Franzl\Lti\ConsumerNonce methods
-###
+    ###
+    ###  Franzl\Lti\ConsumerNonce methods
+    ###
 
-###
-#    Load the consumer nonce from the database
-###
-    public function Consumer_Nonce_load($nonce)
-{
+    ###
+    #    Load the consumer nonce from the database
+    ###
+    public function consumerNonceLoad($nonce)
+    {
 
-#
-### Delete nonce values more than one day old
-#
+    #
+    ### Delete nonce values more than one day old
+    #
         $ok = false;
         $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::NONCE_TABLE_NAME . ' WHERE expires <= ?';
         $result = $this->db->prepare($sql);
@@ -725,9 +725,9 @@ class DataConnectorMysqli extends DataConnector
             $result->close();
         }
 
-#
-### load the nonce
-#
+    #
+    ### load the nonce
+    #
         $ok = true;
         $sql = "SELECT value AS T FROM {$this->dbTableNamePrefix}" . DataConnector::NONCE_TABLE_NAME . ' ' .
            'WHERE (consumer_key = ?) AND (value = ?)';
@@ -755,11 +755,11 @@ class DataConnectorMysqli extends DataConnector
 
     }
 
-###
-#    Save the consumer nonce in the database
-###
-    public function Consumer_Nonce_save($nonce)
-{
+    ###
+    #    Save the consumer nonce in the database
+    ###
+    public function consumerNonceSave($nonce)
+    {
 
         $ok = false;
         $sql = "INSERT INTO {$this->dbTableNamePrefix}" . DataConnector::NONCE_TABLE_NAME . ' (consumer_key, value, expires) ' .
@@ -783,17 +783,17 @@ class DataConnectorMysqli extends DataConnector
     }
 
 
-###
-###  ResourceLinkShareKey methods
-###
+    ###
+    ###  ResourceLinkShareKey methods
+    ###
 
-###
-#    Load the resource link share key from the database
-###
-    public function Resource_Link_Share_Key_load($share_key)
-{
+    ###
+    #    Load the resource link share key from the database
+    ###
+    public function resourceLinkShareKeyLoad($share_key)
+    {
 
-// Clear expired share keys
+        // Clear expired share keys
         $ok = false;
         $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_SHARE_KEY_TABLE_NAME . ' WHERE expires <= ?';
         $result = $this->db->prepare($sql);
@@ -808,7 +808,7 @@ class DataConnectorMysqli extends DataConnector
             $result->close();
         }
 
-// Load share key
+        // Load share key
         $ok = false;
         $id = $share_key->getId();
         $sql = 'SELECT primary_consumer_key, primary_context_id, auto_approve, expires ' .
@@ -838,11 +838,11 @@ class DataConnectorMysqli extends DataConnector
 
     }
 
-###
-#    Save the resource link share key to the database
-###
-    public function Resource_Link_Share_Key_save($share_key)
-{
+    ###
+    #    Save the resource link share key to the database
+    ###
+    public function resourceLinkShareKeySave($share_key)
+    {
 
         $ok = false;
         if ($share_key->auto_approve) {
@@ -877,11 +877,11 @@ class DataConnectorMysqli extends DataConnector
 
     }
 
-###
-#    Delete the resource link share key from the database
-###
-    public function Resource_Link_Share_Key_delete($share_key)
-{
+    ###
+    #    Delete the resource link share key from the database
+    ###
+    public function resourceLinkShareKeyDelete($share_key)
+    {
 
         $ok = false;
         $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_SHARE_KEY_TABLE_NAME . ' WHERE share_key_id = ?';
@@ -906,16 +906,16 @@ class DataConnectorMysqli extends DataConnector
     }
 
 
-###
-###  User methods
-###
+    ###
+    ###  User methods
+    ###
 
 
-###
-#    Load the user from the database
-###
-    public function User_load($user)
-{
+    ###
+    #    Load the user from the database
+    ###
+    public function userLoad($user)
+    {
 
         $ok = false;
         $sql = 'SELECT lti_result_sourcedid, created, updated ' .
@@ -947,11 +947,11 @@ class DataConnectorMysqli extends DataConnector
 
     }
 
-###
-#    Save the user to the database
-###
-    public function User_save($user)
-{
+    ###
+    #    Save the user to the database
+    ###
+    public function userSave($user)
+    {
 
         $ok = false;
         $time = time();
@@ -993,11 +993,11 @@ class DataConnectorMysqli extends DataConnector
 
     }
 
-###
-#    Delete the user from the database
-###
-    public function User_delete($user)
-{
+    ###
+    #    Delete the user from the database
+    ###
+    public function userDelete($user)
+    {
 
         $ok = false;
         $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::USER_TABLE_NAME . ' ' .

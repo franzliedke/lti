@@ -60,7 +60,7 @@ class HttpMessage
      * @param mixed  $params  Associative array of parameter values to be passed or message body (optional, default is none)
      * @param string $header  Values to include in the request header (optional, default is none)
      */
-    function __construct($url, $method = 'GET', $params = null, $header = null)
+    public function __construct($url, $method = 'GET', $params = null, $header = null)
     {
 
         $this->url = $url;

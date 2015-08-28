@@ -176,7 +176,7 @@ class ToolProvider
      * @param mixed $data_connector Object containing a database connection object (optional, default is a blank prefix and MySQL)
      * @param mixed $callbackHandler String containing name of callback function for launch request, or associative array of callback functions for each request type
      */
-    function __construct($data_connector = '', $callbackHandler = null)
+    public function __construct($data_connector = '', $callbackHandler = null)
     {
 
 // For backward compatibility the parameters may be in the opposite order, but the recommended practice is to just pass a data connector object and
@@ -231,15 +231,15 @@ class ToolProvider
     /**
      * Process an incoming request
      *
-     * @deprecated Use handle_request instead
-     * @see LTI_Tool_Provider::$handle_request
+     * @deprecated Use handleRequest instead
+     * @see LTI_Tool_Provider::$handleRequest
      *
      * @return mixed Returns TRUE or FALSE, a redirection URL or HTML
      */
     public function execute()
     {
 
-        $this->handle_request();
+        $this->handleRequest();
 
     }
 
@@ -248,7 +248,7 @@ class ToolProvider
      *
      * @return mixed Returns TRUE or FALSE, a redirection URL or HTML
      */
-    public function handle_request()
+    public function handleRequest()
     {
 
 #
@@ -294,7 +294,7 @@ class ToolProvider
 #
         $this->data_connector = DataConnector::getDataConnector($this->data_connector);
 
-        return $this->data_connector->Tool_Consumer_list();
+        return $this->data_connector->toolConsumerList();
 
     }
 
@@ -666,16 +666,16 @@ EOD;
             try {
                 $store = new OAuthDataStore($this);
                 $server = new OAuthServer($store);
-                $method = new OAuthSignatureMethod_HMAC_SHA1();
-                $server->add_signature_method($method);
-                $request = OAuthRequest::from_request();
-                $res = $server->verify_request($request);
+                $method = new OAuthSignatureMethodHmacSha1();
+                $server->addSignatureMethod($method);
+                $request = OAuthRequest::fromRequest();
+                $res = $server->verifyRequest($request);
             } catch (Exception $e) {
                 $this->isOK = false;
                 if (empty($this->reason)) {
                     if ($this->debugMode) {
                         $consumer = new OAuthConsumer($this->consumer->getKey(), $this->consumer->secret);
-                        $signature = $request->build_signature($method, $consumer, false);
+                        $signature = $request->buildSignature($method, $consumer, false);
                         $this->reason = $e->getMessage();
                         if (empty($this->reason)) {
                             $this->reason = 'OAuth exception';

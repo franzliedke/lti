@@ -12,11 +12,11 @@ class DataConnectorOci extends DataConnector
     private $db = null;
     private $dbTableNamePrefix = '';
 
-###
-#    Class constructor
-###
-    function __construct($db, $dbTableNamePrefix = '')
-{
+    ###
+    #    Class constructor
+    ###
+    public function __construct($db, $dbTableNamePrefix = '')
+    {
 
         $this->db = $db;
         $this->dbTableNamePrefix = $dbTableNamePrefix;
@@ -25,14 +25,14 @@ class DataConnectorOci extends DataConnector
     }
 
 
-###
-###  ToolConsumer methods
-###
+    ###
+    ###  ToolConsumer methods
+    ###
 
-###
-#    Load the tool consumer from the database
-###
-    public function Tool_Consumer_load($consumer)
+    ###
+    #    Load the tool consumer from the database
+    ###
+    public function toolConsumerLoad($consumer)
     {
 
         $sql = 'SELECT name, secret, lti_version, consumer_name, consumer_version, consumer_guid, css_path, protected, enabled, enable_from, enable_until, last_access, created, updated ' .
@@ -80,11 +80,11 @@ class DataConnectorOci extends DataConnector
 
     }
 
-###
-#    Save the tool consumer to the database
-###
-    public function Tool_Consumer_save($consumer)
-{
+    ###
+    #    Save the tool consumer to the database
+    ###
+    public function toolConsumerSave($consumer)
+    {
 
         if ($consumer->protected) {
             $protected = 1;
@@ -166,32 +166,32 @@ class DataConnectorOci extends DataConnector
 
     }
 
-###
-#    Delete the tool consumer from the database
-###
-    public function Tool_Consumer_delete($consumer)
-{
+    ###
+    #    Delete the tool consumer from the database
+    ###
+    public function toolConsumerDelete($consumer)
+    {
 
         $key = $consumer->getKey();
-// Delete any nonce values for this consumer
+        // Delete any nonce values for this consumer
         $sql = 'DELETE FROM ' . $this->dbTableNamePrefix . DataConnector::NONCE_TABLE_NAME . ' WHERE consumer_key = :key';
         $query = oci_parse($this->db, $sql);
         oci_bind_by_name($query, ':key', $key);
         oci_execute($query);
 
-// Delete any outstanding share keys for resource links for this consumer
+        // Delete any outstanding share keys for resource links for this consumer
         $sql = 'DELETE FROM ' . $this->dbTableNamePrefix . DataConnector::RESOURCE_LINK_SHARE_KEY_TABLE_NAME . ' WHERE primary_consumer_key = :key';
         $query = oci_parse($this->db, $sql);
         oci_bind_by_name($query, ':key', $key);
         oci_execute($query);
 
-// Delete any users in resource links for this consumer
+        // Delete any users in resource links for this consumer
         $sql = 'DELETE FROM ' . $this->dbTableNamePrefix . DataConnector::USER_TABLE_NAME . ' WHERE consumer_key = :key';
         $query = oci_parse($this->db, $sql);
         oci_bind_by_name($query, ':key', $key);
         oci_execute($query);
 
-// Update any resource links for which this consumer is acting as a primary resource link
+        // Update any resource links for which this consumer is acting as a primary resource link
         $sql = 'UPDATE ' . $this->dbTableNamePrefix . DataConnector::RESOURCE_LINK_TABLE_NAME . ' ' .
            'SET primary_consumer_key = NULL, primary_context_id = NULL, share_approved = NULL ' .
            'WHERE primary_consumer_key = :key';
@@ -199,13 +199,13 @@ class DataConnectorOci extends DataConnector
         oci_bind_by_name($query, ':key', $key);
         oci_execute($query);
 
-// Delete any resource links for this consumer
+        // Delete any resource links for this consumer
         $sql = 'DELETE FROM ' . $this->dbTableNamePrefix . DataConnector::RESOURCE_LINK_TABLE_NAME . ' WHERE consumer_key = :key';
         $query = oci_parse($this->db, $sql);
         oci_bind_by_name($query, ':key', $key);
         oci_execute($query);
 
-// Delete consumer
+        // Delete consumer
         $sql = 'DELETE FROM ' . $this->dbTableNamePrefix . DataConnector::CONSUMER_TABLE_NAME . ' WHERE consumer_key = :key';
         $query = oci_parse($this->db, $sql);
         oci_bind_by_name($query, ':key', $key);
@@ -219,11 +219,11 @@ class DataConnectorOci extends DataConnector
 
     }
 
-###
-#    Load all tool consumers from the database
-###
-    public function Tool_Consumer_list()
-{
+    ###
+    #    Load all tool consumers from the database
+    ###
+    public function toolConsumerList()
+    {
 
         $consumers = [];
 
@@ -273,15 +273,15 @@ class DataConnectorOci extends DataConnector
 
     }
 
-###
-###  ResourceLink methods
-###
+    ###
+    ###  ResourceLink methods
+    ###
 
-###
-#    Load the resource link from the database
-###
-    public function Resource_Link_load($resource_link)
-{
+    ###
+    #    Load the resource link from the database
+    ###
+    public function resourceLinkLoad($resource_link)
+    {
 
         $key = $resource_link->getKey();
         $id = $resource_link->getId();
@@ -326,11 +326,11 @@ class DataConnectorOci extends DataConnector
 
     }
 
-###
-#    Save the resource link to the database
-###
-    public function Resource_Link_save($resource_link)
-{
+    ###
+    #    Save the resource link to the database
+    ###
+    public function resourceLinkSave($resource_link)
+    {
 
         $time = time();
         $now = date("{$this->date_format} {$this->time_format}", $time);
@@ -402,15 +402,15 @@ class DataConnectorOci extends DataConnector
 
     }
 
-###
-#    Delete the resource link from the database
-###
-    public function Resource_Link_delete($resource_link)
-{
+    ###
+    #    Delete the resource link from the database
+    ###
+    public function resourceLinkDelete($resource_link)
+    {
 
         $key = $resource_link->getKey();
         $id = $resource_link->getId();
-// Delete any outstanding share keys for resource links for this consumer
+        // Delete any outstanding share keys for resource links for this consumer
         $sql = 'DELETE FROM ' . $this->dbTableNamePrefix . DataConnector::RESOURCE_LINK_SHARE_KEY_TABLE_NAME . ' ' .
            'WHERE (primary_consumer_key = :key) AND (primary_context_id = :id)';
         $query = oci_parse($this->db, $sql);
@@ -418,7 +418,7 @@ class DataConnectorOci extends DataConnector
         oci_bind_by_name($query, ':id', $id);
         $ok = oci_execute($query);
 
-// Delete users
+        // Delete users
         if ($ok) {
             $sql = 'DELETE FROM ' . $this->dbTableNamePrefix . DataConnector::USER_TABLE_NAME . ' ' .
              'WHERE (consumer_key = :key) AND (context_id = :id)';
@@ -428,7 +428,7 @@ class DataConnectorOci extends DataConnector
             $ok = oci_execute($query);
         }
 
-// Update any resource links for which this is the primary resource link
+        // Update any resource links for which this is the primary resource link
         if ($ok) {
             $sql = 'UPDATE ' . $this->dbTableNamePrefix . DataConnector::RESOURCE_LINK_TABLE_NAME . ' ' .
              'SET primary_consumer_key = NULL, primary_context_id = NULL ' .
@@ -439,7 +439,7 @@ class DataConnectorOci extends DataConnector
             $ok = oci_execute($query);
         }
 
-// Delete resource link
+        // Delete resource link
         if ($ok) {
             $sql = 'DELETE FROM ' . $this->dbTableNamePrefix . DataConnector::RESOURCE_LINK_TABLE_NAME . ' ' .
              'WHERE (consumer_key = :key) AND (context_id = :id)';
@@ -457,12 +457,12 @@ class DataConnectorOci extends DataConnector
 
     }
 
-###
-#    Obtain an array of User objects for users with a result sourcedId.  The array may include users from other
-#    resource links which are sharing this resource link.  It may also be optionally indexed by the user ID of a specified scope.
-###
-    public function Resource_Link_getUserResultSourcedIDs($resource_link, $local_only, $id_scope)
-{
+    ###
+    #    Obtain an array of User objects for users with a result sourcedId.  The array may include users from other
+    #    resource links which are sharing this resource link.  It may also be optionally indexed by the user ID of a specified scope.
+    ###
+    public function resourceLinkGetUserResultSourcedIDs($resource_link, $local_only, $id_scope)
+    {
 
         $users = [];
 
@@ -504,11 +504,11 @@ class DataConnectorOci extends DataConnector
 
     }
 
-###
-#    Get an array of ResourceLinkShare objects for each resource link which is sharing this resource link
-###
-    public function Resource_Link_getShares($resource_link)
-{
+    ###
+    #    Get an array of ResourceLinkShare objects for each resource link which is sharing this resource link
+    ###
+    public function resourceLinkGetShares($resource_link)
+    {
 
         $shares = [];
 
@@ -538,24 +538,24 @@ class DataConnectorOci extends DataConnector
     }
 
 
-###
-###  Franzl\Lti\ConsumerNonce methods
-###
+    ###
+    ###  Franzl\Lti\ConsumerNonce methods
+    ###
 
-###
-#    Load the consumer nonce from the database
-###
-    public function Consumer_Nonce_load($nonce)
-{
+    ###
+    #    Load the consumer nonce from the database
+    ###
+    public function consumerNonceLoad($nonce)
+    {
 
-// Delete any expired nonce values
+        // Delete any expired nonce values
         $now = date("{$this->date_format} {$this->time_format}", time());
         $sql = 'DELETE FROM ' . $this->dbTableNamePrefix . DataConnector::NONCE_TABLE_NAME . ' WHERE expires <= :now';
         $query = oci_parse($this->db, $sql);
         oci_bind_by_name($query, ':now', $now);
         oci_execute($query);
 
-// Load the nonce
+        // Load the nonce
         $key = $nonce->getKey();
         $value = $nonce->getValue();
         $sql = 'SELECT value T FROM ' . $this->dbTableNamePrefix . DataConnector::NONCE_TABLE_NAME . ' WHERE (consumer_key = :key) AND (value = :value)';
@@ -574,11 +574,11 @@ class DataConnectorOci extends DataConnector
 
     }
 
-###
-#    Save the consumer nonce in the database
-###
-    public function Consumer_Nonce_save($nonce)
-{
+    ###
+    #    Save the consumer nonce in the database
+    ###
+    public function consumerNonceSave($nonce)
+    {
 
         $key = $nonce->getKey();
         $value = $nonce->getValue();
@@ -595,24 +595,24 @@ class DataConnectorOci extends DataConnector
     }
 
 
-###
-###  ResourceLinkShareKey methods
-###
+    ###
+    ###  ResourceLinkShareKey methods
+    ###
 
-###
-#    Load the resource link share key from the database
-###
-    public function Resource_Link_Share_Key_load($share_key)
-{
+    ###
+    #    Load the resource link share key from the database
+    ###
+    public function resourceLinkShareKeyLoad($share_key)
+    {
 
-// Clear expired share keys
+        // Clear expired share keys
         $now = date("{$this->date_format} {$this->time_format}", time());
         $sql = 'DELETE FROM ' . $this->dbTableNamePrefix . DataConnector::RESOURCE_LINK_SHARE_KEY_TABLE_NAME . ' WHERE expires <= :now';
         $query = oci_parse($this->db, $sql);
         oci_bind_by_name($query, ':now', $now);
         oci_execute($query);
 
-// Load share key
+        // Load share key
         $id = $share_key->getId();
         $sql = 'SELECT share_key_id, primary_consumer_key, primary_context_id, auto_approve, expires ' .
            'FROM ' . $this->dbTableNamePrefix . DataConnector::RESOURCE_LINK_SHARE_KEY_TABLE_NAME . ' ' .
@@ -637,11 +637,11 @@ class DataConnectorOci extends DataConnector
 
     }
 
-###
-#    Save the resource link share key to the database
-###
-    public function Resource_Link_Share_Key_save($share_key)
-{
+    ###
+    #    Save the resource link share key to the database
+    ###
+    public function resourceLinkShareKeySave($share_key)
+    {
 
         if ($share_key->auto_approve) {
             $approve = 1;
@@ -664,11 +664,11 @@ class DataConnectorOci extends DataConnector
 
     }
 
-###
-#    Delete the resource link share key from the database
-###
-    public function Resource_Link_Share_Key_delete($share_key)
-{
+    ###
+    #    Delete the resource link share key from the database
+    ###
+    public function resourceLinkShareKeyDelete($share_key)
+    {
 
         $id = $share_key->getId();
         $sql = 'DELETE FROM ' . $this->dbTableNamePrefix . DataConnector::RESOURCE_LINK_SHARE_KEY_TABLE_NAME . ' WHERE share_key_id = :id';
@@ -684,15 +684,15 @@ class DataConnectorOci extends DataConnector
     }
 
 
-###
-###  User methods
-###
+    ###
+    ###  User methods
+    ###
 
-###
-#    Load the user from the database
-###
-    public function User_load($user)
-{
+    ###
+    #    Load the user from the database
+    ###
+    public function userLoad($user)
+    {
 
         $key = $user->getResourceLink()->getKey();
         $id = $user->getResourceLink()->getId();
@@ -721,11 +721,11 @@ class DataConnectorOci extends DataConnector
 
     }
 
-###
-#    Save the user to the database
-###
-    public function User_save($user)
-{
+    ###
+    #    Save the user to the database
+    ###
+    public function userSave($user)
+    {
 
         $time = time();
         $now = date("{$this->date_format} {$this->time_format}", $time);
@@ -759,11 +759,11 @@ class DataConnectorOci extends DataConnector
 
     }
 
-###
-#    Delete the user from the database
-###
-    public function User_delete($user)
-{
+    ###
+    #    Delete the user from the database
+    ###
+    public function userDelete($user)
+    {
 
         $key = $user->getResourceLink()->getKey();
         $id = $user->getResourceLink()->getId();

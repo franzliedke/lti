@@ -7,9 +7,9 @@ namespace Franzl\Lti;
  * over a secure channel such as HTTPS. It does not use the Signature Base String.
  *   - Chapter 9.4 ("PLAINTEXT")
  */
-class OAuthSignatureMethod_PLAINTEXT extends OAuthSignatureMethod
+class OAuthSignatureMethodPlainText extends OAuthSignatureMethod
 {
-    public function get_name()
+    public function getName()
     {
         return "PLAINTEXT";
     }
@@ -23,14 +23,14 @@ class OAuthSignatureMethod_PLAINTEXT extends OAuthSignatureMethod
      * Please note that the second encoding MUST NOT happen in the SignatureMethod, as
      * OAuthRequest handles this!
      */
-    public function build_signature($request, $consumer, $token)
+    public function buildSignature($request, $consumer, $token)
     {
         $key_parts = array(
             $consumer->secret,
             ($token) ? $token->secret : ""
         );
 
-        $key_parts = OAuthUtil::urlencode_rfc3986($key_parts);
+        $key_parts = OAuthUtil::urlencodeRfc3986($key_parts);
         $key = implode('&', $key_parts);
         $request->base_string = $key;
 

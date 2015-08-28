@@ -123,7 +123,7 @@ class ResourceLinkShareKey
             $this->id = DataConnector::getRandomString($this->length);
         }
 
-        return $this->data_connector->Resource_Link_Share_Key_save($this);
+        return $this->data_connector->resourceLinkShareKeySave($this);
 
     }
 
@@ -135,7 +135,7 @@ class ResourceLinkShareKey
     public function delete()
     {
 
-        return $this->data_connector->Resource_Link_Share_Key_delete($this);
+        return $this->data_connector->resourceLinkShareKeyDelete($this);
 
     }
 
@@ -162,7 +162,7 @@ class ResourceLinkShareKey
     {
 
         $this->initialise();
-        $this->data_connector->Resource_Link_Share_Key_load($this);
+        $this->data_connector->resourceLinkShareKeyLoad($this);
         if (!is_null($this->id)) {
             $this->length = strlen($this->id);
         }

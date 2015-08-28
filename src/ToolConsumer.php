@@ -139,7 +139,7 @@ class ToolConsumer
     public function save()
     {
 
-        return $this->data_connector->Tool_Consumer_save($this);
+        return $this->data_connector->toolConsumerSave($this);
 
     }
 
@@ -151,7 +151,7 @@ class ToolConsumer
     public function delete()
     {
 
-        return $this->data_connector->Tool_Consumer_delete($this);
+        return $this->data_connector->toolConsumerDelete($this);
 
     }
 
@@ -235,11 +235,11 @@ class ToolConsumer
             $params['lti_message_type'] = $type;
             $params['oauth_callback'] = 'about:blank';
     // Add OAuth signature
-            $hmac_method = new OAuthSignatureMethod_HMAC_SHA1();
+            $hmac_method = new OAuthSignatureMethodHmacSha1();
             $consumer = new OAuthConsumer($this->getKey(), $this->secret, null);
-            $req = OAuthRequest::from_consumer_and_token($consumer, null, 'POST', $url, $params);
-            $req->sign_request($hmac_method, $consumer, null);
-            $params = $req->get_parameters();
+            $req = OAuthRequest::fromConsumerAndToken($consumer, null, 'POST', $url, $params);
+            $req->signRequest($hmac_method, $consumer, null);
+            $params = $req->getParameters();
     // Remove parameters being passed on the query string
             foreach (array_keys($query_params) as $name) {
                 unset($params[$name]);
@@ -267,7 +267,7 @@ class ToolConsumer
 
         $this->initialise();
         $this->key = $key;
-        $ok = $this->data_connector->Tool_Consumer_load($this);
+        $ok = $this->data_connector->toolConsumerLoad($this);
         if (!$ok) {
             $this->enabled = $autoEnable;
         }

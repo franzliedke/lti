@@ -50,7 +50,7 @@ abstract class DataConnector
      *
      * @return boolean True if the tool consumer object was successfully loaded
      */
-    abstract public function Tool_Consumer_load($consumer);
+    abstract public function toolConsumerLoad($consumer);
 
     /**
      * Save tool consumer object.
@@ -59,7 +59,7 @@ abstract class DataConnector
      *
      * @return boolean True if the tool consumer object was successfully saved
      */
-    abstract public function Tool_Consumer_save($consumer);
+    abstract public function toolConsumerSave($consumer);
 
     /**
      * Delete tool consumer object.
@@ -68,14 +68,14 @@ abstract class DataConnector
      *
      * @return boolean True if the tool consumer object was successfully deleted
      */
-    abstract public function Tool_Consumer_delete($consumer);
+    abstract public function toolConsumerDelete($consumer);
 
     /**
      * Load tool consumer objects.
      *
      * @return array Array of all defined ToolConsumer objects
      */
-    abstract public function Tool_Consumer_list();
+    abstract public function toolConsumerList();
 
     /**
      * Load resource link object.
@@ -84,7 +84,7 @@ abstract class DataConnector
      *
      * @return boolean True if the resource link object was successfully loaded
      */
-    abstract public function Resource_Link_load($resource_link);
+    abstract public function resourceLinkLoad($resource_link);
 
     /**
      * Save resource link object.
@@ -93,7 +93,7 @@ abstract class DataConnector
      *
      * @return boolean True if the resource link object was successfully saved
      */
-    abstract public function Resource_Link_save($resource_link);
+    abstract public function resourceLinkSave($resource_link);
 
     /**
      * Delete resource link object.
@@ -102,7 +102,7 @@ abstract class DataConnector
      *
      * @return boolean True if the Resource_Link object was successfully deleted
      */
-    abstract public function Resource_Link_delete($resource_link);
+    abstract public function resourceLinkDelete($resource_link);
 
     /**
      * Get array of user objects.
@@ -113,7 +113,7 @@ abstract class DataConnector
      *
      * @return array Array of User objects
      */
-    abstract public function Resource_Link_getUserResultSourcedIDs($resource_link, $local_only, $id_scope);
+    abstract public function resourceLinkGetUserResultSourcedIDs($resource_link, $local_only, $id_scope);
 
     /**
      * Get array of shares defined for this resource link.
@@ -122,7 +122,7 @@ abstract class DataConnector
      *
      * @return array Array of ResourceLinkShare objects
      */
-    abstract public function Resource_Link_getShares($resource_link);
+    abstract public function resourceLinkGetShares($resource_link);
 
     /**
      * Load nonce object.
@@ -131,7 +131,7 @@ abstract class DataConnector
      *
      * @return boolean True if the nonce object was successfully loaded
      */
-    abstract public function Consumer_Nonce_load($nonce);
+    abstract public function consumerNonceLoad($nonce);
 
     /**
      * Save nonce object.
@@ -140,7 +140,7 @@ abstract class DataConnector
      *
      * @return boolean True if the nonce object was successfully saved
      */
-    abstract public function Consumer_Nonce_save($nonce);
+    abstract public function consumerNonceSave($nonce);
 
     /**
      * Load resource link share key object.
@@ -149,7 +149,7 @@ abstract class DataConnector
      *
      * @return boolean True if the resource link share key object was successfully loaded
      */
-    abstract public function Resource_Link_Share_Key_load($share_key);
+    abstract public function resourceLinkShareKeyLoad($share_key);
 
     /**
      * Save resource link share key object.
@@ -158,7 +158,7 @@ abstract class DataConnector
      *
      * @return boolean True if the resource link share key object was successfully saved
      */
-    abstract public function Resource_Link_Share_Key_save($share_key);
+    abstract public function resourceLinkShareKeySave($share_key);
 
     /**
      * Delete resource link share key object.
@@ -167,7 +167,7 @@ abstract class DataConnector
      *
      * @return boolean True if the resource link share key object was successfully deleted
      */
-    abstract public function Resource_Link_Share_Key_delete($share_key);
+    abstract public function resourceLinkShareKeyDelete($share_key);
 
     /**
      * Load user object.
@@ -176,7 +176,7 @@ abstract class DataConnector
      *
      * @return boolean True if the user object was successfully loaded
      */
-    abstract public function User_load($user);
+    abstract public function userLoad($user);
 
     /**
      * Save user object.
@@ -185,7 +185,7 @@ abstract class DataConnector
      *
      * @return boolean True if the user object was successfully saved
      */
-    abstract public function User_save($user);
+    abstract public function userSave($user);
 
     /**
      * Delete user object.
@@ -194,7 +194,7 @@ abstract class DataConnector
      *
      * @return boolean True if the user object was successfully deleted
      */
-    abstract public function User_delete($user);
+    abstract public function userDelete($user);
 
     /**
      * Create data connector object.
@@ -215,7 +215,7 @@ abstract class DataConnector
      *
      * @return DataConnector Data connector object
      */
-    static function getDataConnector($data_connector, $db = null, $type = null)
+    public static function getDataConnector($data_connector, $db = null, $type = null)
     {
 
         if (!is_null($data_connector)) {
@@ -280,7 +280,7 @@ abstract class DataConnector
      *
      * @return string Random string
      */
-    static function getRandomString($length = 8)
+    public static function getRandomString($length = 8)
     {
 
         $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -307,7 +307,7 @@ abstract class DataConnector
      *
      * @return boolean True if the user object was successfully deleted
      */
-    static function quoted($value, $addQuotes = true)
+    public static function quoted($value, $addQuotes = true)
     {
 
         if (is_null($value)) {
