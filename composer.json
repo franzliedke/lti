@@ -13,5 +13,8 @@
     "psr-4": {
       "Franzl\\Lti\\": "src/"
     }
+  },
+  "require-dev": {
+    "squizlabs/php_codesniffer": "2.*"
   }
 }
