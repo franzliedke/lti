@@ -9,7 +9,7 @@ namespace Franzl\Lti;
  * @version 2.5.00
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3
  */
-class LTI_Consumer_Nonce
+class ConsumerNonce
 {
 
     /**
@@ -23,7 +23,7 @@ class LTI_Consumer_Nonce
     public $expires = NULL;
 
     /**
-     * @var LTI_Tool_Consumer Tool Consumer to which this nonce applies.
+     * @var ToolConsumer Tool Consumer to which this nonce applies.
      */
     private $consumer = NULL;
     /**
@@ -34,7 +34,7 @@ class LTI_Consumer_Nonce
     /**
      * Class constructor.
      *
-     * @param LTI_Tool_Consumer $consumer Consumer object
+     * @param ToolConsumer $consumer Consumer object
      * @param string $value Nonce value (optional, default is null)
      */
     public function __construct($consumer, $value = NULL)
@@ -73,7 +73,7 @@ class LTI_Consumer_Nonce
     /**
      * Get tool consumer.
      *
-     * @return LTI_Tool_Consumer Consumer for this nonce
+     * @return ToolConsumer Consumer for this nonce
      */
     public function getConsumer()
     {

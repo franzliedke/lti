@@ -9,7 +9,7 @@ namespace Franzl\Lti;
  * @version 2.5.00
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3
  */
-class LTI_HTTP_Message {
+class HttpMessage {
 
     /**
      * @var request Request body.

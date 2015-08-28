@@ -5,14 +5,14 @@ namespace Franzl\Lti;
 /**
  * Class to represent a tool consumer context
  *
- * @deprecated Use LTI_Resource_Link instead
+ * @deprecated Use ResourceLink instead
  * @see LTI_Resource_Link
  *
  * @author  Stephen P Vickers <stephen@spvsoftwareproducts.com>
  * @version 2.5.00
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3
  */
-class LTI_Context extends LTI_Resource_Link {
+class Context extends ResourceLink {
 
     /**
      * ID value for context being shared (if any).

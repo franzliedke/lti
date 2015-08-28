@@ -9,17 +9,17 @@ namespace Franzl\Lti;
  * @version 2.5.00
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3
  */
-class LTI_OAuthDataStore extends OAuthDataStore {
+class OAuthDataStore extends \OAuthDataStore {
 
     /**
-     * @var LTI_Tool_Provider Tool Provider object.
+     * @var ToolProvider Tool Provider object.
      */
     private $tool_provider = NULL;
 
     /**
      * Class constructor.
      *
-     * @param LTI_Tool_Provider $tool_provider Tool_Provider object
+     * @param ToolProvider $tool_provider Tool_Provider object
      */
     public function __construct($tool_provider) {
 
@@ -68,7 +68,7 @@ class LTI_OAuthDataStore extends OAuthDataStore {
      */
     function lookup_nonce($consumer, $token, $value, $timestamp) {
 
-        $nonce = new LTI_Consumer_Nonce($this->tool_provider->consumer, $value);
+        $nonce = new ConsumerNonce($this->tool_provider->consumer, $value);
         $ok = !$nonce->load();
         if ($ok) {
             $ok = $nonce->save();

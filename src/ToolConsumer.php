@@ -9,7 +9,7 @@ namespace Franzl\Lti;
 * @version 2.5.00
 * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3
 */
-class LTI_Tool_Consumer {
+class ToolConsumer {
 
 /**
 * @var string Local name of tool consumer.
@@ -62,7 +62,7 @@ public $last_access = NULL;
 /**
 * @var int Default scope to use when generating an Id value for a user.
 */
-public $id_scope = LTI_Tool_Provider::ID_SCOPE_ID_ONLY;
+public $id_scope = ToolProvider::ID_SCOPE_ID_ONLY;
 /**
 * @var string Default email address (or email domain) to use when no email address is provided for a user.
 */
@@ -94,11 +94,11 @@ private $data_connector = NULL;
 */
 public function __construct($key = NULL, $data_connector = '', $autoEnable = FALSE) {
 
-$this->data_connector = LTI_Data_Connector::getDataConnector($data_connector);
+$this->data_connector = DataConnector::getDataConnector($data_connector);
 if (!empty($key)) {
 $this->load($key, $autoEnable);
 } else {
-$this->secret = LTI_Data_Connector::getRandomString(32);
+$this->secret = DataConnector::getRandomString(32);
 }
 
 }
@@ -121,7 +121,7 @@ $this->enabled = FALSE;
 $this->enable_from = NULL;
 $this->enable_until = NULL;
 $this->last_access = NULL;
-$this->id_scope = LTI_Tool_Provider::ID_SCOPE_ID_ONLY;
+$this->id_scope = ToolProvider::ID_SCOPE_ID_ONLY;
 $this->defaultEmail = '';
 $this->created = NULL;
 $this->updated = NULL;

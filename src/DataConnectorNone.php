@@ -6,10 +6,10 @@ namespace Franzl\Lti;
 ###  Class to represent a dummy LTI Data Connector with no data persistence
 ###
 
-class LTI_Data_Connector_None extends LTI_Data_Connector {
+class DataConnectorNone extends DataConnector {
 
 ###
-###  LTI_Tool_Consumer methods
+###  ToolConsumer methods
 ###
 
 ###
@@ -56,7 +56,7 @@ class LTI_Data_Connector_None extends LTI_Data_Connector {
   }
 
 ###
-###  LTI_Resource_Link methods
+###  ResourceLink methods
 ###
 
 ###
@@ -92,7 +92,7 @@ class LTI_Data_Connector_None extends LTI_Data_Connector {
   }
 
 ###
-#    Obtain an array of LTI_User objects for users with a result sourcedId.  The array may include users from other
+#    Obtain an array of User objects for users with a result sourcedId.  The array may include users from other
 #    resource links which are sharing this resource link.  It may also be optionally indexed by the user ID of a specified scope.
 ###
   public function Resource_Link_getUserResultSourcedIDs($resource_link, $local_only, $id_scope) {
@@ -102,7 +102,7 @@ class LTI_Data_Connector_None extends LTI_Data_Connector {
   }
 
 ###
-#    Get an array of LTI_Resource_Link_Share objects for each resource link which is sharing this resource link
+#    Get an array of ResourceLinkShare objects for each resource link which is sharing this resource link
 ###
   public function Resource_Link_getShares($resource_link) {
 
@@ -112,7 +112,7 @@ class LTI_Data_Connector_None extends LTI_Data_Connector {
 
 
 ###
-###  Franzl\Lti\LTI_Consumer_Nonce methods
+###  Franzl\Lti\ConsumerNonce methods
 ###
 
 ###
@@ -135,7 +135,7 @@ class LTI_Data_Connector_None extends LTI_Data_Connector {
 
 
 ###
-###  LTI_Resource_Link_Share_Key methods
+###  ResourceLinkShareKey methods
 ###
 
 ###
@@ -167,7 +167,7 @@ class LTI_Data_Connector_None extends LTI_Data_Connector {
 
 
 ###
-###  LTI_User methods
+###  User methods
 ###
 
 

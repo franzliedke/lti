@@ -10,7 +10,7 @@ namespace Franzl\Lti;
 #    NB This class assumes that a MySQLi connection has already been opened to the appropriate schema
 ###
 
-class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
+class DataConnectorMysqli extends DataConnector {
 
   private $dbTableNamePrefix = '';
   private $db = NULL;
@@ -27,7 +27,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
 
 
 ###
-###  LTI_Tool_Consumer methods
+###  ToolConsumer methods
 ###
 
 ###
@@ -37,7 +37,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
 
     $ok = FALSE;
     $sql = 'SELECT name, secret, lti_version, consumer_name, consumer_version, consumer_guid, css_path, protected, enabled, enable_from, enable_until, last_access, created, updated ' .
-           "FROM {$this->dbTableNamePrefix}" . LTI_Data_Connector::CONSUMER_TABLE_NAME . ' ' .
+           "FROM {$this->dbTableNamePrefix}" . DataConnector::CONSUMER_TABLE_NAME . ' ' .
            'WHERE consumer_key = ?';
     $result = $this->db->prepare($sql);
     if ($result) {
@@ -110,7 +110,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
     }
     $key = $consumer->getKey();
     if (is_null($consumer->created)) {
-      $sql = "INSERT INTO {$this->dbTableNamePrefix}" . LTI_Data_Connector::CONSUMER_TABLE_NAME . ' (consumer_key, name, ' .
+      $sql = "INSERT INTO {$this->dbTableNamePrefix}" . DataConnector::CONSUMER_TABLE_NAME . ' (consumer_key, name, ' .
              'secret, lti_version, consumer_name, consumer_version, consumer_guid, css_path, protected, enabled, enable_from, enable_until, last_access, created, updated) ' .
              'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
       $result = $this->db->prepare($sql);
@@ -119,7 +119,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
            $consumer->consumer_name, $consumer->consumer_version, $consumer->consumer_guid, $consumer->css_path, $protected, $enabled, $from, $until, $last, $now, $now);
       }
     } else {
-      $sql = "UPDATE {$this->dbTableNamePrefix}" . LTI_Data_Connector::CONSUMER_TABLE_NAME . ' SET ' .
+      $sql = "UPDATE {$this->dbTableNamePrefix}" . DataConnector::CONSUMER_TABLE_NAME . ' SET ' .
              'name = ?, secret= ?, lti_version = ?, consumer_name = ?, consumer_version = ?, consumer_guid = ?, ' .
              'css_path = ?, protected = ?, enabled = ?, enable_from = ?, enable_until = ?, last_access = ?, updated = ? ' .
              'WHERE consumer_key = ?';
@@ -153,7 +153,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
 
     $key = $consumer->getKey();
 // Delete any nonce values for this consumer
-    $sql = "DELETE FROM {$this->dbTableNamePrefix}" . LTI_Data_Connector::NONCE_TABLE_NAME . ' WHERE consumer_key = ?';
+    $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::NONCE_TABLE_NAME . ' WHERE consumer_key = ?';
     $result = $this->db->prepare($sql);
     if ($result) {
       $ok = $result->bind_param('s', $key);
@@ -166,7 +166,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
     }
 
 // Delete any outstanding share keys for resource links for this consumer
-    $sql = "DELETE FROM {$this->dbTableNamePrefix}" . LTI_Data_Connector::RESOURCE_LINK_SHARE_KEY_TABLE_NAME . ' WHERE primary_consumer_key = ?';
+    $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_SHARE_KEY_TABLE_NAME . ' WHERE primary_consumer_key = ?';
     $result = $this->db->prepare($sql);
     if ($result) {
       $ok = $result->bind_param('s', $key);
@@ -179,7 +179,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
     }
 
 // Delete any users in resource links for this consumer
-    $sql = "DELETE FROM {$this->dbTableNamePrefix}" . LTI_Data_Connector::USER_TABLE_NAME . ' WHERE consumer_key = ?';
+    $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::USER_TABLE_NAME . ' WHERE consumer_key = ?';
     $result = $this->db->prepare($sql);
     if ($result) {
       $ok = $result->bind_param('s', $key);
@@ -192,7 +192,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
     }
 
 // Update any resource links for which this consumer is acting as a primary resource link
-    $sql = "UPDATE {$this->dbTableNamePrefix}" . LTI_Data_Connector::RESOURCE_LINK_TABLE_NAME . ' ' .
+    $sql = "UPDATE {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_TABLE_NAME . ' ' .
            'SET primary_consumer_key = NULL, primary_context_id = NULL, share_approved = NULL ' .
            'WHERE primary_consumer_key = ?';
     $result = $this->db->prepare($sql);
@@ -207,7 +207,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
     }
 
 // Delete any resource links for this consumer
-    $sql = "DELETE FROM {$this->dbTableNamePrefix}" . LTI_Data_Connector::RESOURCE_LINK_TABLE_NAME . ' WHERE consumer_key = ?';
+    $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_TABLE_NAME . ' WHERE consumer_key = ?';
     $result = $this->db->prepare($sql);
     if ($result) {
       $ok = $result->bind_param('s', $key);
@@ -220,7 +220,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
     }
 
 // Delete consumer
-    $sql = "DELETE FROM {$this->dbTableNamePrefix}" . LTI_Data_Connector::CONSUMER_TABLE_NAME . ' WHERE consumer_key = ?';
+    $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::CONSUMER_TABLE_NAME . ' WHERE consumer_key = ?';
     $result = $this->db->prepare($sql);
     if ($result) {
       $ok = $result->bind_param('s', $key);
@@ -248,7 +248,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
     $consumers = [];
 
     $sql = 'SELECT consumer_key, name, secret, lti_version, consumer_name, consumer_version, consumer_guid, css_path, protected, enabled, enable_from, enable_until, last_access, created, updated ' .
-           "FROM {$this->dbTableNamePrefix}" . LTI_Data_Connector::CONSUMER_TABLE_NAME . ' ' .
+           "FROM {$this->dbTableNamePrefix}" . DataConnector::CONSUMER_TABLE_NAME . ' ' .
            'ORDER BY name';
     $result = $this->db->prepare($sql);
     if ($result) {
@@ -256,7 +256,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
         if ($result->bind_result($consumer_key, $name, $secret, $lti_version, $consumer_name, $consumer_version, $consumer_guid,
            $css_path, $protected, $enabled, $from, $until, $last, $created, $updated)) {
           while ($result->fetch()) {
-            $consumer = new LTI_Tool_Consumer($consumer_key, $this);
+            $consumer = new ToolConsumer($consumer_key, $this);
             $consumer->name = $name;
             $consumer->secret = $secret;
             $consumer->lti_version = $lti_version;
@@ -295,7 +295,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
 
 
 ###
-###  LTI_Resource_Link methods
+###  ResourceLink methods
 ###
 
 ###
@@ -305,7 +305,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
 
     $ok = FALSE;
     $sql = 'SELECT lti_context_id, lti_resource_id, title, settings, primary_consumer_key, primary_context_id, share_approved, created, updated ' .
-           "FROM {$this->dbTableNamePrefix}" . LTI_Data_Connector::RESOURCE_LINK_TABLE_NAME . ' ' .
+           "FROM {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_TABLE_NAME . ' ' .
            'WHERE (consumer_key = ?) AND (context_id = ?)';
     $result = $this->db->prepare($sql);
     if ($result) {
@@ -358,7 +358,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
     $id = $resource_link->getId();
     $previous_id = $resource_link->getId(TRUE);
     if (is_null($resource_link->created)) {
-      $sql = "INSERT INTO {$this->dbTableNamePrefix}" . LTI_Data_Connector::RESOURCE_LINK_TABLE_NAME . ' (consumer_key, context_id, ' .
+      $sql = "INSERT INTO {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_TABLE_NAME . ' (consumer_key, context_id, ' .
              'lti_context_id, lti_resource_id, title, settings, primary_consumer_key, primary_context_id, share_approved, created, updated) ' .
              'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
       $result = $this->db->prepare($sql);
@@ -368,7 +368,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
            $resource_link->primary_resource_link_id, $approved, $now, $now);
       }
     } else if ($id == $previous_id) {
-      $sql = "UPDATE {$this->dbTableNamePrefix}" . LTI_Data_Connector::RESOURCE_LINK_TABLE_NAME . ' SET ' .
+      $sql = "UPDATE {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_TABLE_NAME . ' SET ' .
              'lti_context_id = ?, lti_resource_id = ?, title = ?, settings = ?, '.
              'primary_consumer_key = ?, primary_context_id = ?, share_approved = ?, updated = ? ' .
              'WHERE (consumer_key = ?) AND (context_id = ?)';
@@ -378,7 +378,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
            $resource_link->primary_consumer_key, $resource_link->primary_resource_link_id, $approved, $now, $key, $id);
       }
     } else {
-      $sql = "UPDATE {$this->dbTableNamePrefix}" . LTI_Data_Connector::RESOURCE_LINK_TABLE_NAME . ' SET ' .
+      $sql = "UPDATE {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_TABLE_NAME . ' SET ' .
              'context_id = ?, lti_context_id = ?, lti_resource_id = ?, title = ?, settings = ?, '.
              'primary_consumer_key = ?, primary_context_id = ?, share_approved = ?, updated = ? ' .
              'WHERE (consumer_key = ?) AND (context_id = ?)';
@@ -416,7 +416,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
     $id = $resource_link->getId();
 // Delete any outstanding share keys for resource links for this consumer
     if ($ok) {
-      $sql = "DELETE FROM {$this->dbTableNamePrefix}" . LTI_Data_Connector::RESOURCE_LINK_SHARE_KEY_TABLE_NAME . ' ' .
+      $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_SHARE_KEY_TABLE_NAME . ' ' .
              'WHERE (primary_consumer_key = ?) AND (primary_context_id = ?)';
       $result = $this->db->prepare($sql);
       if ($result) {
@@ -432,7 +432,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
 
 // Delete users
     if ($ok) {
-      $sql = "DELETE FROM {$this->dbTableNamePrefix}" . LTI_Data_Connector::USER_TABLE_NAME . ' ' .
+      $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::USER_TABLE_NAME . ' ' .
              'WHERE (consumer_key = ?) AND (context_id = ?)';
       $result = $this->db->prepare($sql);
       if ($result) {
@@ -447,7 +447,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
     }
 
 // Update any resource links for which this is the primary resource link
-    $sql = "UPDATE {$this->dbTableNamePrefix}" . LTI_Data_Connector::RESOURCE_LINK_TABLE_NAME . ' ' .
+    $sql = "UPDATE {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_TABLE_NAME . ' ' .
            'SET primary_consumer_key = NULL, primary_context_id = NULL ' .
            'WHERE (primary_consumer_key = ?) AND (primary_context_id = ?)';
     $result = $this->db->prepare($sql);
@@ -463,7 +463,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
 
 // Delete resource link
     if ($ok) {
-      $sql = "DELETE FROM {$this->dbTableNamePrefix}" . LTI_Data_Connector::RESOURCE_LINK_TABLE_NAME . ' ' .
+      $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_TABLE_NAME . ' ' .
              'WHERE (consumer_key = ?) AND (context_id = ?)';
       $result = $this->db->prepare($sql);
       if ($result) {
@@ -486,7 +486,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
   }
 
 ###
-#    Obtain an array of LTI_User objects for users with a result sourcedId.  The array may include users from other
+#    Obtain an array of User objects for users with a result sourcedId.  The array may include users from other
 #    resource links which are sharing this resource link.  It may also be optionally indexed by the user ID of a specified scope.
 ###
   public function Resource_Link_getUserResultSourcedIDs($resource_link, $local_only, $id_scope) {
@@ -498,8 +498,8 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
     $id = $resource_link->getId();
     if ($local_only) {
       $sql = 'SELECT u.consumer_key, u.context_id, u.user_id, u.lti_result_sourcedid ' .
-             "FROM {$this->dbTableNamePrefix}" . LTI_Data_Connector::USER_TABLE_NAME . ' AS u '  .
-             "INNER JOIN {$this->dbTableNamePrefix}" . LTI_Data_Connector::RESOURCE_LINK_TABLE_NAME . ' AS c '  .
+             "FROM {$this->dbTableNamePrefix}" . DataConnector::USER_TABLE_NAME . ' AS u '  .
+             "INNER JOIN {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_TABLE_NAME . ' AS c '  .
              'ON u.consumer_key = c.consumer_key AND u.context_id = c.context_id ' .
              'WHERE (c.consumer_key = ?) AND (c.context_id = ?) AND (c.primary_consumer_key IS NULL) AND (c.primary_context_id IS NULL)';
       $result = $this->db->prepare($sql);
@@ -508,8 +508,8 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
       }
     } else {
       $sql = 'SELECT u.consumer_key, u.context_id, u.user_id, u.lti_result_sourcedid ' .
-             "FROM {$this->dbTableNamePrefix}" . LTI_Data_Connector::USER_TABLE_NAME . ' AS u '  .
-             "INNER JOIN {$this->dbTableNamePrefix}" . LTI_Data_Connector::RESOURCE_LINK_TABLE_NAME . ' AS c '  .
+             "FROM {$this->dbTableNamePrefix}" . DataConnector::USER_TABLE_NAME . ' AS u '  .
+             "INNER JOIN {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_TABLE_NAME . ' AS c '  .
              'ON u.consumer_key = c.consumer_key AND u.context_id = c.context_id ' .
              'WHERE ((c.consumer_key = ?) AND (c.context_id = ?) AND (c.primary_consumer_key IS NULL) AND (c.primary_context_id IS NULL)) OR ' .
              '((c.primary_consumer_key = ?) AND (c.primary_context_id = ?) AND (share_approved = 1))';
@@ -522,7 +522,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
       if ($result->execute()) {
         if ($result->bind_result($consumer_key, $resource_link_id, $user_id, $lti_result_sourcedid)) {
           while ($result->fetch()) {
-            $user = new LTI_User($resource_link, $user_id);
+            $user = new User($resource_link, $user_id);
             $user->consumer_key = $consumer_key;
             $user->context_id = $resource_link_id;
             $user->lti_result_sourcedid = $lti_result_sourcedid;
@@ -544,7 +544,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
   }
 
 ###
-#    Get an array of LTI_Resource_Link_Share objects for each resource link which is sharing this resource link.
+#    Get an array of ResourceLinkShare objects for each resource link which is sharing this resource link.
 ###
   public function Resource_Link_getShares($resource_link) {
 
@@ -552,7 +552,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
 
     $ok = FALSE;
     $sql = 'SELECT consumer_key, context_id, title, share_approved ' .
-           "FROM {$this->dbTableNamePrefix}" . LTI_Data_Connector::RESOURCE_LINK_TABLE_NAME . ' ' .
+           "FROM {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_TABLE_NAME . ' ' .
            'WHERE (primary_consumer_key = ?) AND (primary_context_id = ?) ' .
            'ORDER BY consumer_key';
     $result = $this->db->prepare($sql);
@@ -565,7 +565,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
       if ($result->execute()) {
         if ($result->bind_result($consumer_key, $resource_link_id, $title, $share_approved)) {
           while ($result->fetch()) {
-            $share = new LTI_Resource_Link_Share();
+            $share = new ResourceLinkShare();
             $share->consumer_key = $consumer_key;
             $share->context_id = $resource_link_id;
             $share->title = $title;
@@ -585,7 +585,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
 
 
 ###
-###  Franzl\Lti\LTI_Consumer_Nonce methods
+###  Franzl\Lti\ConsumerNonce methods
 ###
 
 ###
@@ -597,7 +597,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
 ### Delete nonce values more than one day old
 #
     $ok = FALSE;
-    $sql = "DELETE FROM {$this->dbTableNamePrefix}" . LTI_Data_Connector::NONCE_TABLE_NAME . ' WHERE expires <= ?';
+    $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::NONCE_TABLE_NAME . ' WHERE expires <= ?';
     $result = $this->db->prepare($sql);
     if ($result) {
       $now = date("{$this->date_format} {$this->time_format}", time());
@@ -614,7 +614,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
 ### load the nonce
 #
     $ok = TRUE;
-    $sql = "SELECT value AS T FROM {$this->dbTableNamePrefix}" . LTI_Data_Connector::NONCE_TABLE_NAME . ' ' .
+    $sql = "SELECT value AS T FROM {$this->dbTableNamePrefix}" . DataConnector::NONCE_TABLE_NAME . ' ' .
            'WHERE (consumer_key = ?) AND (value = ?)';
     $result = $this->db->prepare($sql);
     if ($result) {
@@ -646,7 +646,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
   public function Consumer_Nonce_save($nonce) {
 
     $ok = FALSE;
-    $sql = "INSERT INTO {$this->dbTableNamePrefix}" . LTI_Data_Connector::NONCE_TABLE_NAME . ' (consumer_key, value, expires) ' .
+    $sql = "INSERT INTO {$this->dbTableNamePrefix}" . DataConnector::NONCE_TABLE_NAME . ' (consumer_key, value, expires) ' .
            'VALUES (?, ?, ?)';
     $result = $this->db->prepare($sql);
     if ($result) {
@@ -668,7 +668,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
 
 
 ###
-###  LTI_Resource_Link_Share_Key methods
+###  ResourceLinkShareKey methods
 ###
 
 ###
@@ -678,7 +678,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
 
 // Clear expired share keys
     $ok = FALSE;
-    $sql = "DELETE FROM {$this->dbTableNamePrefix}" . LTI_Data_Connector::RESOURCE_LINK_SHARE_KEY_TABLE_NAME . ' WHERE expires <= ?';
+    $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_SHARE_KEY_TABLE_NAME . ' WHERE expires <= ?';
     $result = $this->db->prepare($sql);
     if ($result) {
       $now = date("{$this->date_format} {$this->time_format}", time());
@@ -695,7 +695,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
     $ok = FALSE;
     $id = $share_key->getId();
     $sql = 'SELECT primary_consumer_key, primary_context_id, auto_approve, expires ' .
-           "FROM {$this->dbTableNamePrefix}" . LTI_Data_Connector::RESOURCE_LINK_SHARE_KEY_TABLE_NAME . ' ' .
+           "FROM {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_SHARE_KEY_TABLE_NAME . ' ' .
            'WHERE share_key_id = ?';
     $result = $this->db->prepare($sql);
     if ($result) {
@@ -733,7 +733,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
       $approve = 0;
     }
     $expires = date("{$this->date_format} {$this->time_format}", $share_key->expires);
-    $sql = "INSERT INTO {$this->dbTableNamePrefix}" . LTI_Data_Connector::RESOURCE_LINK_SHARE_KEY_TABLE_NAME .
+    $sql = "INSERT INTO {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_SHARE_KEY_TABLE_NAME .
            ' (share_key_id, primary_consumer_key, primary_context_id, auto_approve, expires) ' .
            'VALUES (?, ?, ?, ?, ?)';
     $result = $this->db->prepare($sql);
@@ -759,7 +759,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
   public function Resource_Link_Share_Key_delete($share_key) {
 
     $ok = FALSE;
-    $sql = "DELETE FROM {$this->dbTableNamePrefix}" . LTI_Data_Connector::RESOURCE_LINK_SHARE_KEY_TABLE_NAME . ' WHERE share_key_id = ?';
+    $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_SHARE_KEY_TABLE_NAME . ' WHERE share_key_id = ?';
     $result = $this->db->prepare($sql);
     if ($result) {
       $id = $share_key->getId();
@@ -782,7 +782,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
 
 
 ###
-###  LTI_User methods
+###  User methods
 ###
 
 
@@ -793,13 +793,13 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
 
     $ok = FALSE;
     $sql = 'SELECT lti_result_sourcedid, created, updated ' .
-           "FROM {$this->dbTableNamePrefix}" . LTI_Data_Connector::USER_TABLE_NAME . ' ' .
+           "FROM {$this->dbTableNamePrefix}" . DataConnector::USER_TABLE_NAME . ' ' .
            'WHERE( consumer_key = ?) AND (context_id = ?) AND (user_id = ?)';
     $result = $this->db->prepare($sql);
     if ($result) {
       $key = $user->getResourceLink()->getKey();
       $id = $user->getResourceLink()->getId();
-      $userId = $user->getId(LTI_Tool_Provider::ID_SCOPE_ID_ONLY);
+      $userId = $user->getId(ToolProvider::ID_SCOPE_ID_ONLY);
       $ok = $result->bind_param('sss', $key, $id, $userId);
     }
     if ($result && $ok) {
@@ -831,9 +831,9 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
     $now = date("{$this->date_format} {$this->time_format}", $time);
     $key = $user->getResourceLink()->getKey();
     $id = $user->getResourceLink()->getId();
-    $userId = $user->getId(LTI_Tool_Provider::ID_SCOPE_ID_ONLY);
+    $userId = $user->getId(ToolProvider::ID_SCOPE_ID_ONLY);
     if (is_null($user->created)) {
-      $sql = "INSERT INTO {$this->dbTableNamePrefix}" . LTI_Data_Connector::USER_TABLE_NAME . ' (consumer_key, context_id, ' .
+      $sql = "INSERT INTO {$this->dbTableNamePrefix}" . DataConnector::USER_TABLE_NAME . ' (consumer_key, context_id, ' .
              'user_id, lti_result_sourcedid, created, updated) ' .
              'VALUES (?, ?, ?, ?, ?, ?)';
       $result = $this->db->prepare($sql);
@@ -841,7 +841,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
         $ok = $result->bind_param('ssssss', $key, $id, $userId, $user->lti_result_sourcedid, $now, $now);
       }
     } else {
-      $sql = "UPDATE {$this->dbTableNamePrefix}" . LTI_Data_Connector::USER_TABLE_NAME . ' ' .
+      $sql = "UPDATE {$this->dbTableNamePrefix}" . DataConnector::USER_TABLE_NAME . ' ' .
              'SET lti_result_sourcedid = ?, updated = ? ' .
              'WHERE (consumer_key = ?) AND (context_id = ?) AND (user_id = ?)';
       $result = $this->db->prepare($sql);
@@ -872,13 +872,13 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
   public function User_delete($user) {
 
     $ok = FALSE;
-    $sql = "DELETE FROM {$this->dbTableNamePrefix}" . LTI_Data_Connector::USER_TABLE_NAME . ' ' .
+    $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::USER_TABLE_NAME . ' ' .
            'WHERE (consumer_key = ?) AND (context_id = ?) AND (user_id = ?)';
     $result = $this->db->prepare($sql);
     if ($result) {
       $key = $user->getResourceLink()->getKey();
       $id = $user->getResourceLink()->getId();
-      $userId = $user->getId(LTI_Tool_Provider::ID_SCOPE_ID_ONLY);
+      $userId = $user->getId(ToolProvider::ID_SCOPE_ID_ONLY);
       $ok = $result->bind_param('sss', $key, $id, $userId);
     }
     if ($result && $ok) {

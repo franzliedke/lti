@@ -9,7 +9,7 @@ namespace Franzl\Lti;
  * @version 2.5.00
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3
  */
-class LTI_Resource_Link {
+class ResourceLink {
 
     /**
      * Read action.
@@ -115,7 +115,7 @@ class LTI_Resource_Link {
     public $updated = NULL;
 
     /**
-     * @var LTI_Tool_Consumer Tool Consumer for this resource link.
+     * @var ToolConsumer Tool Consumer for this resource link.
      */
     private $consumer = NULL;
     /**
@@ -214,7 +214,7 @@ class LTI_Resource_Link {
     /**
      * Get tool consumer.
      *
-     * @return object LTI_Tool_Consumer object for this resource link.
+     * @return object ToolConsumer object for this resource link.
      */
     public function getConsumer() {
 
@@ -363,8 +363,8 @@ class LTI_Resource_Link {
      * Perform an Outcomes service request.
      *
      * @param int $action The action type constant
-     * @param LTI_Outcome $lti_outcome Outcome object
-     * @param LTI_User $user User object
+     * @param Outcome $lti_outcome Outcome object
+     * @param User $user User object
      *
      * @return boolean True if the request was successfully processed
      */
@@ -503,11 +503,11 @@ EOF;
      *
      * @param boolean $withGroups True is group information is to be requested as well
      *
-     * @return mixed Array of LTI_User objects or False if the request was not successful
+     * @return mixed Array of User objects or False if the request was not successful
      */
     public function doMembershipsService($withGroups = FALSE) {
         $users = [];
-        $old_users = $this->getUserResultSourcedIDs(TRUE, LTI_Tool_Provider::ID_SCOPE_RESOURCE);
+        $old_users = $this->getUserResultSourcedIDs(TRUE, ToolProvider::ID_SCOPE_RESOURCE);
         $this->ext_response = NULL;
         $url = $this->getSetting('ext_ims_lis_memberships_url');
         $params = [];
@@ -535,7 +535,7 @@ EOF;
 
             for ($i = 0; $i < count($members); $i++) {
 
-                $user = new LTI_User($this, $members[$i]['user_id']);
+                $user = new User($this, $members[$i]['user_id']);
 #
 ### Set the user name
 #
@@ -552,7 +552,7 @@ EOF;
 ### Set the user roles
 #
                 if (isset($members[$i]['roles'])) {
-                    $user->roles = LTI_Tool_Provider::parseRoles($members[$i]['roles']);
+                    $user->roles = ToolProvider::parseRoles($members[$i]['roles']);
                 }
 #
 ### Set the user groups
@@ -600,7 +600,7 @@ EOF;
 #
 ### Remove old user (if it exists)
 #
-                unset($old_users[$user->getId(LTI_Tool_Provider::ID_SCOPE_RESOURCE)]);
+                unset($old_users[$user->getId(ToolProvider::ID_SCOPE_RESOURCE)]);
             }
 #
 ### Delete any old users which were not in the latest list from the tool consumer
@@ -677,7 +677,7 @@ EOF;
     }
 
     /**
-     * Obtain an array of LTI_User objects for users with a result sourcedId.
+     * Obtain an array of User objects for users with a result sourcedId.
      *
      * The array may include users from other resource links which are sharing this resource link.
      * It may also be optionally indexed by the user ID of a specified scope.
@@ -685,7 +685,7 @@ EOF;
      * @param boolean $local_only True if only users from this resource link are to be returned, not users from shared resource links (optional, default is false)
      * @param int     $id_scope     Scope to use for ID values (optional, default is null for consumer default)
      *
-     * @return array Array of LTI_User objects
+     * @return array Array of User objects
      */
     public function getUserResultSourcedIDs($local_only = FALSE, $id_scope = NULL) {
 
@@ -694,9 +694,9 @@ EOF;
     }
 
     /**
-     * Get an array of LTI_Resource_Link_Share objects for each resource link which is sharing this context.
+     * Get an array of ResourceLinkShare objects for each resource link which is sharing this context.
      *
-     * @return array Array of LTI_Resource_Link_Share objects
+     * @return array Array of ResourceLinkShare objects
      */
     public function getShares() {
 
@@ -723,7 +723,7 @@ EOF;
     /**
      * Convert data type of value to a supported type if possible.
      *
-     * @param LTI_Outcome $lti_outcome     Outcome object
+     * @param Outcome $lti_outcome     Outcome object
      * @param string[]    $supported_types Array of outcome types to be supported (optional, default is null to use supported types reported in the last launch for this resource link)
      *
      * @return boolean True if the type/value are valid and supported
@@ -816,7 +816,7 @@ EOF;
         if (!empty($url)) {
             $params = $this->consumer->signParameters($url, $type, $this->consumer->lti_version, $params);
 // Connect to tool consumer
-            $http = new LTI_HTTP_Message($url, 'POST', $params);
+            $http = new HttpMessage($url, 'POST', $params);
 // Parse XML response
             if ($http->send()) {
                 $this->ext_response = $http->response;
@@ -886,7 +886,7 @@ EOD;
             $header = $req->to_header();
             $header .= "\nContent-Type: application/xml";
 // Connect to tool consumer
-            $http = new LTI_HTTP_Message($url, 'POST', $xmlRequest, $header);
+            $http = new HttpMessage($url, 'POST', $xmlRequest, $header);
 // Parse XML response
             if ($http->send()) {
                 $this->ext_response = $http->response;

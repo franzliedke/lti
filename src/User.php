@@ -9,7 +9,7 @@ namespace Franzl\Lti;
  * @version 2.5.00
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3
  */
-class LTI_User {
+class User {
 
     /**
      * @var string User's first name.
@@ -49,11 +49,11 @@ class LTI_User {
     public $updated = NULL;
 
     /**
-     * @var LTI_Resource_Link Resource link object.
+     * @var ResourceLink Resource link object.
      */
     private $resource_link = NULL;
     /**
-     * @var LTI_Context Resource link object.
+     * @var Context Resource link object.
      */
     private $context = NULL;
     /**
@@ -64,7 +64,7 @@ class LTI_User {
     /**
      * Class constructor.
      *
-     * @param LTI_Resource_Link $resource_link Resource_Link object
+     * @param ResourceLink $resource_link Resource_Link object
      * @param string      $id      User ID value
      */
     public function __construct($resource_link, $id) {
@@ -145,7 +145,7 @@ class LTI_User {
     /**
      * Get resource link.
      *
-     * @return LTI_Resource_Link Resource link object
+     * @return ResourceLink Resource link object
      */
     public function getResourceLink() {
 
@@ -159,7 +159,7 @@ class LTI_User {
      * @deprecated Use getResourceLink() instead
      * @see LTI_User::getResourceLink()
      *
-     * @return LTI_Resource_Link Context object
+     * @return ResourceLink Context object
      */
     public function getContext() {
 
@@ -180,26 +180,26 @@ class LTI_User {
             if (!is_null($this->resource_link)) {
                 $id_scope = $this->resource_link->getConsumer()->id_scope;
             } else {
-                $id_scope = LTI_Tool_Provider::ID_SCOPE_ID_ONLY;
+                $id_scope = ToolProvider::ID_SCOPE_ID_ONLY;
             }
         }
         switch ($id_scope) {
-            case LTI_Tool_Provider::ID_SCOPE_GLOBAL:
-                $id = $this->resource_link->getKey() . LTI_Tool_Provider::ID_SCOPE_SEPARATOR . $this->id;
+            case ToolProvider::ID_SCOPE_GLOBAL:
+                $id = $this->resource_link->getKey() . ToolProvider::ID_SCOPE_SEPARATOR . $this->id;
                 break;
-            case LTI_Tool_Provider::ID_SCOPE_CONTEXT:
+            case ToolProvider::ID_SCOPE_CONTEXT:
                 $id = $this->resource_link->getKey();
                 if ($this->resource_link->lti_context_id) {
-                    $id .= LTI_Tool_Provider::ID_SCOPE_SEPARATOR . $this->resource_link->lti_context_id;
+                    $id .= ToolProvider::ID_SCOPE_SEPARATOR . $this->resource_link->lti_context_id;
                 }
-                $id .= LTI_Tool_Provider::ID_SCOPE_SEPARATOR . $this->id;
+                $id .= ToolProvider::ID_SCOPE_SEPARATOR . $this->id;
                 break;
-            case LTI_Tool_Provider::ID_SCOPE_RESOURCE:
+            case ToolProvider::ID_SCOPE_RESOURCE:
                 $id = $this->resource_link->getKey();
                 if ($this->resource_link->lti_resource_id) {
-                    $id .= LTI_Tool_Provider::ID_SCOPE_SEPARATOR . $this->resource_link->lti_resource_id;
+                    $id .= ToolProvider::ID_SCOPE_SEPARATOR . $this->resource_link->lti_resource_id;
                 }
-                $id .= LTI_Tool_Provider::ID_SCOPE_SEPARATOR . $this->id;
+                $id .= ToolProvider::ID_SCOPE_SEPARATOR . $this->id;
                 break;
             default:
                 $id = $this->id;

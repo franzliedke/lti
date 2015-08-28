@@ -9,7 +9,7 @@ namespace Franzl\Lti;
  * @version 2.5.00
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3
  */
-class LTI_Resource_Link_Share_Key {
+class ResourceLinkShareKey {
 
     /**
      * Maximum permitted life for a share key value.
@@ -58,14 +58,14 @@ class LTI_Resource_Link_Share_Key {
      */
     private $id = NULL;
     /**
-     * @var LTI_Data_Connector Data connector.
+     * @var DataConnector Data connector.
      */
     private $data_connector = NULL;
 
     /**
      * Class constructor.
      *
-     * @param LTI_Resource_Link $resource_link  Resource_Link object
+     * @param ResourceLink $resource_link  Resource_Link object
      * @param string      $id      Value of share key (optional, default is null)
      */
     public function __construct($resource_link, $id = NULL) {
@@ -116,7 +116,7 @@ class LTI_Resource_Link_Share_Key {
             } else {
                 $this->length = max(min($this->length, self::MAX_SHARE_KEY_LENGTH), self::MIN_SHARE_KEY_LENGTH);
             }
-            $this->id = LTI_Data_Connector::getRandomString($this->length);
+            $this->id = DataConnector::getRandomString($this->length);
         }
 
         return $this->data_connector->Resource_Link_Share_Key_save($this);

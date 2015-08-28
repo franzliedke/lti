@@ -9,7 +9,7 @@ namespace Franzl\Lti;
  * @version 2.5.00
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3
  */
-class LTI_Content_Item {
+class ContentItem {
 
     /**
      * Media type for LTI launch links.
@@ -20,7 +20,7 @@ class LTI_Content_Item {
      * Class constructor.
      *
      * @param string $type Class type of content-item
-     * @param LTI_Content_Item_Placement $placementAdvice  Placement object for item (optional)
+     * @param ContentItemPlacement $placementAdvice  Placement object for item (optional)
      * @param string $id   URL of content-item (optional)
      */
     function __construct($type, $placementAdvice = NULL, $id = NULL) {

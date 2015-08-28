@@ -9,7 +9,7 @@ namespace Franzl\Lti;
  * @version 2.5.00
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3
  */
-abstract class LTI_Data_Connector
+abstract class DataConnector
 {
 
     /**
@@ -46,7 +46,7 @@ abstract class LTI_Data_Connector
     /**
      * Load tool consumer object.
      *
-     * @param mixed $consumer LTI_Tool_Consumer object
+     * @param mixed $consumer ToolConsumer object
      *
      * @return boolean True if the tool consumer object was successfully loaded
      */
@@ -55,7 +55,7 @@ abstract class LTI_Data_Connector
     /**
      * Save tool consumer object.
      *
-     * @param LTI_Tool_Consumer $consumer Consumer object
+     * @param ToolConsumer $consumer Consumer object
      *
      * @return boolean True if the tool consumer object was successfully saved
      */
@@ -64,7 +64,7 @@ abstract class LTI_Data_Connector
     /**
      * Delete tool consumer object.
      *
-     * @param LTI_Tool_Consumer $consumer Consumer object
+     * @param ToolConsumer $consumer Consumer object
      *
      * @return boolean True if the tool consumer object was successfully deleted
      */
@@ -73,14 +73,14 @@ abstract class LTI_Data_Connector
     /**
      * Load tool consumer objects.
      *
-     * @return array Array of all defined LTI_Tool_Consumer objects
+     * @return array Array of all defined ToolConsumer objects
      */
     abstract public function Tool_Consumer_list();
 
     /**
      * Load resource link object.
      *
-     * @param LTI_Resource_Link $resource_link Resource_Link object
+     * @param ResourceLink $resource_link Resource_Link object
      *
      * @return boolean True if the resource link object was successfully loaded
      */
@@ -89,7 +89,7 @@ abstract class LTI_Data_Connector
     /**
      * Save resource link object.
      *
-     * @param LTI_Resource_Link $resource_link Resource_Link object
+     * @param ResourceLink $resource_link Resource_Link object
      *
      * @return boolean True if the resource link object was successfully saved
      */
@@ -98,7 +98,7 @@ abstract class LTI_Data_Connector
     /**
      * Delete resource link object.
      *
-     * @param LTI_Resource_Link $resource_link Resource_Link object
+     * @param ResourceLink $resource_link Resource_Link object
      *
      * @return boolean True if the Resource_Link object was successfully deleted
      */
@@ -107,27 +107,27 @@ abstract class LTI_Data_Connector
     /**
      * Get array of user objects.
      *
-     * @param LTI_Resource_Link $resource_link Resource link object
+     * @param ResourceLink $resource_link Resource link object
      * @param boolean $local_only True if only users within the resource link are to be returned (excluding users sharing this resource link)
      * @param int $id_scope Scope value to use for user IDs
      *
-     * @return array Array of LTI_User objects
+     * @return array Array of User objects
      */
     abstract public function Resource_Link_getUserResultSourcedIDs($resource_link, $local_only, $id_scope);
 
     /**
      * Get array of shares defined for this resource link.
      *
-     * @param LTI_Resource_Link $resource_link Resource_Link object
+     * @param ResourceLink $resource_link Resource_Link object
      *
-     * @return array Array of LTI_Resource_Link_Share objects
+     * @return array Array of ResourceLinkShare objects
      */
     abstract public function Resource_Link_getShares($resource_link);
 
     /**
      * Load nonce object.
      *
-     * @param LTI_Consumer_Nonce $nonce Nonce object
+     * @param ConsumerNonce $nonce Nonce object
      *
      * @return boolean True if the nonce object was successfully loaded
      */
@@ -136,7 +136,7 @@ abstract class LTI_Data_Connector
     /**
      * Save nonce object.
      *
-     * @param LTI_Consumer_Nonce $nonce Nonce object
+     * @param ConsumerNonce $nonce Nonce object
      *
      * @return boolean True if the nonce object was successfully saved
      */
@@ -145,7 +145,7 @@ abstract class LTI_Data_Connector
     /**
      * Load resource link share key object.
      *
-     * @param LTI_Resource_Link_Share_Key $share_key Resource_Link share key object
+     * @param ResourceLinkShareKey $share_key Resource_Link share key object
      *
      * @return boolean True if the resource link share key object was successfully loaded
      */
@@ -154,7 +154,7 @@ abstract class LTI_Data_Connector
     /**
      * Save resource link share key object.
      *
-     * @param LTI_Resource_Link_Share_Key $share_key Resource link share key object
+     * @param ResourceLinkShareKey $share_key Resource link share key object
      *
      * @return boolean True if the resource link share key object was successfully saved
      */
@@ -163,7 +163,7 @@ abstract class LTI_Data_Connector
     /**
      * Delete resource link share key object.
      *
-     * @param LTI_Resource_Link_Share_Key $share_key Resource link share key object
+     * @param ResourceLinkShareKey $share_key Resource link share key object
      *
      * @return boolean True if the resource link share key object was successfully deleted
      */
@@ -172,7 +172,7 @@ abstract class LTI_Data_Connector
     /**
      * Load user object.
      *
-     * @param LTI_User $user User object
+     * @param User $user User object
      *
      * @return boolean True if the user object was successfully loaded
      */
@@ -181,7 +181,7 @@ abstract class LTI_Data_Connector
     /**
      * Save user object.
      *
-     * @param LTI_User $user User object
+     * @param User $user User object
      *
      * @return boolean True if the user object was successfully saved
      */
@@ -190,7 +190,7 @@ abstract class LTI_Data_Connector
     /**
      * Delete user object.
      *
-     * @param LTI_User $user User object
+     * @param User $user User object
      *
      * @return boolean True if the user object was successfully deleted
      */
@@ -213,7 +213,7 @@ abstract class LTI_Data_Connector
      * @param mixed $db A database connection object or string (optional)
      * @param string $type The type of data connector (optional)
      *
-     * @return LTI_Data_Connector Data connector object
+     * @return DataConnector Data connector object
      */
     static function getDataConnector($data_connector, $db = NULL, $type = NULL)
     {

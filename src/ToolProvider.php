@@ -9,7 +9,7 @@ namespace Franzl\Lti;
  * @version 2.5.00
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3
  */
-class LTI_Tool_Provider
+class ToolProvider
 {
 
     /**
@@ -58,7 +58,7 @@ class LTI_Tool_Provider
      */
     public $isOK = TRUE;
     /**
-     * @var LTI_Tool_Consumer Tool Consumer object.
+     * @var ToolConsumer Tool Consumer object.
      */
     public $consumer = NULL;
     /**
@@ -66,22 +66,22 @@ class LTI_Tool_Provider
      */
     public $return_url = NULL;
     /**
-     * @var LTI_User User object.
+     * @var User User object.
      */
     public $user = NULL;
     /**
-     * @var LTI_Resource_Link Resource link object.
+     * @var ResourceLink Resource link object.
      */
     public $resource_link = NULL;
     /**
-     * @var LTI_Context Resource link object.
+     * @var Context Resource link object.
      *
      * @deprecated Use resource_link instead
      * @see LTI_Tool_Provider::$resource_link
      */
     public $context = NULL;
     /**
-     * @var LTI_Data_Connector Data connector object.
+     * @var DataConnector Data connector object.
      */
     public $data_connector = NULL;
     /**
@@ -211,7 +211,7 @@ class LTI_Tool_Provider
         } else if (!empty($callbackHandler)) {
             $this->callbackHandler['launch'] = $callbackHandler;
         }
-        $this->data_connector = LTI_Data_Connector::getDataConnector($data_connector);
+        $this->data_connector = DataConnector::getDataConnector($data_connector);
         $this->isOK = !is_null($this->data_connector);
 #
 ### Set debug mode
@@ -284,7 +284,7 @@ class LTI_Tool_Provider
     /**
      * Get an array of defined tool consumers
      *
-     * @return array Array of LTI_Tool_Consumer objects
+     * @return array Array of ToolConsumer objects
      */
     public function getConsumers()
     {
@@ -292,7 +292,7 @@ class LTI_Tool_Provider
 #
 ### Initialise data connector
 #
-        $this->data_connector = LTI_Data_Connector::getDataConnector($this->data_connector);
+        $this->data_connector = DataConnector::getDataConnector($this->data_connector);
 
         return $this->data_connector->Tool_Consumer_list();
 
@@ -536,9 +536,9 @@ EOD;
                         if (isset($_POST['data'])) {
                             $form_params['data'] = $_POST['data'];
                         }
-                        $version = (isset($_POST['lti_version'])) ? $_POST['lti_version'] : LTI_Tool_Provider::LTI_VERSION1;
+                        $version = (isset($_POST['lti_version'])) ? $_POST['lti_version'] : ToolProvider::LTI_VERSION1;
                         $form_params = $this->consumer->signParameters($error_url, 'ContentItemSelection', $version, $form_params);
-                        $page = LTI_Tool_Provider::sendForm($error_url, $form_params);
+                        $page = ToolProvider::sendForm($error_url, $form_params);
                         echo $page;
                     } else {
                         header("Location: {$error_url}");
@@ -644,7 +644,7 @@ EOD;
             }
         }
         if ($this->isOK) {
-            $this->consumer = new LTI_Tool_Consumer($_POST['oauth_consumer_key'], $this->data_connector);
+            $this->consumer = new ToolConsumer($_POST['oauth_consumer_key'], $this->data_connector);
             $this->isOK = !is_null($this->consumer->created);
             if (!$this->isOK) {
                 $this->reason = 'Invalid consumer key.';
@@ -661,7 +661,7 @@ EOD;
             }
             $this->consumer->last_access = $now;
             try {
-                $store = new LTI_OAuthDataStore($this);
+                $store = new OAuthDataStore($this);
                 $server = new OAuthServer($store);
                 $method = new OAuthSignatureMethod_HMAC_SHA1();
                 $server->add_signature_method($method);
@@ -784,7 +784,7 @@ EOD;
                 if (isset($_POST['custom_content_item_id'])) {
                     $content_item_id = $_POST['custom_content_item_id'];
                 }
-                $this->resource_link = new LTI_Resource_Link($this->consumer, trim($_POST['resource_link_id']), $content_item_id);
+                $this->resource_link = new ResourceLink($this->consumer, trim($_POST['resource_link_id']), $content_item_id);
                 if (isset($_POST['context_id'])) {
                     $this->resource_link->lti_context_id = trim($_POST['context_id']);
                 }
@@ -831,7 +831,7 @@ EOD;
             if (isset($_POST['user_id'])) {
                 $user_id = trim($_POST['user_id']);
             }
-            $this->user = new LTI_User($this->resource_link, $user_id);
+            $this->user = new User($this->resource_link, $user_id);
 #
 ### Set the user name
 #
@@ -848,7 +848,7 @@ EOD;
 ### Set the user roles
 #
             if (isset($_POST['roles'])) {
-                $this->user->roles = LTI_Tool_Provider::parseRoles($_POST['roles']);
+                $this->user->roles = ToolProvider::parseRoles($_POST['roles']);
             }
 #
 ### Save the user instance
@@ -958,7 +958,7 @@ EOD;
                 $this->reason = 'Your sharing request has been refused because sharing is not being permitted.';
             } else {
 // Check if this is a new share key
-                $share_key = new LTI_Resource_Link_Share_Key($this->resource_link, $_POST['custom_share_key']);
+                $share_key = new ResourceLinkShareKey($this->resource_link, $_POST['custom_share_key']);
                 if (!is_null($share_key->primary_consumer_key) && !is_null($share_key->primary_resource_link_id)) {
 // Update resource link with sharing primary resource link details
                     $key = $share_key->primary_consumer_key;
@@ -1006,10 +1006,10 @@ EOD;
 
 // Look up primary resource link
         if ($ok && !is_null($key)) {
-            $consumer = new LTI_Tool_Consumer($key, $this->data_connector);
+            $consumer = new ToolConsumer($key, $this->data_connector);
             $ok = !is_null($consumer->created);
             if ($ok) {
-                $resource_link = new LTI_Resource_Link($consumer, $id);
+                $resource_link = new ResourceLink($consumer, $id);
                 $ok = !is_null($resource_link->created);
             }
             if ($ok) {
