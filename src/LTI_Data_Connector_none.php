@@ -1,39 +1,4 @@
 <?php
-/**
- * LTI_Tool_Provider - PHP class to include in an external tool to handle connections with an LTI 1 compliant tool consumer
- * Copyright (C) 2015  Stephen P Vickers
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- *
- * Contact: stephen@spvsoftwareproducts.com
- *
- * Version history:
- *   2.0.00  30-Jun-12  Initial release
- *   2.1.00   3-Jul-12
- *   2.2.00  16-Oct-12
- *   2.3.00   2-Jan-13  Updated Context to Resource_Link in method names
- *   2.3.01   2-Feb-13
- *   2.3.02  18-Feb-13
- *   2.3.03   5-Jun-13  Corrected errors with Consumer_Nonce_load and Consumer_Nonce_save methods
- *                      Fixed syntax errors with $now variable references
- *   2.3.04  13-Aug-13
- *   2.3.05  29-Jul-14
- *   2.3.06   5-Aug-14
- *   2.4.00  10-Apr-15
- *   2.5.00  20-May-15
-*/
 
 ###
 ###  Class to represent a dummy LTI Data Connector with no data persistence
@@ -237,5 +202,3 @@ class LTI_Data_Connector_None extends LTI_Data_Connector {
   }
 
 }
-
-?>

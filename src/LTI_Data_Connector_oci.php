@@ -1,30 +1,4 @@
 <?php
-/**
- * LTI_Tool_Provider - PHP class to include in an external tool to handle connections with an LTI 1 compliant tool consumer
- * Copyright (C) 2015  Stephen P Vickers
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- *
- * Contact: stephen@spvsoftwareproducts.com
- *
- * Version history:
- *   2.3.05  29-Jul-14  Added to release
- *   2.3.06   5-Aug-14  Fixed bug with loading CLOB field
- *   2.4.00  10-Apr-15
- *   2.5.00  20-May-15  Updated Resource_Link_save to allow for changes in ID values
-*/
 
 ###
 ###  Class to represent a OCI (Oracle) LTI Data Connector
@@ -788,5 +762,3 @@ class LTI_Data_Connector_oci extends LTI_Data_Connector {
   }
 
 }
-
-?>

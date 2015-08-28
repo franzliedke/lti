@@ -1,5 +1,4 @@
 <?php
-// vim: foldmethod=marker
 
 /* Generic exception class
  */
@@ -891,5 +890,3 @@ class OAuthUtil {
     return implode('&', $pairs);
   }
 }
-
-?>
