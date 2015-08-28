@@ -14,6 +14,9 @@
       "Franzl\\Lti\\": "src/"
     }
   },
+  "require": {
+    "php": ">=5.4.0"
+  },
   "require-dev": {
     "phpspec/phpspec": "^2.2",
     "squizlabs/php_codesniffer": "2.*"
