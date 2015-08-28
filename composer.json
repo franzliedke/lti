@@ -8,5 +8,10 @@
       "name": "Franz Liedke",
       "email": "franz@develophp.org"
     }
-  ]
+  ],
+  "autoload": {
+    "psr-4": {
+      "Franzl\\Lti\\": "src/"
+    }
+  }
 }
