@@ -9,7 +9,8 @@ namespace Franzl\Lti;
  * @version 2.5.00
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3
  */
-class ResourceLink {
+class ResourceLink
+{
 
     /**
      * Read action.
@@ -56,88 +57,88 @@ class ResourceLink {
     /**
      * @var string Context ID as supplied in the last connection request.
      */
-    public $lti_context_id = NULL;
+    public $lti_context_id = null;
     /**
      * @var string Resource link ID as supplied in the last connection request.
      */
-    public $lti_resource_id = NULL;
+    public $lti_resource_id = null;
     /**
      * @var string Context title.
      */
-    public $title = NULL;
+    public $title = null;
     /**
      * @var array Setting values (LTI parameters, custom parameters and local parameters).
      */
-    public $settings = NULL;
+    public $settings = null;
     /**
      * @var array User group sets (NULL if the consumer does not support the groups enhancement)
      */
-    public $group_sets = NULL;
+    public $group_sets = null;
     /**
      * @var array User groups (NULL if the consumer does not support the groups enhancement)
      */
-    public $groups = NULL;
+    public $groups = null;
     /**
      * @var string Request for last service request.
      */
-    public $ext_request = NULL;
+    public $ext_request = null;
     /**
      * @var array Request headers for last service request.
      */
-    public $ext_request_headers = NULL;
+    public $ext_request_headers = null;
     /**
      * @var string Response from last service request.
      */
-    public $ext_response = NULL;
+    public $ext_response = null;
     /**
      * @var array Response header from last service request.
      */
-    public $ext_response_headers = NULL;
+    public $ext_response_headers = null;
     /**
      * @var string Consumer key value for resource link being shared (if any).
      */
-    public $primary_consumer_key = NULL;
+    public $primary_consumer_key = null;
     /**
      * @var string ID value for resource link being shared (if any).
      */
-    public $primary_resource_link_id = NULL;
+    public $primary_resource_link_id = null;
     /**
      * @var boolean Whether the sharing request has been approved by the primary resource link.
      */
-    public $share_approved = NULL;
+    public $share_approved = null;
     /**
      * @var object Date/time when the object was created.
      */
-    public $created = NULL;
+    public $created = null;
     /**
      * @var object Date/time when the object was last updated.
      */
-    public $updated = NULL;
+    public $updated = null;
 
     /**
      * @var ToolConsumer Tool Consumer for this resource link.
      */
-    private $consumer = NULL;
+    private $consumer = null;
     /**
      * @var string ID for this resource link.
      */
-    private $id = NULL;
+    private $id = null;
     /**
      * @var string Previous ID for this resource link.
      */
-    private $previous_id = NULL;
+    private $previous_id = null;
     /**
      * @var boolean Whether the settings value have changed since last saved.
      */
-    private $settings_changed = FALSE;
+    private $settings_changed = false;
     /**
      * @var string XML document for the last extension service request.
      */
-    private $ext_doc = NULL;
+    private $ext_doc = null;
     /**
      * @var array XML node array for the last extension service request.
      */
-    private $ext_nodes = NULL;
+    private $ext_nodes = null;
 
     /**
      * Class constructor.
@@ -146,7 +147,8 @@ class ResourceLink {
      * @param string $id               Resource link ID value
      * @param string $current_id       Current ID of resource link (optional, default is NULL)
      */
-    public function __construct($consumer, $id, $current_id = NULL) {
+    public function __construct($consumer, $id, $current_id = null)
+    {
 
         $this->consumer = $consumer;
         $this->id = $id;
@@ -168,19 +170,20 @@ class ResourceLink {
     /**
      * Initialise the resource link.
      */
-    public function initialise() {
+    public function initialise()
+    {
 
-        $this->lti_context_id = NULL;
-        $this->lti_resource_id = NULL;
+        $this->lti_context_id = null;
+        $this->lti_resource_id = null;
         $this->title = '';
         $this->settings = [];
-        $this->group_sets = NULL;
-        $this->groups = NULL;
-        $this->primary_consumer_key = NULL;
-        $this->primary_resource_link_id = NULL;
-        $this->share_approved = NULL;
-        $this->created = NULL;
-        $this->updated = NULL;
+        $this->group_sets = null;
+        $this->groups = null;
+        $this->primary_consumer_key = null;
+        $this->primary_resource_link_id = null;
+        $this->share_approved = null;
+        $this->created = null;
+        $this->updated = null;
 
     }
 
@@ -189,11 +192,12 @@ class ResourceLink {
      *
      * @return boolean True if the resource link was successfully saved.
      */
-    public function save() {
+    public function save()
+    {
 
         $ok = $this->consumer->getDataConnector()->Resource_Link_save($this);
         if ($ok) {
-            $this->settings_changed = FALSE;
+            $this->settings_changed = false;
         }
 
         return $ok;
@@ -205,7 +209,8 @@ class ResourceLink {
      *
      * @return boolean True if the resource link was successfully deleted.
      */
-    public function delete() {
+    public function delete()
+    {
 
         return $this->consumer->getDataConnector()->Resource_Link_delete($this);
 
@@ -216,7 +221,8 @@ class ResourceLink {
      *
      * @return object ToolConsumer object for this resource link.
      */
-    public function getConsumer() {
+    public function getConsumer()
+    {
 
         return $this->consumer;
 
@@ -227,7 +233,8 @@ class ResourceLink {
      *
      * @return string Consumer key value for this resource link.
      */
-    public function getKey() {
+    public function getKey()
+    {
 
         return $this->consumer->getKey();
 
@@ -240,7 +247,8 @@ class ResourceLink {
      *
      * @return string ID for this resource link.
      */
-    public function getId($previous = FALSE) {
+    public function getId($previous = false)
+    {
 
         if ($previous) {
             $id = $this->previous_id;
@@ -260,7 +268,8 @@ class ResourceLink {
      *
      * @return string Setting value
      */
-    public function getSetting($name, $default = '') {
+    public function getSetting($name, $default = '')
+    {
 
         if (array_key_exists($name, $this->settings)) {
             $value = $this->settings[$name];
@@ -278,7 +287,8 @@ class ResourceLink {
      * @param string $name  Name of setting
      * @param string $value Value to set, use an empty value to delete a setting (optional, default is null)
      */
-    public function setSetting($name, $value = NULL) {
+    public function setSetting($name, $value = null)
+    {
 
         $old_value = $this->getSetting($name);
         if ($value != $old_value) {
@@ -287,7 +297,7 @@ class ResourceLink {
             } else {
                 unset($this->settings[$name]);
             }
-            $this->settings_changed = TRUE;
+            $this->settings_changed = true;
         }
 
     }
@@ -297,7 +307,8 @@ class ResourceLink {
      *
      * @return array Associative array of setting values
      */
-    public function getSettings() {
+    public function getSettings()
+    {
 
         return $this->settings;
 
@@ -308,12 +319,13 @@ class ResourceLink {
      *
      * @return boolean True if the settings were successfully saved
      */
-    public function saveSettings() {
+    public function saveSettings()
+    {
 
         if ($this->settings_changed) {
             $ok = $this->save();
         } else {
-            $ok = TRUE;
+            $ok = true;
         }
 
         return $ok;
@@ -325,7 +337,8 @@ class ResourceLink {
      *
      * @return boolean True if this resource link supports the Outcomes service (either the LTI 1.1 or extension service)
      */
-    public function hasOutcomesService() {
+    public function hasOutcomesService()
+    {
 
         $url = $this->getSetting('ext_ims_lis_basic_outcome_url') . $this->getSetting('lis_outcome_service_url');
 
@@ -338,7 +351,8 @@ class ResourceLink {
      *
      * @return boolean True if this resource link supports the Memberships service
      */
-    public function hasMembershipsService() {
+    public function hasMembershipsService()
+    {
 
         $url = $this->getSetting('ext_ims_lis_memberships_url');
 
@@ -351,7 +365,8 @@ class ResourceLink {
      *
      * @return boolean True if this resource link supports the Setting service
      */
-    public function hasSettingService() {
+    public function hasSettingService()
+    {
 
         $url = $this->getSetting('ext_ims_lti_tool_setting_url');
 
@@ -368,10 +383,11 @@ class ResourceLink {
      *
      * @return boolean True if the request was successfully processed
      */
-    public function doOutcomesService($action, $lti_outcome, $user = NULL) {
+    public function doOutcomesService($action, $lti_outcome, $user = null)
+    {
 
-        $response = FALSE;
-        $this->ext_response = NULL;
+        $response = false;
+        $this->ext_response = null;
 #
 ### Lookup service details from the source resource link appropriate to the user (in case the destination is being shared)
 #
@@ -392,7 +408,7 @@ class ResourceLink {
                     if ($urlLTI11 && ($lti_outcome->type == self::EXT_TYPE_DECIMAL)) {
                         $do = 'readResult';
                     } else if ($urlExt) {
-                        $urlLTI11 = NULL;
+                        $urlLTI11 = null;
                         $do = 'basic-lis-readresult';
                     }
                     break;
@@ -400,7 +416,7 @@ class ResourceLink {
                     if ($urlLTI11 && $this->checkValueType($lti_outcome, [self::EXT_TYPE_DECIMAL])) {
                         $do = 'replaceResult';
                     } else if ($this->checkValueType($lti_outcome)) {
-                        $urlLTI11 = NULL;
+                        $urlLTI11 = null;
                         $do = 'basic-lis-updateresult';
                     }
                     break;
@@ -408,7 +424,7 @@ class ResourceLink {
                     if ($urlLTI11 && ($lti_outcome->type == self::EXT_TYPE_DECIMAL)) {
                         $do = 'deleteResult';
                     } else if ($urlExt) {
-                        $urlLTI11 = NULL;
+                        $urlLTI11 = null;
                         $do = 'basic-lis-deleteresult';
                     }
                     break;
@@ -450,7 +466,7 @@ EOF;
                             }
                         case self::EXT_WRITE:
                         case self::EXT_DELETE:
-                            $response = TRUE;
+                            $response = true;
                             break;
                     }
                 }
@@ -482,7 +498,7 @@ EOF;
                             break;
                         case self::EXT_WRITE:
                         case self::EXT_DELETE:
-                            $response = TRUE;
+                            $response = true;
                             break;
                     }
                 }
@@ -505,14 +521,15 @@ EOF;
      *
      * @return mixed Array of User objects or False if the request was not successful
      */
-    public function doMembershipsService($withGroups = FALSE) {
+    public function doMembershipsService($withGroups = false)
+    {
         $users = [];
-        $old_users = $this->getUserResultSourcedIDs(TRUE, ToolProvider::ID_SCOPE_RESOURCE);
-        $this->ext_response = NULL;
+        $old_users = $this->getUserResultSourcedIDs(true, ToolProvider::ID_SCOPE_RESOURCE);
+        $this->ext_response = null;
         $url = $this->getSetting('ext_ims_lis_memberships_url');
         $params = [];
         $params['id'] = $this->getSetting('ext_ims_lis_memberships_id');
-        $ok = FALSE;
+        $ok = false;
         if ($withGroups) {
             $ok = $this->doService('basic-lis-readmembershipsforcontextwithgroups', $url, $params);
         }
@@ -534,7 +551,6 @@ EOF;
             }
 
             for ($i = 0; $i < count($members); $i++) {
-
                 $user = new User($this, $members[$i]['user_id']);
 #
 ### Set the user name
@@ -609,7 +625,7 @@ EOF;
                 $user->delete();
             }
         } else {
-            $users = FALSE;
+            $users = false;
         }
 
         return $users;
@@ -624,10 +640,11 @@ EOF;
      *
      * @return mixed The setting value for a read action, true if a write or delete action was successful, otherwise false
      */
-    public function doSettingService($action, $value = NULL) {
+    public function doSettingService($action, $value = null)
+    {
 
-        $response = FALSE;
-        $this->ext_response = NULL;
+        $response = false;
+        $this->ext_response = null;
         switch ($action) {
             case self::EXT_READ:
                 $do = 'basic-lti-loadsetting';
@@ -640,7 +657,6 @@ EOF;
                 break;
         }
         if (isset($do)) {
-
             $url = $this->getSetting('ext_ims_lti_tool_setting_url');
             $params = [];
             $params['id'] = $this->getSetting('ext_ims_lti_tool_setting_id');
@@ -662,10 +678,10 @@ EOF;
                     case self::EXT_WRITE:
                         $this->setSetting('ext_ims_lti_tool_setting', $value);
                         $this->saveSettings();
-                        $response = TRUE;
+                        $response = true;
                         break;
                     case self::EXT_DELETE:
-                        $response = TRUE;
+                        $response = true;
                         break;
                 }
             }
@@ -687,7 +703,8 @@ EOF;
      *
      * @return array Array of User objects
      */
-    public function getUserResultSourcedIDs($local_only = FALSE, $id_scope = NULL) {
+    public function getUserResultSourcedIDs($local_only = false, $id_scope = null)
+    {
 
         return $this->consumer->getDataConnector()->Resource_Link_getUserResultSourcedIDs($this, $local_only, $id_scope);
 
@@ -698,7 +715,8 @@ EOF;
      *
      * @return array Array of ResourceLinkShare objects
      */
-    public function getShares() {
+    public function getShares()
+    {
 
         return $this->consumer->getDataConnector()->Resource_Link_getShares($this);
 
@@ -713,7 +731,8 @@ EOF;
      *
      * @return boolean True if resource link was successfully loaded
      */
-    private function load() {
+    private function load()
+    {
 
         $this->initialise();
         return $this->consumer->getDataConnector()->Resource_Link_load($this);
@@ -728,7 +747,8 @@ EOF;
      *
      * @return boolean True if the type/value are valid and supported
      */
-    private function checkValueType($lti_outcome, $supported_types = NULL) {
+    private function checkValueType($lti_outcome, $supported_types = null)
+    {
 
         if (empty($supported_types)) {
             $supported_types = explode(',', str_replace(' ', '', strtolower($this->getSetting('ext_ims_lis_resultvalue_sourcedids', self::EXT_TYPE_DECIMAL))));
@@ -758,19 +778,19 @@ EOF;
 // Convert letter_af to letter_af_plus or text
             } else if ($type == self::EXT_TYPE_LETTER_AF) {
                 if (in_array(self::EXT_TYPE_LETTER_AF_PLUS, $supported_types)) {
-                    $ok = TRUE;
+                    $ok = true;
                     $lti_outcome->type = self::EXT_TYPE_LETTER_AF_PLUS;
                 } else if (in_array(self::EXT_TYPE_TEXT, $supported_types)) {
-                    $ok = TRUE;
+                    $ok = true;
                     $lti_outcome->type = self::EXT_TYPE_TEXT;
                 }
 // Convert letter_af_plus to letter_af or text
             } else if ($type == self::EXT_TYPE_LETTER_AF_PLUS) {
                 if (in_array(self::EXT_TYPE_LETTER_AF, $supported_types) && (strlen($value) == 1)) {
-                    $ok = TRUE;
+                    $ok = true;
                     $lti_outcome->type = self::EXT_TYPE_LETTER_AF;
                 } else if (in_array(self::EXT_TYPE_TEXT, $supported_types)) {
-                    $ok = TRUE;
+                    $ok = true;
                     $lti_outcome->type = self::EXT_TYPE_TEXT;
                 }
 // Convert text to decimal
@@ -806,12 +826,13 @@ EOF;
      *
      * @return boolean True if the request successfully obtained a response
      */
-    private function doService($type, $url, $params) {
+    private function doService($type, $url, $params)
+    {
 
-        $ok = FALSE;
-        $this->ext_request = NULL;
+        $ok = false;
+        $this->ext_request = null;
         $this->ext_request_headers = '';
-        $this->ext_response = NULL;
+        $this->ext_response = null;
         $this->ext_response_headers = '';
         if (!empty($url)) {
             $params = $this->consumer->signParameters($url, $type, $this->consumer->lti_version, $params);
@@ -826,7 +847,7 @@ EOF;
                     $this->ext_doc->loadXML($http->response);
                     $this->ext_nodes = $this->domnode_to_array($this->ext_doc->documentElement);
                     if (isset($this->ext_nodes['statusinfo']['codemajor']) && ($this->ext_nodes['statusinfo']['codemajor'] == 'Success')) {
-                        $ok = TRUE;
+                        $ok = true;
                     }
                 } catch (Exception $e) {
                 }
@@ -848,12 +869,13 @@ EOF;
      *
      * @return boolean True if the request successfully obtained a response
      */
-    private function doLTI11Service($type, $url, $xml) {
+    private function doLTI11Service($type, $url, $xml)
+    {
 
-        $ok = FALSE;
-        $this->ext_request = NULL;
+        $ok = false;
+        $this->ext_request = null;
         $this->ext_request_headers = '';
-        $this->ext_response = NULL;
+        $this->ext_response = null;
         $this->ext_response_headers = '';
         if (!empty($url)) {
             $id = uniqid();
@@ -874,14 +896,14 @@ EOF;
 </imsx_POXEnvelopeRequest>
 EOD;
 // Calculate body hash
-            $hash = base64_encode(sha1($xmlRequest, TRUE));
+            $hash = base64_encode(sha1($xmlRequest, true));
             $params = ['oauth_body_hash' => $hash];
 
 // Add OAuth signature
             $hmac_method = new OAuthSignatureMethod_HMAC_SHA1();
-            $consumer = new OAuthConsumer($this->consumer->getKey(), $this->consumer->secret, NULL);
-            $req = OAuthRequest::from_consumer_and_token($consumer, NULL, 'POST', $url, $params);
-            $req->sign_request($hmac_method, $consumer, NULL);
+            $consumer = new OAuthConsumer($this->consumer->getKey(), $this->consumer->secret, null);
+            $req = OAuthRequest::from_consumer_and_token($consumer, null, 'POST', $url, $params);
+            $req->sign_request($hmac_method, $consumer, null);
             $params = $req->get_parameters();
             $header = $req->to_header();
             $header .= "\nContent-Type: application/xml";
@@ -897,7 +919,7 @@ EOD;
                     $this->ext_nodes = $this->domnode_to_array($this->ext_doc->documentElement);
                     if (isset($this->ext_nodes['imsx_POXHeader']['imsx_POXResponseHeaderInfo']['imsx_statusInfo']['imsx_codeMajor']) &&
                         ($this->ext_nodes['imsx_POXHeader']['imsx_POXResponseHeaderInfo']['imsx_statusInfo']['imsx_codeMajor'] == 'success')) {
-                        $ok = TRUE;
+                        $ok = true;
                     }
                 } catch (Exception $e) {
                 }
@@ -917,7 +939,8 @@ EOD;
      *
      * @return array Array of XML document elements
      */
-    private function domnode_to_array($node) {
+    private function domnode_to_array($node)
+    {
 
         $output = '';
         switch ($node->nodeType) {
@@ -962,5 +985,4 @@ EOD;
         return $output;
 
     }
-
 }

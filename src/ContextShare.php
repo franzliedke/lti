@@ -12,7 +12,8 @@ namespace Franzl\Lti;
  * @version 2.5.00
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3
  */
-class ContextShare extends ResourceLinkShare {
+class ContextShare extends ResourceLinkShare
+{
 
     /**
      * Context ID value.
@@ -20,16 +21,16 @@ class ContextShare extends ResourceLinkShare {
      * @deprecated Use ResourceLinkShare->resource_link_id instead
      * @see LTI_Resource_Link_Share::$resource_link_id
      */
-    public $context_id = NULL;
+    public $context_id = null;
 
     /**
      * Class constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
 
         parent::__construct();
         $this->context_id = &$this->resource_link_id;
 
     }
-
 }

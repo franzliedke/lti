@@ -9,7 +9,8 @@ namespace Franzl\Lti;
  * @version 2.5.00
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3
  */
-class User {
+class User
+{
 
     /**
      * @var string User's first name.
@@ -38,28 +39,28 @@ class User {
     /**
      * @var string User's result sourcedid.
      */
-    public $lti_result_sourcedid = NULL;
+    public $lti_result_sourcedid = null;
     /**
      * @var object Date/time the record was created.
      */
-    public $created = NULL;
+    public $created = null;
     /**
      * @var object Date/time the record was last updated.
      */
-    public $updated = NULL;
+    public $updated = null;
 
     /**
      * @var ResourceLink Resource link object.
      */
-    private $resource_link = NULL;
+    private $resource_link = null;
     /**
      * @var Context Resource link object.
      */
-    private $context = NULL;
+    private $context = null;
     /**
      * @var string User ID value.
      */
-    private $id = NULL;
+    private $id = null;
 
     /**
      * Class constructor.
@@ -67,7 +68,8 @@ class User {
      * @param ResourceLink $resource_link Resource_Link object
      * @param string      $id      User ID value
      */
-    public function __construct($resource_link, $id) {
+    public function __construct($resource_link, $id)
+    {
 
         $this->initialise();
         $this->resource_link = $resource_link;
@@ -80,7 +82,8 @@ class User {
     /**
      * Initialise the user.
      */
-    public function initialise() {
+    public function initialise()
+    {
 
         $this->firstname = '';
         $this->lastname = '';
@@ -88,9 +91,9 @@ class User {
         $this->email = '';
         $this->roles = [];
         $this->groups = [];
-        $this->lti_result_sourcedid = NULL;
-        $this->created = NULL;
-        $this->updated = NULL;
+        $this->lti_result_sourcedid = null;
+        $this->created = null;
+        $this->updated = null;
 
     }
 
@@ -99,7 +102,8 @@ class User {
      *
      * @return boolean True if the user object was successfully loaded
      */
-    public function load() {
+    public function load()
+    {
 
         $this->initialise();
         if (!is_null($this->resource_link)) {
@@ -113,12 +117,13 @@ class User {
      *
      * @return boolean True if the user object was successfully saved
      */
-    public function save() {
+    public function save()
+    {
 
         if (!empty($this->lti_result_sourcedid) && !is_null($this->resource_link)) {
             $ok = $this->resource_link->getConsumer()->getDataConnector()->User_save($this);
         } else {
-            $ok = TRUE;
+            $ok = true;
         }
 
         return $ok;
@@ -130,12 +135,13 @@ class User {
      *
      * @return boolean True if the user object was successfully deleted
      */
-    public function delete() {
+    public function delete()
+    {
 
         if (!is_null($this->resource_link)) {
             $ok = $this->resource_link->getConsumer()->getDataConnector()->User_delete($this);
         } else {
-            $ok = TRUE;
+            $ok = true;
         }
 
         return $ok;
@@ -147,7 +153,8 @@ class User {
      *
      * @return ResourceLink Resource link object
      */
-    public function getResourceLink() {
+    public function getResourceLink()
+    {
 
         return $this->resource_link;
 
@@ -161,7 +168,8 @@ class User {
      *
      * @return ResourceLink Context object
      */
-    public function getContext() {
+    public function getContext()
+    {
 
         return $this->resource_link;
 
@@ -174,7 +182,8 @@ class User {
      *
      * @return string User ID value
      */
-    public function getId($id_scope = NULL) {
+    public function getId($id_scope = null)
+    {
 
         if (empty($id_scope)) {
             if (!is_null($this->resource_link)) {
@@ -217,7 +226,8 @@ class User {
      * @param string $lastname User's last name.
      * @param string $fullname User's full name.
      */
-    public function setNames($firstname, $lastname, $fullname) {
+    public function setNames($firstname, $lastname, $fullname)
+    {
 
         $names = [0 => '', 1 => ''];
         if (!empty($fullname)) {
@@ -252,7 +262,8 @@ class User {
      * @param string $email        Email address value
      * @param string $defaultEmail Value to use if no email is provided (optional, default is none)
      */
-    public function setEmail($email, $defaultEmail = NULL) {
+    public function setEmail($email, $defaultEmail = null)
+    {
 
         if (!empty($email)) {
             $this->email = $email;
@@ -272,7 +283,8 @@ class User {
      *
      * @return boolean True if the user has a role of administrator
      */
-    public function isAdmin() {
+    public function isAdmin()
+    {
 
         return $this->hasRole('Administrator') || $this->hasRole('urn:lti:sysrole:ims/lis/SysAdmin') ||
         $this->hasRole('urn:lti:sysrole:ims/lis/Administrator') || $this->hasRole('urn:lti:instrole:ims/lis/Administrator');
@@ -284,7 +296,8 @@ class User {
      *
      * @return boolean True if the user has a role of instructor, contentdeveloper or teachingassistant
      */
-    public function isStaff() {
+    public function isStaff()
+    {
 
         return ($this->hasRole('Instructor') || $this->hasRole('ContentDeveloper') || $this->hasRole('TeachingAssistant'));
 
@@ -295,7 +308,8 @@ class User {
      *
      * @return boolean True if the user has a role of learner
      */
-    public function isLearner() {
+    public function isLearner()
+    {
 
         return $this->hasRole('Learner');
 
@@ -312,7 +326,8 @@ class User {
      *
      * @return boolean True if the user has the specified role
      */
-    private function hasRole($role) {
+    private function hasRole($role)
+    {
 
         if (substr($role, 0, 4) != 'urn:') {
             $role = 'urn:lti:role:ims/lis/' . $role;
@@ -321,5 +336,4 @@ class User {
         return in_array($role, $this->roles);
 
     }
-
 }

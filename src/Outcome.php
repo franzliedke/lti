@@ -9,39 +9,40 @@ namespace Franzl\Lti;
  * @version 2.5.00
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3
  */
-class Outcome {
+class Outcome
+{
 
     /**
      * @var string Language value.
      */
-    public $language = NULL;
+    public $language = null;
     /**
      * @var string Outcome status value.
      */
-    public $status = NULL;
+    public $status = null;
     /**
      * @var object Outcome date value.
      */
-    public $date = NULL;
+    public $date = null;
     /**
      * @var string Outcome type value.
      */
-    public $type = NULL;
+    public $type = null;
     /**
      * @var string Outcome data source value.
      */
-    public $data_source = NULL;
+    public $data_source = null;
 
     /**
      * @var string Result sourcedid.
      *
      * @deprecated Use User object instead
      */
-    private $sourcedid = NULL;
+    private $sourcedid = null;
     /**
      * @var string Outcome value.
      */
-    private $value = NULL;
+    private $value = null;
 
     /**
      * Class constructor.
@@ -49,7 +50,8 @@ class Outcome {
      * @param string $sourcedid Result sourcedid value for the user/resource link (optional, default is to use associated User object)
      * @param string $value     Outcome value (optional, default is none)
      */
-    public function __construct($sourcedid = NULL, $value = NULL) {
+    public function __construct($sourcedid = null, $value = null)
+    {
 
         $this->sourcedid = $sourcedid;
         $this->value = $value;
@@ -66,7 +68,8 @@ class Outcome {
      *
      * @return string Result sourcedid value
      */
-    public function getSourcedid() {
+    public function getSourcedid()
+    {
 
         return $this->sourcedid;
 
@@ -77,7 +80,8 @@ class Outcome {
      *
      * @return string Outcome value
      */
-    public function getValue() {
+    public function getValue()
+    {
 
         return $this->value;
 
@@ -88,10 +92,10 @@ class Outcome {
      *
      * @param string Outcome value
      */
-    public function setValue($value) {
+    public function setValue($value)
+    {
 
         $this->value = $value;
 
     }
-
 }

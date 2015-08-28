@@ -215,12 +215,12 @@ abstract class DataConnector
      *
      * @return DataConnector Data connector object
      */
-    static function getDataConnector($data_connector, $db = NULL, $type = NULL)
+    static function getDataConnector($data_connector, $db = null, $type = null)
     {
 
         if (!is_null($data_connector)) {
             if (!is_object($data_connector) || !is_subclass_of($data_connector, get_class())) {
-                $prefix = NULL;
+                $prefix = null;
                 if (is_string($data_connector)) {
                     $prefix = $data_connector;
                 } else if (is_array($data_connector)) {
@@ -244,7 +244,7 @@ abstract class DataConnector
                 if (!is_null($db)) {
                     if (is_string($db)) {
                         $type = $db;
-                        $db = NULL;
+                        $db = null;
                     } else if (is_null($type)) {
                         if (is_object($db)) {
                             $type = get_class($db);
@@ -307,7 +307,7 @@ abstract class DataConnector
      *
      * @return boolean True if the user object was successfully deleted
      */
-    static function quoted($value, $addQuotes = TRUE)
+    static function quoted($value, $addQuotes = true)
     {
 
         if (is_null($value)) {
@@ -322,5 +322,4 @@ abstract class DataConnector
         return $value;
 
     }
-
 }

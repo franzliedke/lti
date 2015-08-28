@@ -9,12 +9,13 @@ namespace Franzl\Lti;
  * @version 2.5.00
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3
  */
-class HttpMessage {
+class HttpMessage
+{
 
     /**
      * @var request Request body.
      */
-    public $request = NULL;
+    public $request = null;
 
     /**
      * @var request_headers Request headers.
@@ -24,7 +25,7 @@ class HttpMessage {
     /**
      * @var response Response body.
      */
-    public $response = NULL;
+    public $response = null;
 
     /**
      * @var response_headers Response headers.
@@ -44,12 +45,12 @@ class HttpMessage {
     /**
      * @var url Request URL.
      */
-    private $url = NULL;
+    private $url = null;
 
     /**
      * @var method Request method.
      */
-    private $method = NULL;
+    private $method = null;
 
     /**
      * Class constructor.
@@ -59,7 +60,8 @@ class HttpMessage {
      * @param mixed  $params  Associative array of parameter values to be passed or message body (optional, default is none)
      * @param string $header  Values to include in the request header (optional, default is none)
      */
-    function __construct($url, $method = 'GET', $params = NULL, $header = NULL) {
+    function __construct($url, $method = 'GET', $params = null, $header = null)
+    {
 
         $this->url = $url;
         $this->method = strtoupper($method);
@@ -79,9 +81,10 @@ class HttpMessage {
      *
      * @return boolean TRUE if the request was successful
      */
-    public function send() {
+    public function send()
+    {
 
-        $ok = FALSE;
+        $ok = false;
 // Try using curl if available
         if (function_exists('curl_init')) {
             $ch = curl_init();
@@ -92,7 +95,7 @@ class HttpMessage {
                 curl_setopt($ch, CURLOPT_HEADER, 0);
             }
             if ($this->method == 'POST') {
-                curl_setopt($ch, CURLOPT_POST, TRUE);
+                curl_setopt($ch, CURLOPT_POST, true);
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $this->request);
             } else if ($this->method != 'GET') {
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $this->method);
@@ -100,12 +103,12 @@ class HttpMessage {
                     curl_setopt($ch, CURLOPT_POSTFIELDS, $this->request);
                 }
             }
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-            curl_setopt($ch, CURLINFO_HEADER_OUT, TRUE);
-            curl_setopt($ch, CURLOPT_HEADER, TRUE);
-            curl_setopt($ch, CURLOPT_SSLVERSION,3);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLINFO_HEADER_OUT, true);
+            curl_setopt($ch, CURLOPT_HEADER, true);
+            curl_setopt($ch, CURLOPT_SSLVERSION, 3);
             $ch_resp = curl_exec($ch);
-            $ok = $ch_resp !== FALSE;
+            $ok = $ch_resp !== false;
             if ($ok) {
                 $ch_resp = str_replace("\r\n", "\n", $ch_resp);
                 $ch_resp_split = explode("\n\n", $ch_resp, 2);
@@ -136,15 +139,14 @@ class HttpMessage {
                 $fp = @fopen($this->url, 'rb', false, $ctx);
                 if ($fp) {
                     $resp = @stream_get_contents($fp);
-                    $ok = $resp !== FALSE;
+                    $ok = $resp !== false;
                 }
             } catch (Exception $e) {
-                $ok = FALSE;
+                $ok = false;
             }
         }
 
         return $ok;
 
     }
-
 }

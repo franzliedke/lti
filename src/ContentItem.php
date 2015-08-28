@@ -9,7 +9,8 @@ namespace Franzl\Lti;
  * @version 2.5.00
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3
  */
-class ContentItem {
+class ContentItem
+{
 
     /**
      * Media type for LTI launch links.
@@ -23,7 +24,8 @@ class ContentItem {
      * @param ContentItemPlacement $placementAdvice  Placement object for item (optional)
      * @param string $id   URL of content-item (optional)
      */
-    function __construct($type, $placementAdvice = NULL, $id = NULL) {
+    function __construct($type, $placementAdvice = null, $id = null)
+    {
 
         $this->{'@type'} = $type;
         if (is_object($placementAdvice) && (count(get_object_vars($placementAdvice)) > 0)) {
@@ -40,7 +42,8 @@ class ContentItem {
      *
      * @param string $url  URL value
      */
-    public function setUrl($url) {
+    public function setUrl($url)
+    {
 
         if (!empty($url)) {
             $this->url = $url;
@@ -55,7 +58,8 @@ class ContentItem {
      *
      * @param string $mediaType  Media type value
      */
-    public function setMediaType($mediaType) {
+    public function setMediaType($mediaType)
+    {
 
         if (!empty($mediaType)) {
             $this->mediaType = $mediaType;
@@ -70,7 +74,8 @@ class ContentItem {
      *
      * @param string $title  Title value
      */
-    public function setTitle($title) {
+    public function setTitle($title)
+    {
 
         if (!empty($title)) {
             $this->title = $title;
@@ -85,7 +90,8 @@ class ContentItem {
      *
      * @param string $text  Link text value
      */
-    public function setText($text) {
+    public function setText($text)
+    {
 
         if (!empty($text)) {
             $this->text = $text;
@@ -100,7 +106,8 @@ class ContentItem {
      *
      * @param mixed $items  An array of content items or a single item
      */
-    public static function toJson($items) {
+    public static function toJson($items)
+    {
 
         $data = [];
         if (!is_array($items)) {
@@ -115,5 +122,4 @@ class ContentItem {
         return $json;
 
     }
-
 }

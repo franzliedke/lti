@@ -56,34 +56,34 @@ class ToolProvider
     /**
      * @var boolean True if the last request was successful.
      */
-    public $isOK = TRUE;
+    public $isOK = true;
     /**
      * @var ToolConsumer Tool Consumer object.
      */
-    public $consumer = NULL;
+    public $consumer = null;
     /**
      * @var string Return URL provided by tool consumer.
      */
-    public $return_url = NULL;
+    public $return_url = null;
     /**
      * @var User User object.
      */
-    public $user = NULL;
+    public $user = null;
     /**
      * @var ResourceLink Resource link object.
      */
-    public $resource_link = NULL;
+    public $resource_link = null;
     /**
      * @var Context Resource link object.
      *
      * @deprecated Use resource_link instead
      * @see LTI_Tool_Provider::$resource_link
      */
-    public $context = NULL;
+    public $context = null;
     /**
      * @var DataConnector Data connector object.
      */
-    public $data_connector = NULL;
+    public $data_connector = null;
     /**
      * @var string Default email domain.
      */
@@ -95,7 +95,7 @@ class ToolProvider
     /**
      * @var boolean Whether shared resource link arrangements are permitted.
      */
-    public $allowSharing = FALSE;
+    public $allowSharing = false;
     /**
      * @var string Message for last request processed
      */
@@ -103,7 +103,7 @@ class ToolProvider
     /**
      * @var string Error message for last request processed.
      */
-    public $reason = NULL;
+    public $reason = null;
     /**
      * @var array Details for error message relating to last request processed.
      */
@@ -112,36 +112,36 @@ class ToolProvider
     /**
      * @var string URL to redirect user to on successful completion of the request.
      */
-    protected $redirectURL = NULL;
+    protected $redirectURL = null;
     /**
      * @var string URL to redirect user to on successful completion of the request.
      */
-    protected $mediaTypes = NULL;
+    protected $mediaTypes = null;
     /**
      * @var string URL to redirect user to on successful completion of the request.
      */
-    protected $documentTargets = NULL;
+    protected $documentTargets = null;
     /**
      * @var string HTML to be displayed on a successful completion of the request.
      */
-    protected $output = NULL;
+    protected $output = null;
     /**
      * @var string HTML to be displayed on an unsuccessful completion of the request and no return URL is available.
      */
-    protected $error_output = NULL;
+    protected $error_output = null;
     /**
      * @var boolean Whether debug messages explaining the cause of errors are to be returned to the tool consumer.
      */
-    protected $debugMode = FALSE;
+    protected $debugMode = false;
 
     /**
      * @var array Callback functions for handling requests.
      */
-    private $callbackHandler = NULL;
+    private $callbackHandler = null;
     /**
      * @var array LTI parameter constraints for auto validation checks.
      */
-    private $constraints = NULL;
+    private $constraints = null;
     /**
      * @var array List of supported message types and associated callback type names
      */
@@ -176,23 +176,23 @@ class ToolProvider
      * @param mixed $data_connector Object containing a database connection object (optional, default is a blank prefix and MySQL)
      * @param mixed $callbackHandler String containing name of callback function for launch request, or associative array of callback functions for each request type
      */
-    function __construct($data_connector = '', $callbackHandler = NULL)
+    function __construct($data_connector = '', $callbackHandler = null)
     {
 
 // For backward compatibility the parameters may be in the opposite order, but the recommended practice is to just pass a data connector object and
 // override the callback class methods instead of using callback method names.
 
-        $reverse = FALSE;
+        $reverse = false;
         if (!is_string($data_connector) || (!is_null($callbackHandler) && !is_string($callbackHandler))) {
             if (is_object($callbackHandler)) {
-                $reverse = TRUE;
+                $reverse = true;
             } else if (is_array($data_connector) && array_diff_key($data_connector, array_keys(array_keys($data_connector)))) {
-                $reverse = TRUE;
+                $reverse = true;
             } else if (!is_array($data_connector) && is_array($callbackHandler)) {
-                $reverse = TRUE;
+                $reverse = true;
             }
         } else if (!is_null($callbackHandler) && empty($callbackHandler)) {
-            $reverse = TRUE;
+            $reverse = true;
         }
         if ($reverse) {
             $temp = $callbackHandler;
@@ -271,7 +271,7 @@ class ToolProvider
      * @param int $max_length Maximum permitted length of parameter value (optional, default is NULL)
      * @param array $message_types Array of message types to which the constraint applies (default is all)
      */
-    public function setParameterConstraint($name, $required = TRUE, $max_length = NULL, $message_types = NULL)
+    public function setParameterConstraint($name, $required = true, $max_length = null, $message_types = null)
     {
 
         $name = trim($name);
@@ -465,7 +465,7 @@ EOD;
      *
      * @return boolean True if no error reported
      */
-    private function doCallbackMethod($type = NULL)
+    private function doCallbackMethod($type = null)
     {
 
         $callback = $type;
@@ -491,7 +491,7 @@ EOD;
                 $this->isOK = $result;
             }
         } else if (is_null($type) && $this->isOK) {
-            $this->isOK = FALSE;
+            $this->isOK = false;
             $this->reason = 'Message type not supported.';
         }
 
@@ -507,7 +507,7 @@ EOD;
     private function result()
     {
 
-        $ok = FALSE;
+        $ok = false;
         if (!$this->isOK) {
             $ok = $this->onError();
         }
@@ -518,7 +518,7 @@ EOD;
 #
                 if (!empty($this->return_url)) {
                     $error_url = $this->return_url;
-                    if (strpos($error_url, '?') === FALSE) {
+                    if (strpos($error_url, '?') === false) {
                         $error_url .= '?';
                     } else {
                         $error_url .= '&';
@@ -576,7 +576,7 @@ EOD;
 #
 ### Get the consumer
 #
-        $doSaveConsumer = FALSE;
+        $doSaveConsumer = false;
 // Check all required launch parameters
         $this->isOK = isset($_POST['lti_message_type']) && array_key_exists($_POST['lti_message_type'], $this->messageTypes);
         if (!$this->isOK) {
@@ -605,7 +605,7 @@ EOD;
                         $this->mediaTypes = $mediaTypes;
                     }
                 } else {
-                    $this->isOK = FALSE;
+                    $this->isOK = false;
                 }
                 if ($this->isOK && isset($_POST['accept_presentation_document_targets']) && (strlen(trim($_POST['accept_presentation_document_targets'])) > 0)) {
                     $documentTargets = array_filter(explode(',', str_replace(' ', '', $_POST['accept_presentation_document_targets'])), 'strlen');
@@ -615,8 +615,11 @@ EOD;
                         $this->reason = 'Missing or empty accept_presentation_document_targets parameter.';
                     } else {
                         foreach ($documentTargets as $documentTarget) {
-                            $this->isOK = $this->checkValue($documentTarget, ['embed', 'frame', 'iframe', 'window', 'popup', 'overlay', 'none'],
-                                'Invalid value in accept_presentation_document_targets parameter: %s.');
+                            $this->isOK = $this->checkValue(
+                                $documentTarget,
+                                ['embed', 'frame', 'iframe', 'window', 'popup', 'overlay', 'none'],
+                                'Invalid value in accept_presentation_document_targets parameter: %s.'
+                            );
                             if (!$this->isOK) {
                                 break;
                             }
@@ -626,7 +629,7 @@ EOD;
                         }
                     }
                 } else {
-                    $this->isOK = FALSE;
+                    $this->isOK = false;
                 }
                 if ($this->isOK) {
                     $this->isOK = isset($_POST['content_item_return_url']) && (strlen(trim($_POST['content_item_return_url'])) > 0);
@@ -654,7 +657,7 @@ EOD;
         if ($this->isOK) {
             $today = date('Y-m-d', $now);
             if (is_null($this->consumer->last_access)) {
-                $doSaveConsumer = TRUE;
+                $doSaveConsumer = true;
             } else {
                 $last = date('Y-m-d', $this->consumer->last_access);
                 $doSaveConsumer = $doSaveConsumer || ($last != $today);
@@ -668,11 +671,11 @@ EOD;
                 $request = OAuthRequest::from_request();
                 $res = $server->verify_request($request);
             } catch (Exception $e) {
-                $this->isOK = FALSE;
+                $this->isOK = false;
                 if (empty($this->reason)) {
                     if ($this->debugMode) {
                         $consumer = new OAuthConsumer($this->consumer->getKey(), $this->consumer->secret);
-                        $signature = $request->build_signature($method, $consumer, FALSE);
+                        $signature = $request->build_signature($method, $consumer, false);
                         $this->reason = $e->getMessage();
                         if (empty($this->reason)) {
                             $this->reason = 'OAuth exception';
@@ -724,8 +727,11 @@ EOD;
         if ($this->isOK) {
             if ($_POST['lti_message_type'] != 'ContentItemSelectionRequest') {
                 if (isset($_POST['launch_presentation_document_target'])) {
-                    $this->isOK = $this->checkValue($_POST['launch_presentation_document_target'], ['embed', 'frame', 'iframe', 'window', 'popup', 'overlay'],
-                        'Invalid value for launch_presentation_document_target parameter: %s.');
+                    $this->isOK = $this->checkValue(
+                        $_POST['launch_presentation_document_target'],
+                        ['embed', 'frame', 'iframe', 'window', 'popup', 'overlay'],
+                        'Invalid value for launch_presentation_document_target parameter: %s.'
+                    );
                 }
             } else {
                 if (isset($_POST['accept_unsigned'])) {
@@ -753,11 +759,11 @@ EOD;
             $invalid_parameters = [];
             foreach ($this->constraints as $name => $constraint) {
                 if (empty($constraint['messages']) || in_array($_POST['lti_message_type'], $constraint['messages'])) {
-                    $ok = TRUE;
+                    $ok = true;
                     if ($constraint['required']) {
                         if (!isset($_POST[$name]) || (strlen(trim($_POST[$name])) <= 0)) {
                             $invalid_parameters[] = "{$name} (missing)";
-                            $ok = FALSE;
+                            $ok = false;
                         }
                     }
                     if ($ok && !is_null($constraint['max_length']) && isset($_POST[$name])) {
@@ -768,7 +774,7 @@ EOD;
                 }
             }
             if (count($invalid_parameters) > 0) {
-                $this->isOK = FALSE;
+                $this->isOK = false;
                 if (empty($this->reason)) {
                     $this->reason = 'Invalid parameter(s): ' . implode(', ', $invalid_parameters) . '.';
                 }
@@ -808,7 +814,7 @@ EOD;
                     if (isset($_POST[$name])) {
                         $this->resource_link->setSetting($name, $_POST[$name]);
                     } else {
-                        $this->resource_link->setSetting($name, NULL);
+                        $this->resource_link->setSetting($name, null);
                     }
                 }
 // Delete any existing custom parameters
@@ -867,12 +873,12 @@ EOD;
             $this->consumer->defaultEmail = $this->defaultEmail;
             if ($this->consumer->lti_version != $_POST['lti_version']) {
                 $this->consumer->lti_version = $_POST['lti_version'];
-                $doSaveConsumer = TRUE;
+                $doSaveConsumer = true;
             }
             if (isset($_POST['tool_consumer_instance_name'])) {
                 if ($this->consumer->consumer_name != $_POST['tool_consumer_instance_name']) {
                     $this->consumer->consumer_name = $_POST['tool_consumer_instance_name'];
-                    $doSaveConsumer = TRUE;
+                    $doSaveConsumer = true;
                 }
             }
             if (isset($_POST['tool_consumer_info_product_family_code'])) {
@@ -883,16 +889,16 @@ EOD;
 // do not delete any existing consumer version if none is passed
                 if ($this->consumer->consumer_version != $version) {
                     $this->consumer->consumer_version = $version;
-                    $doSaveConsumer = TRUE;
+                    $doSaveConsumer = true;
                 }
             } else if (isset($_POST['ext_lms']) && ($this->consumer->consumer_name != $_POST['ext_lms'])) {
                 $this->consumer->consumer_version = $_POST['ext_lms'];
-                $doSaveConsumer = TRUE;
+                $doSaveConsumer = true;
             }
             if (isset($_POST['tool_consumer_instance_guid'])) {
                 if (is_null($this->consumer->consumer_guid)) {
                     $this->consumer->consumer_guid = $_POST['tool_consumer_instance_guid'];
-                    $doSaveConsumer = TRUE;
+                    $doSaveConsumer = true;
                 } else if (!$this->consumer->protected) {
                     $doSaveConsumer = ($this->consumer->consumer_guid != $_POST['tool_consumer_instance_guid']);
                     if ($doSaveConsumer) {
@@ -903,16 +909,16 @@ EOD;
             if (isset($_POST['launch_presentation_css_url'])) {
                 if ($this->consumer->css_path != $_POST['launch_presentation_css_url']) {
                     $this->consumer->css_path = $_POST['launch_presentation_css_url'];
-                    $doSaveConsumer = TRUE;
+                    $doSaveConsumer = true;
                 }
             } else if (isset($_POST['ext_launch_presentation_css_url']) &&
                 ($this->consumer->css_path != $_POST['ext_launch_presentation_css_url'])
             ) {
                 $this->consumer->css_path = $_POST['ext_launch_presentation_css_url'];
-                $doSaveConsumer = TRUE;
+                $doSaveConsumer = true;
             } else if (!empty($this->consumer->css_path)) {
-                $this->consumer->css_path = NULL;
-                $doSaveConsumer = TRUE;
+                $this->consumer->css_path = null;
+                $doSaveConsumer = true;
             }
         }
 #
@@ -945,8 +951,8 @@ EOD;
     private function checkForShare()
     {
 
-        $ok = TRUE;
-        $doSaveResourceLink = TRUE;
+        $ok = true;
+        $doSaveResourceLink = true;
 
         $key = $this->resource_link->primary_consumer_key;
         $id = $this->resource_link->primary_resource_link_id;
@@ -954,7 +960,7 @@ EOD;
         $shareRequest = isset($_POST['custom_share_key']) && !empty($_POST['custom_share_key']);
         if ($shareRequest) {
             if (!$this->allowSharing) {
-                $ok = FALSE;
+                $ok = false;
                 $this->reason = 'Your sharing request has been refused because sharing is not being permitted.';
             } else {
 // Check if this is a new share key
@@ -970,7 +976,7 @@ EOD;
                         $this->resource_link->share_approved = $share_key->auto_approve;
                         $ok = $this->resource_link->save();
                         if ($ok) {
-                            $doSaveResourceLink = FALSE;
+                            $doSaveResourceLink = false;
                             $this->user->getResourceLink()->primary_consumer_key = $key;
                             $this->user->getResourceLink()->primary_resource_link_id = $id;
                             $this->user->getResourceLink()->share_approved = $share_key->auto_approve;
@@ -1042,5 +1048,4 @@ EOD;
         return $ok;
 
     }
-
 }

@@ -9,7 +9,8 @@ namespace Franzl\Lti;
  * @version 2.5.00
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3
  */
-class ResourceLinkShareKey {
+class ResourceLinkShareKey
+{
 
     /**
      * Maximum permitted life for a share key value.
@@ -31,36 +32,36 @@ class ResourceLinkShareKey {
     /**
      * @var string Consumer key for resource link being shared.
      */
-    public $primary_consumer_key = NULL;
+    public $primary_consumer_key = null;
     /**
      * @var string ID for resource link being shared.
      */
-    public $primary_resource_link_id = NULL;
+    public $primary_resource_link_id = null;
     /**
      * @var int Length of share key.
      */
-    public $length = NULL;
+    public $length = null;
     /**
      * @var int Life of share key.
      */
-    public $life = NULL;  // in hours
+    public $life = null;  // in hours
     /**
      * @var boolean Whether the sharing arrangement should be automatically approved when first used.
      */
-    public $auto_approve = FALSE;
+    public $auto_approve = false;
     /**
      * @var object Date/time when the share key expires.
      */
-    public $expires = NULL;
+    public $expires = null;
 
     /**
      * @var string Share key value.
      */
-    private $id = NULL;
+    private $id = null;
     /**
      * @var DataConnector Data connector.
      */
-    private $data_connector = NULL;
+    private $data_connector = null;
 
     /**
      * Class constructor.
@@ -68,7 +69,8 @@ class ResourceLinkShareKey {
      * @param ResourceLink $resource_link  Resource_Link object
      * @param string      $id      Value of share key (optional, default is null)
      */
-    public function __construct($resource_link, $id = NULL) {
+    public function __construct($resource_link, $id = null)
+    {
 
         $this->initialise();
         $this->data_connector = $resource_link->getConsumer()->getDataConnector();
@@ -86,14 +88,15 @@ class ResourceLinkShareKey {
     /**
      * Initialise the resource link share key.
      */
-    public function initialise() {
+    public function initialise()
+    {
 
-        $this->primary_consumer_key = NULL;
-        $this->primary_resource_link_id = NULL;
-        $this->length = NULL;
-        $this->life = NULL;
-        $this->auto_approve = FALSE;
-        $this->expires = NULL;
+        $this->primary_consumer_key = null;
+        $this->primary_resource_link_id = null;
+        $this->length = null;
+        $this->life = null;
+        $this->auto_approve = false;
+        $this->expires = null;
 
     }
 
@@ -102,7 +105,8 @@ class ResourceLinkShareKey {
      *
      * @return boolean True if the share key was successfully saved
      */
-    public function save() {
+    public function save()
+    {
 
         if (empty($this->life)) {
             $this->life = self::DEFAULT_SHARE_KEY_LIFE;
@@ -128,7 +132,8 @@ class ResourceLinkShareKey {
      *
      * @return boolean True if the share key was successfully deleted
      */
-    public function delete() {
+    public function delete()
+    {
 
         return $this->data_connector->Resource_Link_Share_Key_delete($this);
 
@@ -139,7 +144,8 @@ class ResourceLinkShareKey {
      *
      * @return string Share key value
      */
-    public function getId() {
+    public function getId()
+    {
 
         return $this->id;
 
@@ -152,7 +158,8 @@ class ResourceLinkShareKey {
     /**
      * Load the resource link share key from the database.
      */
-    private function load() {
+    private function load()
+    {
 
         $this->initialise();
         $this->data_connector->Resource_Link_Share_Key_load($this);
@@ -164,5 +171,4 @@ class ResourceLinkShareKey {
         }
 
     }
-
 }

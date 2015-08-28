@@ -10,20 +10,22 @@ namespace Franzl\Lti;
 #    NB This class assumes that a MySQLi connection has already been opened to the appropriate schema
 ###
 
-class DataConnectorMysqli extends DataConnector {
+class DataConnectorMysqli extends DataConnector
+{
 
-  private $dbTableNamePrefix = '';
-  private $db = NULL;
+    private $dbTableNamePrefix = '';
+    private $db = null;
 
 ###
 #    Class constructor
 ###
-  function __construct($db, $dbTableNamePrefix = '') {
+    function __construct($db, $dbTableNamePrefix = '')
+{
 
-    $this->db = $db;
-    $this->dbTableNamePrefix = $dbTableNamePrefix;
+        $this->db = $db;
+        $this->dbTableNamePrefix = $dbTableNamePrefix;
 
-  }
+    }
 
 
 ###
@@ -33,265 +35,329 @@ class DataConnectorMysqli extends DataConnector {
 ###
 #    Load the tool consumer from the database
 ###
-  public function Tool_Consumer_load($consumer) {
+    public function Tool_Consumer_load($consumer)
+    {
 
-    $ok = FALSE;
-    $sql = 'SELECT name, secret, lti_version, consumer_name, consumer_version, consumer_guid, css_path, protected, enabled, enable_from, enable_until, last_access, created, updated ' .
+        $ok = false;
+        $sql = 'SELECT name, secret, lti_version, consumer_name, consumer_version, consumer_guid, css_path, protected, enabled, enable_from, enable_until, last_access, created, updated ' .
            "FROM {$this->dbTableNamePrefix}" . DataConnector::CONSUMER_TABLE_NAME . ' ' .
            'WHERE consumer_key = ?';
-    $result = $this->db->prepare($sql);
-    if ($result) {
-      $key = $consumer->getKey();
-      $result->bind_param('s', $key);
-    }
-    if ($result) {
-      if ($result->execute()) {
-        if ($result->bind_result($consumer->name, $consumer->secret, $consumer->lti_version, $consumer->consumer_name, $consumer->consumer_version,
-           $consumer->consumer_guid, $consumer->css_path, $protected, $enabled, $from, $until, $last, $created, $updated)) {
-          if ($result->fetch()) {
-            $consumer->protected = ($protected == 1);
-            $consumer->enabled = ($enabled == 1);
-            $consumer->enable_from = NULL;
-            if (!is_null($from)) {
-              $consumer->enable_from = strtotime($from);
-            }
-            $consumer->enable_until = NULL;
-            if (!is_null($until)) {
-              $consumer->enable_until = strtotime($until);
-            }
-            $consumer->last_access = NULL;
-            if (!is_null($last)) {
-              $consumer->last_access = strtotime($last);
-            }
-            $consumer->created = strtotime($created);
-            $consumer->updated = strtotime($updated);
-            $ok = TRUE;
-          }
+        $result = $this->db->prepare($sql);
+        if ($result) {
+            $key = $consumer->getKey();
+            $result->bind_param('s', $key);
         }
-      }
-    }
-    if ($result) {
-      $result->close();
-    }
+        if ($result) {
+            if ($result->execute()) {
+                if ($result->bind_result(
+                    $consumer->name,
+                    $consumer->secret,
+                    $consumer->lti_version,
+                    $consumer->consumer_name,
+                    $consumer->consumer_version,
+                    $consumer->consumer_guid,
+                    $consumer->css_path,
+                    $protected,
+                    $enabled,
+                    $from,
+                    $until,
+                    $last,
+                    $created,
+                    $updated
+                )) {
+                    if ($result->fetch()) {
+                        $consumer->protected = ($protected == 1);
+                        $consumer->enabled = ($enabled == 1);
+                        $consumer->enable_from = null;
+                        if (!is_null($from)) {
+                            $consumer->enable_from = strtotime($from);
+                        }
+                        $consumer->enable_until = null;
+                        if (!is_null($until)) {
+                            $consumer->enable_until = strtotime($until);
+                        }
+                        $consumer->last_access = null;
+                        if (!is_null($last)) {
+                            $consumer->last_access = strtotime($last);
+                        }
+                        $consumer->created = strtotime($created);
+                        $consumer->updated = strtotime($updated);
+                        $ok = true;
+                    }
+                }
+            }
+        }
+        if ($result) {
+            $result->close();
+        }
 
-    return $ok;
+        return $ok;
 
-  }
+    }
 
 ###
 #    Save the tool consumer to the database
 ###
-  public function Tool_Consumer_save($consumer) {
+    public function Tool_Consumer_save($consumer)
+{
 
-    $ok = FALSE;
-    if ($consumer->protected) {
-      $protected = 1;
-    } else {
-      $protected = 0;
-    }
-    if ($consumer->enabled) {
-      $enabled = 1;
-    } else {
-      $enabled = 0;
-    }
-    $time = time();
-    $now = date("{$this->date_format} {$this->time_format}", $time);
-    $from = NULL;
-    if (!is_null($consumer->enable_from)) {
-      $from = date("{$this->date_format} {$this->time_format}", $consumer->enable_from);
-    }
-    $until = NULL;
-    if (!is_null($consumer->enable_until)) {
-      $until = date("{$this->date_format} {$this->time_format}", $consumer->enable_until);
-    }
-    $last = NULL;
-    if (!is_null($consumer->last_access)) {
-      $last = date($this->date_format, $consumer->last_access);
-    }
-    $key = $consumer->getKey();
-    if (is_null($consumer->created)) {
-      $sql = "INSERT INTO {$this->dbTableNamePrefix}" . DataConnector::CONSUMER_TABLE_NAME . ' (consumer_key, name, ' .
+        $ok = false;
+        if ($consumer->protected) {
+            $protected = 1;
+        } else {
+            $protected = 0;
+        }
+        if ($consumer->enabled) {
+            $enabled = 1;
+        } else {
+            $enabled = 0;
+        }
+        $time = time();
+        $now = date("{$this->date_format} {$this->time_format}", $time);
+        $from = null;
+        if (!is_null($consumer->enable_from)) {
+            $from = date("{$this->date_format} {$this->time_format}", $consumer->enable_from);
+        }
+        $until = null;
+        if (!is_null($consumer->enable_until)) {
+            $until = date("{$this->date_format} {$this->time_format}", $consumer->enable_until);
+        }
+        $last = null;
+        if (!is_null($consumer->last_access)) {
+            $last = date($this->date_format, $consumer->last_access);
+        }
+        $key = $consumer->getKey();
+        if (is_null($consumer->created)) {
+            $sql = "INSERT INTO {$this->dbTableNamePrefix}" . DataConnector::CONSUMER_TABLE_NAME . ' (consumer_key, name, ' .
              'secret, lti_version, consumer_name, consumer_version, consumer_guid, css_path, protected, enabled, enable_from, enable_until, last_access, created, updated) ' .
              'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-      $result = $this->db->prepare($sql);
-      if ($result) {
-        $ok = $result->bind_param('ssssssssiisssss', $key, $consumer->name, $consumer->secret, $consumer->lti_version,
-           $consumer->consumer_name, $consumer->consumer_version, $consumer->consumer_guid, $consumer->css_path, $protected, $enabled, $from, $until, $last, $now, $now);
-      }
-    } else {
-      $sql = "UPDATE {$this->dbTableNamePrefix}" . DataConnector::CONSUMER_TABLE_NAME . ' SET ' .
+            $result = $this->db->prepare($sql);
+            if ($result) {
+                $ok = $result->bind_param(
+                    'ssssssssiisssss',
+                    $key,
+                    $consumer->name,
+                    $consumer->secret,
+                    $consumer->lti_version,
+                    $consumer->consumer_name,
+                    $consumer->consumer_version,
+                    $consumer->consumer_guid,
+                    $consumer->css_path,
+                    $protected,
+                    $enabled,
+                    $from,
+                    $until,
+                    $last,
+                    $now,
+                    $now
+                );
+            }
+        } else {
+            $sql = "UPDATE {$this->dbTableNamePrefix}" . DataConnector::CONSUMER_TABLE_NAME . ' SET ' .
              'name = ?, secret= ?, lti_version = ?, consumer_name = ?, consumer_version = ?, consumer_guid = ?, ' .
              'css_path = ?, protected = ?, enabled = ?, enable_from = ?, enable_until = ?, last_access = ?, updated = ? ' .
              'WHERE consumer_key = ?';
-      $result = $this->db->prepare($sql);
-      if ($result) {
-        $ok = $result->bind_param('sssssssiisssss', $consumer->name, $consumer->secret, $consumer->lti_version,
-           $consumer->consumer_name, $consumer->consumer_version, $consumer->consumer_guid, $consumer->css_path, $protected, $enabled, $from, $until, $last, $now, $key);
-      }
-    }
-    if ($result && $ok) {
-      $ok = $result->execute();
-    }
-    if ($result) {
-      $result->close();
-    }
-    if ($ok) {
-      if (is_null($consumer->created)) {
-        $consumer->created = $time;
-      }
-      $consumer->updated = $time;
-    }
+            $result = $this->db->prepare($sql);
+            if ($result) {
+                $ok = $result->bind_param(
+                    'sssssssiisssss',
+                    $consumer->name,
+                    $consumer->secret,
+                    $consumer->lti_version,
+                    $consumer->consumer_name,
+                    $consumer->consumer_version,
+                    $consumer->consumer_guid,
+                    $consumer->css_path,
+                    $protected,
+                    $enabled,
+                    $from,
+                    $until,
+                    $last,
+                    $now,
+                    $key
+                );
+            }
+        }
+        if ($result && $ok) {
+            $ok = $result->execute();
+        }
+        if ($result) {
+            $result->close();
+        }
+        if ($ok) {
+            if (is_null($consumer->created)) {
+                $consumer->created = $time;
+            }
+            $consumer->updated = $time;
+        }
 
-    return $ok;
+        return $ok;
 
-  }
+    }
 
 ###
 #    Delete the tool consumer from the database
 ###
-  public function Tool_Consumer_delete($consumer) {
+    public function Tool_Consumer_delete($consumer)
+{
 
-    $key = $consumer->getKey();
+        $key = $consumer->getKey();
 // Delete any nonce values for this consumer
-    $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::NONCE_TABLE_NAME . ' WHERE consumer_key = ?';
-    $result = $this->db->prepare($sql);
-    if ($result) {
-      $ok = $result->bind_param('s', $key);
-    }
-    if ($result && $ok) {
-      $ok = $result->execute();
-    }
-    if ($result) {
-      $result->close();
-    }
+        $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::NONCE_TABLE_NAME . ' WHERE consumer_key = ?';
+        $result = $this->db->prepare($sql);
+        if ($result) {
+            $ok = $result->bind_param('s', $key);
+        }
+        if ($result && $ok) {
+            $ok = $result->execute();
+        }
+        if ($result) {
+            $result->close();
+        }
 
 // Delete any outstanding share keys for resource links for this consumer
-    $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_SHARE_KEY_TABLE_NAME . ' WHERE primary_consumer_key = ?';
-    $result = $this->db->prepare($sql);
-    if ($result) {
-      $ok = $result->bind_param('s', $key);
-    }
-    if ($result && $ok) {
-      $ok = $result->execute();
-    }
-    if ($result) {
-      $result->close();
-    }
+        $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_SHARE_KEY_TABLE_NAME . ' WHERE primary_consumer_key = ?';
+        $result = $this->db->prepare($sql);
+        if ($result) {
+            $ok = $result->bind_param('s', $key);
+        }
+        if ($result && $ok) {
+            $ok = $result->execute();
+        }
+        if ($result) {
+            $result->close();
+        }
 
 // Delete any users in resource links for this consumer
-    $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::USER_TABLE_NAME . ' WHERE consumer_key = ?';
-    $result = $this->db->prepare($sql);
-    if ($result) {
-      $ok = $result->bind_param('s', $key);
-    }
-    if ($result && $ok) {
-      $ok = $result->execute();
-    }
-    if ($result) {
-      $result->close();
-    }
+        $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::USER_TABLE_NAME . ' WHERE consumer_key = ?';
+        $result = $this->db->prepare($sql);
+        if ($result) {
+            $ok = $result->bind_param('s', $key);
+        }
+        if ($result && $ok) {
+            $ok = $result->execute();
+        }
+        if ($result) {
+            $result->close();
+        }
 
 // Update any resource links for which this consumer is acting as a primary resource link
-    $sql = "UPDATE {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_TABLE_NAME . ' ' .
+        $sql = "UPDATE {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_TABLE_NAME . ' ' .
            'SET primary_consumer_key = NULL, primary_context_id = NULL, share_approved = NULL ' .
            'WHERE primary_consumer_key = ?';
-    $result = $this->db->prepare($sql);
-    if ($result) {
-      $ok = $result->bind_param('s', $key);
-    }
-    if ($result && $ok) {
-      $ok = $result->execute();
-    }
-    if ($result) {
-      $result->close();
-    }
+        $result = $this->db->prepare($sql);
+        if ($result) {
+            $ok = $result->bind_param('s', $key);
+        }
+        if ($result && $ok) {
+            $ok = $result->execute();
+        }
+        if ($result) {
+            $result->close();
+        }
 
 // Delete any resource links for this consumer
-    $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_TABLE_NAME . ' WHERE consumer_key = ?';
-    $result = $this->db->prepare($sql);
-    if ($result) {
-      $ok = $result->bind_param('s', $key);
-    }
-    if ($result && $ok) {
-      $ok = $result->execute();
-    }
-    if ($result) {
-      $result->close();
-    }
+        $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_TABLE_NAME . ' WHERE consumer_key = ?';
+        $result = $this->db->prepare($sql);
+        if ($result) {
+            $ok = $result->bind_param('s', $key);
+        }
+        if ($result && $ok) {
+            $ok = $result->execute();
+        }
+        if ($result) {
+            $result->close();
+        }
 
 // Delete consumer
-    $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::CONSUMER_TABLE_NAME . ' WHERE consumer_key = ?';
-    $result = $this->db->prepare($sql);
-    if ($result) {
-      $ok = $result->bind_param('s', $key);
-    }
-    if ($result && $ok) {
-      $ok = $result->execute();
-    }
-    if ($result) {
-      $result->close();
-    }
+        $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::CONSUMER_TABLE_NAME . ' WHERE consumer_key = ?';
+        $result = $this->db->prepare($sql);
+        if ($result) {
+            $ok = $result->bind_param('s', $key);
+        }
+        if ($result && $ok) {
+            $ok = $result->execute();
+        }
+        if ($result) {
+            $result->close();
+        }
 
-    if ($ok) {
-      $consumer->initialise();
+        if ($ok) {
+            $consumer->initialise();
+        }
+
+        return $ok;
+
     }
-
-    return $ok;
-
-  }
 
 ###
 #    Load all tool consumers from the database
 ###
-  public function Tool_Consumer_list() {
+    public function Tool_Consumer_list()
+{
 
-    $consumers = [];
+        $consumers = [];
 
-    $sql = 'SELECT consumer_key, name, secret, lti_version, consumer_name, consumer_version, consumer_guid, css_path, protected, enabled, enable_from, enable_until, last_access, created, updated ' .
+        $sql = 'SELECT consumer_key, name, secret, lti_version, consumer_name, consumer_version, consumer_guid, css_path, protected, enabled, enable_from, enable_until, last_access, created, updated ' .
            "FROM {$this->dbTableNamePrefix}" . DataConnector::CONSUMER_TABLE_NAME . ' ' .
            'ORDER BY name';
-    $result = $this->db->prepare($sql);
-    if ($result) {
-      if ($result->execute()) {
-        if ($result->bind_result($consumer_key, $name, $secret, $lti_version, $consumer_name, $consumer_version, $consumer_guid,
-           $css_path, $protected, $enabled, $from, $until, $last, $created, $updated)) {
-          while ($result->fetch()) {
-            $consumer = new ToolConsumer($consumer_key, $this);
-            $consumer->name = $name;
-            $consumer->secret = $secret;
-            $consumer->lti_version = $lti_version;
-            $consumer->consumer_name = $consumer_name;
-            $consumer->consumer_version = $consumer_version;
-            $consumer->consumer_guid = $consumer_guid;
-            $consumer->css_path = $css_path;
-            $consumer->protected = ($protected == 1);
-            $consumer->enabled = ($enabled == 1);
-            $consumer->enable_from = NULL;
-            if (!is_null($from)) {
-              $consumer->enable_from = strtotime($from);
+        $result = $this->db->prepare($sql);
+        if ($result) {
+            if ($result->execute()) {
+                if ($result->bind_result(
+                    $consumer_key,
+                    $name,
+                    $secret,
+                    $lti_version,
+                    $consumer_name,
+                    $consumer_version,
+                    $consumer_guid,
+                    $css_path,
+                    $protected,
+                    $enabled,
+                    $from,
+                    $until,
+                    $last,
+                    $created,
+                    $updated
+                )) {
+                    while ($result->fetch()) {
+                        $consumer = new ToolConsumer($consumer_key, $this);
+                        $consumer->name = $name;
+                        $consumer->secret = $secret;
+                        $consumer->lti_version = $lti_version;
+                        $consumer->consumer_name = $consumer_name;
+                        $consumer->consumer_version = $consumer_version;
+                        $consumer->consumer_guid = $consumer_guid;
+                        $consumer->css_path = $css_path;
+                        $consumer->protected = ($protected == 1);
+                        $consumer->enabled = ($enabled == 1);
+                        $consumer->enable_from = null;
+                        if (!is_null($from)) {
+                            $consumer->enable_from = strtotime($from);
+                        }
+                        $consumer->enable_until = null;
+                        if (!is_null($until)) {
+                            $consumer->enable_until = strtotime($until);
+                        }
+                        $consumer->last_access = null;
+                        if (!is_null($last)) {
+                            $consumer->last_access = strtotime($last);
+                        }
+                        $consumer->created = strtotime($created);
+                        $consumer->updated = strtotime($updated);
+                        $consumers[] = $consumer;
+                    }
+                }
             }
-            $consumer->enable_until = NULL;
-            if (!is_null($until)) {
-              $consumer->enable_until = strtotime($until);
-            }
-            $consumer->last_access = NULL;
-            if (!is_null($last)) {
-              $consumer->last_access = strtotime($last);
-            }
-            $consumer->created = strtotime($created);
-            $consumer->updated = strtotime($updated);
-            $consumers[] = $consumer;
-          }
         }
-      }
-    }
-    if ($result) {
-      $result->close();
-    }
+        if ($result) {
+            $result->close();
+        }
 
-    return $consumers;
+        return $consumers;
 
-  }
+    }
 
 
 ###
@@ -301,287 +367,335 @@ class DataConnectorMysqli extends DataConnector {
 ###
 #    Load the resource link from the database
 ###
-  public function Resource_Link_load($resource_link) {
+    public function Resource_Link_load($resource_link)
+{
 
-    $ok = FALSE;
-    $sql = 'SELECT lti_context_id, lti_resource_id, title, settings, primary_consumer_key, primary_context_id, share_approved, created, updated ' .
+        $ok = false;
+        $sql = 'SELECT lti_context_id, lti_resource_id, title, settings, primary_consumer_key, primary_context_id, share_approved, created, updated ' .
            "FROM {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_TABLE_NAME . ' ' .
            'WHERE (consumer_key = ?) AND (context_id = ?)';
-    $result = $this->db->prepare($sql);
-    if ($result) {
-      $key = $resource_link->getKey();
-      $id = $resource_link->getId();
-      $result->bind_param('ss', $key, $id);
-    }
-    if ($result) {
-      if ($result->execute()) {
-        if ($result->bind_result($resource_link->lti_context_id, $resource_link->lti_resource_id, $resource_link->title, $settings,
-           $resource_link->primary_consumer_key, $resource_link->primary_resource_link_id, $share_approved, $created, $updated)) {
-          if ($result->fetch()) {
-            $resource_link->settings = unserialize($settings);
-            if (!is_array($resource_link->settings)) {
-              $resource_link->settings = [];
-            }
-            $resource_link->share_approved = (is_null($share_approved)) ? NULL : ($share_approved == 1);
-            $resource_link->created = strtotime($created);
-            $resource_link->updated = strtotime($updated);
-            $ok = TRUE;
-          }
+        $result = $this->db->prepare($sql);
+        if ($result) {
+            $key = $resource_link->getKey();
+            $id = $resource_link->getId();
+            $result->bind_param('ss', $key, $id);
         }
-      }
-    }
-    if ($result) {
-      $result->close();
-    }
+        if ($result) {
+            if ($result->execute()) {
+                if ($result->bind_result(
+                    $resource_link->lti_context_id,
+                    $resource_link->lti_resource_id,
+                    $resource_link->title,
+                    $settings,
+                    $resource_link->primary_consumer_key,
+                    $resource_link->primary_resource_link_id,
+                    $share_approved,
+                    $created,
+                    $updated
+                )) {
+                    if ($result->fetch()) {
+                        $resource_link->settings = unserialize($settings);
+                        if (!is_array($resource_link->settings)) {
+                            $resource_link->settings = [];
+                        }
+                        $resource_link->share_approved = (is_null($share_approved)) ? null : ($share_approved == 1);
+                        $resource_link->created = strtotime($created);
+                        $resource_link->updated = strtotime($updated);
+                        $ok = true;
+                    }
+                }
+            }
+        }
+        if ($result) {
+            $result->close();
+        }
 
-    return $ok;
+        return $ok;
 
-  }
+    }
 
 ###
 #    Save the resource link to the database
 ###
-  public function Resource_Link_save($resource_link) {
+    public function Resource_Link_save($resource_link)
+{
 
-    $ok = FALSE;
-    if (is_null($resource_link->share_approved)) {
-      $approved = NULL;
-    } else if ($resource_link->share_approved) {
-      $approved = 1;
-    } else {
-      $approved = 0;
-    }
-    $time = time();
-    $now = date("{$this->date_format} {$this->time_format}", $time);
-    $settingsValue = serialize($resource_link->settings);
-    $key = $resource_link->getKey();
-    $id = $resource_link->getId();
-    $previous_id = $resource_link->getId(TRUE);
-    if (is_null($resource_link->created)) {
-      $sql = "INSERT INTO {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_TABLE_NAME . ' (consumer_key, context_id, ' .
+        $ok = false;
+        if (is_null($resource_link->share_approved)) {
+            $approved = null;
+        } else if ($resource_link->share_approved) {
+            $approved = 1;
+        } else {
+            $approved = 0;
+        }
+        $time = time();
+        $now = date("{$this->date_format} {$this->time_format}", $time);
+        $settingsValue = serialize($resource_link->settings);
+        $key = $resource_link->getKey();
+        $id = $resource_link->getId();
+        $previous_id = $resource_link->getId(true);
+        if (is_null($resource_link->created)) {
+            $sql = "INSERT INTO {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_TABLE_NAME . ' (consumer_key, context_id, ' .
              'lti_context_id, lti_resource_id, title, settings, primary_consumer_key, primary_context_id, share_approved, created, updated) ' .
              'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-      $result = $this->db->prepare($sql);
-      if ($result) {
-        $ok = $result->bind_param('ssssssssiss', $key, $id,
-           $resource_link->lti_context_id, $resource_link->lti_resource_id, $resource_link->title, $settingsValue, $resource_link->primary_consumer_key,
-           $resource_link->primary_resource_link_id, $approved, $now, $now);
-      }
-    } else if ($id == $previous_id) {
-      $sql = "UPDATE {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_TABLE_NAME . ' SET ' .
+            $result = $this->db->prepare($sql);
+            if ($result) {
+                $ok = $result->bind_param(
+                    'ssssssssiss',
+                    $key,
+                    $id,
+                    $resource_link->lti_context_id,
+                    $resource_link->lti_resource_id,
+                    $resource_link->title,
+                    $settingsValue,
+                    $resource_link->primary_consumer_key,
+                    $resource_link->primary_resource_link_id,
+                    $approved,
+                    $now,
+                    $now
+                );
+            }
+        } else if ($id == $previous_id) {
+            $sql = "UPDATE {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_TABLE_NAME . ' SET ' .
              'lti_context_id = ?, lti_resource_id = ?, title = ?, settings = ?, '.
              'primary_consumer_key = ?, primary_context_id = ?, share_approved = ?, updated = ? ' .
              'WHERE (consumer_key = ?) AND (context_id = ?)';
-      $result = $this->db->prepare($sql);
-      if ($result) {
-        $ok = $result->bind_param('ssssssisss', $resource_link->lti_context_id, $resource_link->lti_resource_id, $resource_link->title, $settingsValue,
-           $resource_link->primary_consumer_key, $resource_link->primary_resource_link_id, $approved, $now, $key, $id);
-      }
-    } else {
-      $sql = "UPDATE {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_TABLE_NAME . ' SET ' .
+            $result = $this->db->prepare($sql);
+            if ($result) {
+                $ok = $result->bind_param(
+                    'ssssssisss',
+                    $resource_link->lti_context_id,
+                    $resource_link->lti_resource_id,
+                    $resource_link->title,
+                    $settingsValue,
+                    $resource_link->primary_consumer_key,
+                    $resource_link->primary_resource_link_id,
+                    $approved,
+                    $now,
+                    $key,
+                    $id
+                );
+            }
+        } else {
+            $sql = "UPDATE {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_TABLE_NAME . ' SET ' .
              'context_id = ?, lti_context_id = ?, lti_resource_id = ?, title = ?, settings = ?, '.
              'primary_consumer_key = ?, primary_context_id = ?, share_approved = ?, updated = ? ' .
              'WHERE (consumer_key = ?) AND (context_id = ?)';
-      $result = $this->db->prepare($sql);
-      if ($result) {
-        $ok = $result->bind_param('sssssssisss', $id, $resource_link->lti_context_id, $resource_link->lti_resource_id, $resource_link->title, $settingsValue,
-           $resource_link->primary_consumer_key, $resource_link->primary_resource_link_id, $approved, $now, $key, $previous_id);
-      }
-    }
-    if ($result && $ok) {
-      $ok = $result->execute();
-    }
-    if ($result) {
-      $result->close();
-    }
-    if ($ok) {
-      if (is_null($resource_link->created)) {
-        $resource_link->created = $time;
-      }
-      $resource_link->updated = $time;
-    }
+            $result = $this->db->prepare($sql);
+            if ($result) {
+                $ok = $result->bind_param(
+                    'sssssssisss',
+                    $id,
+                    $resource_link->lti_context_id,
+                    $resource_link->lti_resource_id,
+                    $resource_link->title,
+                    $settingsValue,
+                    $resource_link->primary_consumer_key,
+                    $resource_link->primary_resource_link_id,
+                    $approved,
+                    $now,
+                    $key,
+                    $previous_id
+                );
+            }
+        }
+        if ($result && $ok) {
+            $ok = $result->execute();
+        }
+        if ($result) {
+            $result->close();
+        }
+        if ($ok) {
+            if (is_null($resource_link->created)) {
+                $resource_link->created = $time;
+            }
+            $resource_link->updated = $time;
+        }
 
-    return $ok;
+        return $ok;
 
-  }
+    }
 
 ###
 #    Delete the resource link from the database
 ###
-  public function Resource_Link_delete($resource_link) {
+    public function Resource_Link_delete($resource_link)
+{
 
-    $ok = FALSE;
+        $ok = false;
 
-    $key = $resource_link->getKey();
-    $id = $resource_link->getId();
+        $key = $resource_link->getKey();
+        $id = $resource_link->getId();
 // Delete any outstanding share keys for resource links for this consumer
-    if ($ok) {
-      $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_SHARE_KEY_TABLE_NAME . ' ' .
+        if ($ok) {
+            $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_SHARE_KEY_TABLE_NAME . ' ' .
              'WHERE (primary_consumer_key = ?) AND (primary_context_id = ?)';
-      $result = $this->db->prepare($sql);
-      if ($result) {
-        $ok = $result->bind_param('ss', $key, $id);
-      }
-      if ($result && $ok) {
-        $ok = $result->execute();
-      }
-      if ($result) {
-        $result->close();
-      }
-    }
+            $result = $this->db->prepare($sql);
+            if ($result) {
+                $ok = $result->bind_param('ss', $key, $id);
+            }
+            if ($result && $ok) {
+                $ok = $result->execute();
+            }
+            if ($result) {
+                $result->close();
+            }
+        }
 
 // Delete users
-    if ($ok) {
-      $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::USER_TABLE_NAME . ' ' .
+        if ($ok) {
+            $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::USER_TABLE_NAME . ' ' .
              'WHERE (consumer_key = ?) AND (context_id = ?)';
-      $result = $this->db->prepare($sql);
-      if ($result) {
-        $ok = $result->bind_param('ss', $key, $id);
-      }
-      if ($result && $ok) {
-        $ok = $result->execute();
-      }
-      if ($result) {
-        $result->close();
-      }
-    }
+            $result = $this->db->prepare($sql);
+            if ($result) {
+                $ok = $result->bind_param('ss', $key, $id);
+            }
+            if ($result && $ok) {
+                $ok = $result->execute();
+            }
+            if ($result) {
+                $result->close();
+            }
+        }
 
 // Update any resource links for which this is the primary resource link
-    $sql = "UPDATE {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_TABLE_NAME . ' ' .
+        $sql = "UPDATE {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_TABLE_NAME . ' ' .
            'SET primary_consumer_key = NULL, primary_context_id = NULL ' .
            'WHERE (primary_consumer_key = ?) AND (primary_context_id = ?)';
-    $result = $this->db->prepare($sql);
-    if ($result) {
-      $ok = $result->bind_param('ss', $key, $id);
-    }
-    if ($result && $ok) {
-      $ok = $result->execute();
-    }
-    if ($result) {
-      $result->close();
-    }
+        $result = $this->db->prepare($sql);
+        if ($result) {
+            $ok = $result->bind_param('ss', $key, $id);
+        }
+        if ($result && $ok) {
+            $ok = $result->execute();
+        }
+        if ($result) {
+            $result->close();
+        }
 
 // Delete resource link
-    if ($ok) {
-      $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_TABLE_NAME . ' ' .
+        if ($ok) {
+            $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_TABLE_NAME . ' ' .
              'WHERE (consumer_key = ?) AND (context_id = ?)';
-      $result = $this->db->prepare($sql);
-      if ($result) {
-        $ok = $result->bind_param('ss', $key, $id);
-      }
-      if ($result && $ok) {
-        $ok = $result->execute();
-      }
-      if ($result) {
-        $result->close();
-      }
+            $result = $this->db->prepare($sql);
+            if ($result) {
+                $ok = $result->bind_param('ss', $key, $id);
+            }
+            if ($result && $ok) {
+                $ok = $result->execute();
+            }
+            if ($result) {
+                $result->close();
+            }
+        }
+
+        if ($ok) {
+            $resource_link->initialise();
+        }
+
+        return $ok;
+
     }
-
-    if ($ok) {
-      $resource_link->initialise();
-    }
-
-    return $ok;
-
-  }
 
 ###
 #    Obtain an array of User objects for users with a result sourcedId.  The array may include users from other
 #    resource links which are sharing this resource link.  It may also be optionally indexed by the user ID of a specified scope.
 ###
-  public function Resource_Link_getUserResultSourcedIDs($resource_link, $local_only, $id_scope) {
+    public function Resource_Link_getUserResultSourcedIDs($resource_link, $local_only, $id_scope)
+{
 
-    $users = [];
+        $users = [];
 
-    $ok = FALSE;
-    $key = $resource_link->getKey();
-    $id = $resource_link->getId();
-    if ($local_only) {
-      $sql = 'SELECT u.consumer_key, u.context_id, u.user_id, u.lti_result_sourcedid ' .
+        $ok = false;
+        $key = $resource_link->getKey();
+        $id = $resource_link->getId();
+        if ($local_only) {
+            $sql = 'SELECT u.consumer_key, u.context_id, u.user_id, u.lti_result_sourcedid ' .
              "FROM {$this->dbTableNamePrefix}" . DataConnector::USER_TABLE_NAME . ' AS u '  .
              "INNER JOIN {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_TABLE_NAME . ' AS c '  .
              'ON u.consumer_key = c.consumer_key AND u.context_id = c.context_id ' .
              'WHERE (c.consumer_key = ?) AND (c.context_id = ?) AND (c.primary_consumer_key IS NULL) AND (c.primary_context_id IS NULL)';
-      $result = $this->db->prepare($sql);
-      if ($result) {
-        $ok = $result->bind_param('ss', $key, $id);
-      }
-    } else {
-      $sql = 'SELECT u.consumer_key, u.context_id, u.user_id, u.lti_result_sourcedid ' .
+            $result = $this->db->prepare($sql);
+            if ($result) {
+                $ok = $result->bind_param('ss', $key, $id);
+            }
+        } else {
+            $sql = 'SELECT u.consumer_key, u.context_id, u.user_id, u.lti_result_sourcedid ' .
              "FROM {$this->dbTableNamePrefix}" . DataConnector::USER_TABLE_NAME . ' AS u '  .
              "INNER JOIN {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_TABLE_NAME . ' AS c '  .
              'ON u.consumer_key = c.consumer_key AND u.context_id = c.context_id ' .
              'WHERE ((c.consumer_key = ?) AND (c.context_id = ?) AND (c.primary_consumer_key IS NULL) AND (c.primary_context_id IS NULL)) OR ' .
              '((c.primary_consumer_key = ?) AND (c.primary_context_id = ?) AND (share_approved = 1))';
-      $result = $this->db->prepare($sql);
-      if ($result) {
-        $ok = $result->bind_param('ssss', $key, $id, $key, $id);
-      }
-    }
-    if ($result && $ok) {
-      if ($result->execute()) {
-        if ($result->bind_result($consumer_key, $resource_link_id, $user_id, $lti_result_sourcedid)) {
-          while ($result->fetch()) {
-            $user = new User($resource_link, $user_id);
-            $user->consumer_key = $consumer_key;
-            $user->context_id = $resource_link_id;
-            $user->lti_result_sourcedid = $lti_result_sourcedid;
-            if (is_null($id_scope)) {
-              $users[] = $user;
-            } else {
-              $users[$user->getId($id_scope)] = $user;
+            $result = $this->db->prepare($sql);
+            if ($result) {
+                $ok = $result->bind_param('ssss', $key, $id, $key, $id);
             }
-          }
         }
-      }
-    }
-    if ($result) {
-      $result->close();
-    }
+        if ($result && $ok) {
+            if ($result->execute()) {
+                if ($result->bind_result($consumer_key, $resource_link_id, $user_id, $lti_result_sourcedid)) {
+                    while ($result->fetch()) {
+                        $user = new User($resource_link, $user_id);
+                        $user->consumer_key = $consumer_key;
+                        $user->context_id = $resource_link_id;
+                        $user->lti_result_sourcedid = $lti_result_sourcedid;
+                        if (is_null($id_scope)) {
+                            $users[] = $user;
+                        } else {
+                            $users[$user->getId($id_scope)] = $user;
+                        }
+                    }
+                }
+            }
+        }
+        if ($result) {
+            $result->close();
+        }
 
-    return $users;
+        return $users;
 
-  }
+    }
 
 ###
 #    Get an array of ResourceLinkShare objects for each resource link which is sharing this resource link.
 ###
-  public function Resource_Link_getShares($resource_link) {
+    public function Resource_Link_getShares($resource_link)
+{
 
-    $shares = [];
+        $shares = [];
 
-    $ok = FALSE;
-    $sql = 'SELECT consumer_key, context_id, title, share_approved ' .
+        $ok = false;
+        $sql = 'SELECT consumer_key, context_id, title, share_approved ' .
            "FROM {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_TABLE_NAME . ' ' .
            'WHERE (primary_consumer_key = ?) AND (primary_context_id = ?) ' .
            'ORDER BY consumer_key';
-    $result = $this->db->prepare($sql);
-    if ($result) {
-      $key = $resource_link->getKey();
-      $id = $resource_link->getId();
-      $ok = $result->bind_param('ss', $key, $id);
-    }
-    if ($result && $ok) {
-      if ($result->execute()) {
-        if ($result->bind_result($consumer_key, $resource_link_id, $title, $share_approved)) {
-          while ($result->fetch()) {
-            $share = new ResourceLinkShare();
-            $share->consumer_key = $consumer_key;
-            $share->context_id = $resource_link_id;
-            $share->title = $title;
-            $share->approved = ($share_approved == 1);
-            $shares[] = $share;
-          }
+        $result = $this->db->prepare($sql);
+        if ($result) {
+            $key = $resource_link->getKey();
+            $id = $resource_link->getId();
+            $ok = $result->bind_param('ss', $key, $id);
         }
-      }
-    }
-    if ($result) {
-      $result->close();
-    }
+        if ($result && $ok) {
+            if ($result->execute()) {
+                if ($result->bind_result($consumer_key, $resource_link_id, $title, $share_approved)) {
+                    while ($result->fetch()) {
+                        $share = new ResourceLinkShare();
+                        $share->consumer_key = $consumer_key;
+                        $share->context_id = $resource_link_id;
+                        $share->title = $title;
+                        $share->approved = ($share_approved == 1);
+                        $shares[] = $share;
+                    }
+                }
+            }
+        }
+        if ($result) {
+            $result->close();
+        }
 
-    return $shares;
+        return $shares;
 
-  }
+    }
 
 
 ###
@@ -591,80 +705,82 @@ class DataConnectorMysqli extends DataConnector {
 ###
 #    Load the consumer nonce from the database
 ###
-  public function Consumer_Nonce_load($nonce) {
+    public function Consumer_Nonce_load($nonce)
+{
 
 #
 ### Delete nonce values more than one day old
 #
-    $ok = FALSE;
-    $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::NONCE_TABLE_NAME . ' WHERE expires <= ?';
-    $result = $this->db->prepare($sql);
-    if ($result) {
-      $now = date("{$this->date_format} {$this->time_format}", time());
-      $ok = $result->bind_param('s', $now);
-    }
-    if ($result && $ok) {
-      $ok = $result->execute();
-    }
-    if ($result) {
-      $result->close();
-    }
+        $ok = false;
+        $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::NONCE_TABLE_NAME . ' WHERE expires <= ?';
+        $result = $this->db->prepare($sql);
+        if ($result) {
+            $now = date("{$this->date_format} {$this->time_format}", time());
+            $ok = $result->bind_param('s', $now);
+        }
+        if ($result && $ok) {
+            $ok = $result->execute();
+        }
+        if ($result) {
+            $result->close();
+        }
 
 #
 ### load the nonce
 #
-    $ok = TRUE;
-    $sql = "SELECT value AS T FROM {$this->dbTableNamePrefix}" . DataConnector::NONCE_TABLE_NAME . ' ' .
+        $ok = true;
+        $sql = "SELECT value AS T FROM {$this->dbTableNamePrefix}" . DataConnector::NONCE_TABLE_NAME . ' ' .
            'WHERE (consumer_key = ?) AND (value = ?)';
-    $result = $this->db->prepare($sql);
-    if ($result) {
-      $key = $nonce->getKey();
-      $value = $nonce->getValue();
-      $result->bind_param('ss', $key, $value);
-    }
-    if ($result) {
-      if ($result->execute()) {
-        if ($result->bind_result($value)) {
-          $r = $result->fetch();
-          if (!$r) {
-            $ok = FALSE;
-          }
+        $result = $this->db->prepare($sql);
+        if ($result) {
+            $key = $nonce->getKey();
+            $value = $nonce->getValue();
+            $result->bind_param('ss', $key, $value);
         }
-      }
-    }
-    if ($result) {
-      $result->close();
-    }
+        if ($result) {
+            if ($result->execute()) {
+                if ($result->bind_result($value)) {
+                    $r = $result->fetch();
+                    if (!$r) {
+                        $ok = false;
+                    }
+                }
+            }
+        }
+        if ($result) {
+            $result->close();
+        }
 
-    return $ok;
+        return $ok;
 
-  }
+    }
 
 ###
 #    Save the consumer nonce in the database
 ###
-  public function Consumer_Nonce_save($nonce) {
+    public function Consumer_Nonce_save($nonce)
+{
 
-    $ok = FALSE;
-    $sql = "INSERT INTO {$this->dbTableNamePrefix}" . DataConnector::NONCE_TABLE_NAME . ' (consumer_key, value, expires) ' .
+        $ok = false;
+        $sql = "INSERT INTO {$this->dbTableNamePrefix}" . DataConnector::NONCE_TABLE_NAME . ' (consumer_key, value, expires) ' .
            'VALUES (?, ?, ?)';
-    $result = $this->db->prepare($sql);
-    if ($result) {
-      $key = $nonce->getKey();
-      $value = $nonce->getValue();
-      $expires = date("{$this->date_format} {$this->time_format}", $nonce->expires);
-      $ok = $result->bind_param('sss', $key, $value, $expires);
-    }
-    if ($result && $ok) {
-      $ok = $result->execute();
-    }
-    if ($result) {
-      $result->close();
-    }
+        $result = $this->db->prepare($sql);
+        if ($result) {
+            $key = $nonce->getKey();
+            $value = $nonce->getValue();
+            $expires = date("{$this->date_format} {$this->time_format}", $nonce->expires);
+            $ok = $result->bind_param('sss', $key, $value, $expires);
+        }
+        if ($result && $ok) {
+            $ok = $result->execute();
+        }
+        if ($result) {
+            $result->close();
+        }
 
-    return $ok;
+        return $ok;
 
-  }
+    }
 
 
 ###
@@ -674,111 +790,120 @@ class DataConnectorMysqli extends DataConnector {
 ###
 #    Load the resource link share key from the database
 ###
-  public function Resource_Link_Share_Key_load($share_key) {
+    public function Resource_Link_Share_Key_load($share_key)
+{
 
 // Clear expired share keys
-    $ok = FALSE;
-    $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_SHARE_KEY_TABLE_NAME . ' WHERE expires <= ?';
-    $result = $this->db->prepare($sql);
-    if ($result) {
-      $now = date("{$this->date_format} {$this->time_format}", time());
-      $ok = $result->bind_param('i', $now);
-    }
-    if ($result && $ok) {
-      $ok = $result->execute();
-    }
-    if ($result) {
-      $result->close();
-    }
+        $ok = false;
+        $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_SHARE_KEY_TABLE_NAME . ' WHERE expires <= ?';
+        $result = $this->db->prepare($sql);
+        if ($result) {
+            $now = date("{$this->date_format} {$this->time_format}", time());
+            $ok = $result->bind_param('i', $now);
+        }
+        if ($result && $ok) {
+            $ok = $result->execute();
+        }
+        if ($result) {
+            $result->close();
+        }
 
 // Load share key
-    $ok = FALSE;
-    $id = $share_key->getId();
-    $sql = 'SELECT primary_consumer_key, primary_context_id, auto_approve, expires ' .
+        $ok = false;
+        $id = $share_key->getId();
+        $sql = 'SELECT primary_consumer_key, primary_context_id, auto_approve, expires ' .
            "FROM {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_SHARE_KEY_TABLE_NAME . ' ' .
            'WHERE share_key_id = ?';
-    $result = $this->db->prepare($sql);
-    if ($result) {
-      $id = $share_key->getId();
-      $result->bind_param('s', $id);
-    }
-    if ($result) {
-      if ($result->execute()) {
-        if ($result->bind_result($share_key->primary_consumer_key, $share_key->primary_resource_link_id, $auto_approve, $expires)) {
-          if ($result->fetch()) {
-            $share_key->auto_approve = ($auto_approve == 1);
-            $share_key->expires = strtotime($expires);
-            $ok = TRUE;
-          }
+        $result = $this->db->prepare($sql);
+        if ($result) {
+            $id = $share_key->getId();
+            $result->bind_param('s', $id);
         }
-      }
-    }
-    if ($result) {
-      $result->close();
-    }
+        if ($result) {
+            if ($result->execute()) {
+                if ($result->bind_result($share_key->primary_consumer_key, $share_key->primary_resource_link_id, $auto_approve, $expires)) {
+                    if ($result->fetch()) {
+                        $share_key->auto_approve = ($auto_approve == 1);
+                        $share_key->expires = strtotime($expires);
+                        $ok = true;
+                    }
+                }
+            }
+        }
+        if ($result) {
+            $result->close();
+        }
 
-    return $ok;
+        return $ok;
 
-  }
+    }
 
 ###
 #    Save the resource link share key to the database
 ###
-  public function Resource_Link_Share_Key_save($share_key) {
+    public function Resource_Link_Share_Key_save($share_key)
+{
 
-    $ok = FALSE;
-    if ($share_key->auto_approve) {
-      $approve = 1;
-    } else {
-      $approve = 0;
-    }
-    $expires = date("{$this->date_format} {$this->time_format}", $share_key->expires);
-    $sql = "INSERT INTO {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_SHARE_KEY_TABLE_NAME .
+        $ok = false;
+        if ($share_key->auto_approve) {
+            $approve = 1;
+        } else {
+            $approve = 0;
+        }
+        $expires = date("{$this->date_format} {$this->time_format}", $share_key->expires);
+        $sql = "INSERT INTO {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_SHARE_KEY_TABLE_NAME .
            ' (share_key_id, primary_consumer_key, primary_context_id, auto_approve, expires) ' .
            'VALUES (?, ?, ?, ?, ?)';
-    $result = $this->db->prepare($sql);
-    if ($result) {
-      $id = $share_key->getId();
-      $ok = $result->bind_param('sssis', $id, $share_key->primary_consumer_key,
-         $share_key->primary_resource_link_id, $approve, $expires);
-    }
-    if ($result && $ok) {
-      $ok = $result->execute();
-    }
-    if ($result) {
-      $result->close();
-    }
+        $result = $this->db->prepare($sql);
+        if ($result) {
+            $id = $share_key->getId();
+            $ok = $result->bind_param(
+                'sssis',
+                $id,
+                $share_key->primary_consumer_key,
+                $share_key->primary_resource_link_id,
+                $approve,
+                $expires
+            );
+        }
+        if ($result && $ok) {
+            $ok = $result->execute();
+        }
+        if ($result) {
+            $result->close();
+        }
 
-    return $ok;
+        return $ok;
 
-  }
+    }
 
 ###
 #    Delete the resource link share key from the database
 ###
-  public function Resource_Link_Share_Key_delete($share_key) {
+    public function Resource_Link_Share_Key_delete($share_key)
+{
 
-    $ok = FALSE;
-    $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_SHARE_KEY_TABLE_NAME . ' WHERE share_key_id = ?';
-    $result = $this->db->prepare($sql);
-    if ($result) {
-      $id = $share_key->getId();
-      $ok = $result->bind_param('s', $id);
-    }
-    if ($result && $ok) {
-      $ok = $result->execute();
-    }
-    if ($result) {
-      $result->close();
-    }
+        $ok = false;
+        $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::RESOURCE_LINK_SHARE_KEY_TABLE_NAME . ' WHERE share_key_id = ?';
+        $result = $this->db->prepare($sql);
+        if ($result) {
+            $id = $share_key->getId();
+            $ok = $result->bind_param('s', $id);
+        }
+        if ($result && $ok) {
+            $ok = $result->execute();
+        }
+        if ($result) {
+            $result->close();
+        }
 
-    if ($ok) {
-      $share_key->initialise();
+        if ($ok) {
+            $share_key->initialise();
+        }
+
+        return $ok;
+
     }
-
-    return $ok;
-
-  }
 
 
 ###
@@ -789,111 +914,113 @@ class DataConnectorMysqli extends DataConnector {
 ###
 #    Load the user from the database
 ###
-  public function User_load($user) {
+    public function User_load($user)
+{
 
-    $ok = FALSE;
-    $sql = 'SELECT lti_result_sourcedid, created, updated ' .
+        $ok = false;
+        $sql = 'SELECT lti_result_sourcedid, created, updated ' .
            "FROM {$this->dbTableNamePrefix}" . DataConnector::USER_TABLE_NAME . ' ' .
            'WHERE( consumer_key = ?) AND (context_id = ?) AND (user_id = ?)';
-    $result = $this->db->prepare($sql);
-    if ($result) {
-      $key = $user->getResourceLink()->getKey();
-      $id = $user->getResourceLink()->getId();
-      $userId = $user->getId(ToolProvider::ID_SCOPE_ID_ONLY);
-      $ok = $result->bind_param('sss', $key, $id, $userId);
-    }
-    if ($result && $ok) {
-      if ($result->execute()) {
-        if ($result->bind_result($user->lti_result_sourcedid, $created, $updated)) {
-          if ($result->fetch()) {
-            $user->created = strtotime($created);
-            $user->updated = strtotime($updated);
-            $ok = TRUE;
-          }
+        $result = $this->db->prepare($sql);
+        if ($result) {
+            $key = $user->getResourceLink()->getKey();
+            $id = $user->getResourceLink()->getId();
+            $userId = $user->getId(ToolProvider::ID_SCOPE_ID_ONLY);
+            $ok = $result->bind_param('sss', $key, $id, $userId);
         }
-      }
-    }
-    if ($result) {
-      $result->close();
-    }
+        if ($result && $ok) {
+            if ($result->execute()) {
+                if ($result->bind_result($user->lti_result_sourcedid, $created, $updated)) {
+                    if ($result->fetch()) {
+                        $user->created = strtotime($created);
+                        $user->updated = strtotime($updated);
+                        $ok = true;
+                    }
+                }
+            }
+        }
+        if ($result) {
+            $result->close();
+        }
 
-    return $ok;
+        return $ok;
 
-  }
+    }
 
 ###
 #    Save the user to the database
 ###
-  public function User_save($user) {
+    public function User_save($user)
+{
 
-    $ok = FALSE;
-    $time = time();
-    $now = date("{$this->date_format} {$this->time_format}", $time);
-    $key = $user->getResourceLink()->getKey();
-    $id = $user->getResourceLink()->getId();
-    $userId = $user->getId(ToolProvider::ID_SCOPE_ID_ONLY);
-    if (is_null($user->created)) {
-      $sql = "INSERT INTO {$this->dbTableNamePrefix}" . DataConnector::USER_TABLE_NAME . ' (consumer_key, context_id, ' .
+        $ok = false;
+        $time = time();
+        $now = date("{$this->date_format} {$this->time_format}", $time);
+        $key = $user->getResourceLink()->getKey();
+        $id = $user->getResourceLink()->getId();
+        $userId = $user->getId(ToolProvider::ID_SCOPE_ID_ONLY);
+        if (is_null($user->created)) {
+            $sql = "INSERT INTO {$this->dbTableNamePrefix}" . DataConnector::USER_TABLE_NAME . ' (consumer_key, context_id, ' .
              'user_id, lti_result_sourcedid, created, updated) ' .
              'VALUES (?, ?, ?, ?, ?, ?)';
-      $result = $this->db->prepare($sql);
-      if ($result) {
-        $ok = $result->bind_param('ssssss', $key, $id, $userId, $user->lti_result_sourcedid, $now, $now);
-      }
-    } else {
-      $sql = "UPDATE {$this->dbTableNamePrefix}" . DataConnector::USER_TABLE_NAME . ' ' .
+            $result = $this->db->prepare($sql);
+            if ($result) {
+                $ok = $result->bind_param('ssssss', $key, $id, $userId, $user->lti_result_sourcedid, $now, $now);
+            }
+        } else {
+            $sql = "UPDATE {$this->dbTableNamePrefix}" . DataConnector::USER_TABLE_NAME . ' ' .
              'SET lti_result_sourcedid = ?, updated = ? ' .
              'WHERE (consumer_key = ?) AND (context_id = ?) AND (user_id = ?)';
-      $result = $this->db->prepare($sql);
-      if ($result) {
-        $ok = $result->bind_param('sssss', $user->lti_result_sourcedid, $now, $key, $id, $userId);
-      }
-    }
-    if ($result && $ok) {
-      $ok = $result->execute();
-    }
-    if ($result) {
-      $result->close();
-    }
-    if ($ok) {
-      if (is_null($user->created)) {
-        $user->created = $time;
-      }
-      $user->updated = $time;
-    }
+            $result = $this->db->prepare($sql);
+            if ($result) {
+                $ok = $result->bind_param('sssss', $user->lti_result_sourcedid, $now, $key, $id, $userId);
+            }
+        }
+        if ($result && $ok) {
+            $ok = $result->execute();
+        }
+        if ($result) {
+            $result->close();
+        }
+        if ($ok) {
+            if (is_null($user->created)) {
+                $user->created = $time;
+            }
+            $user->updated = $time;
+        }
 
-    return $ok;
+        return $ok;
 
-  }
+    }
 
 ###
 #    Delete the user from the database
 ###
-  public function User_delete($user) {
+    public function User_delete($user)
+{
 
-    $ok = FALSE;
-    $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::USER_TABLE_NAME . ' ' .
+        $ok = false;
+        $sql = "DELETE FROM {$this->dbTableNamePrefix}" . DataConnector::USER_TABLE_NAME . ' ' .
            'WHERE (consumer_key = ?) AND (context_id = ?) AND (user_id = ?)';
-    $result = $this->db->prepare($sql);
-    if ($result) {
-      $key = $user->getResourceLink()->getKey();
-      $id = $user->getResourceLink()->getId();
-      $userId = $user->getId(ToolProvider::ID_SCOPE_ID_ONLY);
-      $ok = $result->bind_param('sss', $key, $id, $userId);
-    }
-    if ($result && $ok) {
-      $ok = $result->execute();
-    }
-    if ($result) {
-      $result->close();
-    }
+        $result = $this->db->prepare($sql);
+        if ($result) {
+            $key = $user->getResourceLink()->getKey();
+            $id = $user->getResourceLink()->getId();
+            $userId = $user->getId(ToolProvider::ID_SCOPE_ID_ONLY);
+            $ok = $result->bind_param('sss', $key, $id, $userId);
+        }
+        if ($result && $ok) {
+            $ok = $result->execute();
+        }
+        if ($result) {
+            $result->close();
+        }
 
-    if ($ok) {
-      $user->initialise();
+        if ($ok) {
+            $user->initialise();
+        }
+
+        return $ok;
+
     }
-
-    return $ok;
-
-  }
-
 }

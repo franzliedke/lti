@@ -20,16 +20,16 @@ class ConsumerNonce
     /**
      * Date/time when the nonce value expires.
      */
-    public $expires = NULL;
+    public $expires = null;
 
     /**
      * @var ToolConsumer Tool Consumer to which this nonce applies.
      */
-    private $consumer = NULL;
+    private $consumer = null;
     /**
      * @var string Nonce value.
      */
-    private $value = NULL;
+    private $value = null;
 
     /**
      * Class constructor.
@@ -37,7 +37,7 @@ class ConsumerNonce
      * @param ToolConsumer $consumer Consumer object
      * @param string $value Nonce value (optional, default is null)
      */
-    public function __construct($consumer, $value = NULL)
+    public function __construct($consumer, $value = null)
     {
 
         $this->consumer = $consumer;
@@ -105,5 +105,4 @@ class ConsumerNonce
         return $this->value;
 
     }
-
 }

@@ -9,81 +9,82 @@ namespace Franzl\Lti;
 * @version 2.5.00
 * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3
 */
-class ToolConsumer {
+class ToolConsumer
+{
 
 /**
 * @var string Local name of tool consumer.
 */
-public $name = NULL;
+    public $name = null;
 /**
 * @var string Shared secret.
 */
-public $secret = NULL;
+    public $secret = null;
 /**
 * @var string LTI version (as reported by last tool consumer connection).
 */
-public $lti_version = NULL;
+    public $lti_version = null;
 /**
 * @var string Name of tool consumer (as reported by last tool consumer connection).
 */
-public $consumer_name = NULL;
+    public $consumer_name = null;
 /**
 * @var string Tool consumer version (as reported by last tool consumer connection).
 */
-public $consumer_version = NULL;
+    public $consumer_version = null;
 /**
 * @var string Tool consumer GUID (as reported by first tool consumer connection).
 */
-public $consumer_guid = NULL;
+    public $consumer_guid = null;
 /**
 * @var string Optional CSS path (as reported by last tool consumer connection).
 */
-public $css_path = NULL;
+    public $css_path = null;
 /**
 * @var boolean Whether the tool consumer instance is protected by matching the consumer_guid value in incoming requests.
 */
-public $protected = FALSE;
+    public $protected = false;
 /**
 * @var boolean Whether the tool consumer instance is enabled to accept incoming connection requests.
 */
-public $enabled = FALSE;
+    public $enabled = false;
 /**
 * @var object Date/time from which the the tool consumer instance is enabled to accept incoming connection requests.
 */
-public $enable_from = NULL;
+    public $enable_from = null;
 /**
 * @var object Date/time until which the tool consumer instance is enabled to accept incoming connection requests.
 */
-public $enable_until = NULL;
+    public $enable_until = null;
 /**
 * @var object Date of last connection from this tool consumer.
 */
-public $last_access = NULL;
+    public $last_access = null;
 /**
 * @var int Default scope to use when generating an Id value for a user.
 */
-public $id_scope = ToolProvider::ID_SCOPE_ID_ONLY;
+    public $id_scope = ToolProvider::ID_SCOPE_ID_ONLY;
 /**
 * @var string Default email address (or email domain) to use when no email address is provided for a user.
 */
-public $defaultEmail = '';
+    public $defaultEmail = '';
 /**
 * @var object Date/time when the object was created.
 */
-public $created = NULL;
+    public $created = null;
 /**
 * @var object Date/time when the object was last updated.
 */
-public $updated = NULL;
+    public $updated = null;
 
 /**
 * @var string Consumer key value.
 */
-private $key = NULL;
+    private $key = null;
 /**
 * @var mixed Data connector object or string.
 */
-private $data_connector = NULL;
+    private $data_connector = null;
 
 /**
 * Class constructor.
@@ -92,106 +93,113 @@ private $data_connector = NULL;
 * @param mixed   $data_connector  String containing table name prefix, or database connection object, or array containing one or both values (optional, default is MySQL with an empty table name prefix)
 * @param boolean $autoEnable      true if the tool consumers is to be enabled automatically (optional, default is false)
 */
-public function __construct($key = NULL, $data_connector = '', $autoEnable = FALSE) {
+    public function __construct($key = null, $data_connector = '', $autoEnable = false)
+    {
 
-$this->data_connector = DataConnector::getDataConnector($data_connector);
-if (!empty($key)) {
-$this->load($key, $autoEnable);
-} else {
-$this->secret = DataConnector::getRandomString(32);
-}
+        $this->data_connector = DataConnector::getDataConnector($data_connector);
+        if (!empty($key)) {
+            $this->load($key, $autoEnable);
+        } else {
+            $this->secret = DataConnector::getRandomString(32);
+        }
 
-}
+    }
 
 /**
 * Initialise the tool consumer.
 */
-public function initialise() {
+    public function initialise()
+    {
 
-$this->key = NULL;
-$this->name = NULL;
-$this->secret = NULL;
-$this->lti_version = NULL;
-$this->consumer_name = NULL;
-$this->consumer_version = NULL;
-$this->consumer_guid = NULL;
-$this->css_path = NULL;
-$this->protected = FALSE;
-$this->enabled = FALSE;
-$this->enable_from = NULL;
-$this->enable_until = NULL;
-$this->last_access = NULL;
-$this->id_scope = ToolProvider::ID_SCOPE_ID_ONLY;
-$this->defaultEmail = '';
-$this->created = NULL;
-$this->updated = NULL;
+        $this->key = null;
+        $this->name = null;
+        $this->secret = null;
+        $this->lti_version = null;
+        $this->consumer_name = null;
+        $this->consumer_version = null;
+        $this->consumer_guid = null;
+        $this->css_path = null;
+        $this->protected = false;
+        $this->enabled = false;
+        $this->enable_from = null;
+        $this->enable_until = null;
+        $this->last_access = null;
+        $this->id_scope = ToolProvider::ID_SCOPE_ID_ONLY;
+        $this->defaultEmail = '';
+        $this->created = null;
+        $this->updated = null;
 
-}
+    }
 
 /**
 * Save the tool consumer to the database.
 *
 * @return boolean True if the object was successfully saved
 */
-public function save() {
+    public function save()
+    {
 
-return $this->data_connector->Tool_Consumer_save($this);
+        return $this->data_connector->Tool_Consumer_save($this);
 
-}
+    }
 
 /**
 * Delete the tool consumer from the database.
 *
 * @return boolean True if the object was successfully deleted
 */
-public function delete() {
+    public function delete()
+    {
 
-return $this->data_connector->Tool_Consumer_delete($this);
+        return $this->data_connector->Tool_Consumer_delete($this);
 
-}
+    }
 
 /**
 * Get the tool consumer key.
 *
 * @return string Consumer key value
 */
-public function getKey() {
+    public function getKey()
+    {
 
-return $this->key;
+        return $this->key;
 
-}
+    }
 
 /**
 * Get the data connector.
 *
 * @return mixed Data connector object or string
 */
-public function getDataConnector() {
+    public function getDataConnector()
+    {
 
-return $this->data_connector;
+        return $this->data_connector;
 
-}
+    }
 
 /**
 * Is the consumer key available to accept launch requests?
 *
 * @return boolean True if the consumer key is enabled and within any date constraints
 */
-public function getIsAvailable() {
+    public function getIsAvailable()
+    {
 
-$ok = $this->enabled;
+        $ok = $this->enabled;
 
-$now = time();
-if ($ok && !is_null($this->enable_from)) {
-$ok = $this->enable_from <= $now;
-}
-if ($ok && !is_null($this->enable_until)) {
-$ok = $this->enable_until > $now;
-}
+        $now = time();
+        if ($ok && !is_null($this->enable_from)) {
+            $ok = $this->enable_from <= $now;
+        }
+        if ($ok && !is_null($this->enable_until)) {
+            $ok = $this->enable_until > $now;
+        }
 
-return $ok;
+        return $ok;
 
-}
+    }
 
 /**
 * Add the OAuth signature to an LTI message.
@@ -203,43 +211,44 @@ return $ok;
 *
 * @return array Array of signed message parameters
 */
-public function signParameters($url, $type, $version, $params) {
+    public function signParameters($url, $type, $version, $params)
+    {
 
-if (!empty($url)) {
-// Check for query parameters which need to be included in the signature
-$query_params = [];
-$query_string = parse_url($url, PHP_URL_QUERY);
-if (!is_null($query_string)) {
-$query_items = explode('&', $query_string);
-foreach ($query_items as $item) {
-if (strpos($item, '=') !== FALSE) {
-list($name, $value) = explode('=', $item);
-$query_params[urldecode($name)] = urldecode($value);
-} else {
-$query_params[urldecode($item)] = '';
-}
-}
-}
-$params = $params + $query_params;
-// Add standard parameters
-$params['lti_version'] = $version;
-$params['lti_message_type'] = $type;
-$params['oauth_callback'] = 'about:blank';
-// Add OAuth signature
-$hmac_method = new OAuthSignatureMethod_HMAC_SHA1();
-$consumer = new OAuthConsumer($this->getKey(), $this->secret, NULL);
-$req = OAuthRequest::from_consumer_and_token($consumer, NULL, 'POST', $url, $params);
-$req->sign_request($hmac_method, $consumer, NULL);
-$params = $req->get_parameters();
-// Remove parameters being passed on the query string
-foreach (array_keys($query_params) as $name) {
-unset($params[$name]);
-}
-}
+        if (!empty($url)) {
+    // Check for query parameters which need to be included in the signature
+            $query_params = [];
+            $query_string = parse_url($url, PHP_URL_QUERY);
+            if (!is_null($query_string)) {
+                $query_items = explode('&', $query_string);
+                foreach ($query_items as $item) {
+                    if (strpos($item, '=') !== false) {
+                        list($name, $value) = explode('=', $item);
+                        $query_params[urldecode($name)] = urldecode($value);
+                    } else {
+                        $query_params[urldecode($item)] = '';
+                    }
+                }
+            }
+            $params = $params + $query_params;
+    // Add standard parameters
+            $params['lti_version'] = $version;
+            $params['lti_message_type'] = $type;
+            $params['oauth_callback'] = 'about:blank';
+    // Add OAuth signature
+            $hmac_method = new OAuthSignatureMethod_HMAC_SHA1();
+            $consumer = new OAuthConsumer($this->getKey(), $this->secret, null);
+            $req = OAuthRequest::from_consumer_and_token($consumer, null, 'POST', $url, $params);
+            $req->sign_request($hmac_method, $consumer, null);
+            $params = $req->get_parameters();
+    // Remove parameters being passed on the query string
+            foreach (array_keys($query_params) as $name) {
+                unset($params[$name]);
+            }
+        }
 
-return $params;
+        return $params;
 
-}
+    }
 
 ###
 ###  PRIVATE METHOD
@@ -253,17 +262,17 @@ return $params;
 *
 * @return boolean True if the consumer was successfully loaded
 */
-private function load($key, $autoEnable = FALSE) {
+    private function load($key, $autoEnable = false)
+    {
 
-$this->initialise();
-$this->key = $key;
-$ok = $this->data_connector->Tool_Consumer_load($this);
-if (!$ok) {
-$this->enabled = $autoEnable;
-}
+        $this->initialise();
+        $this->key = $key;
+        $ok = $this->data_connector->Tool_Consumer_load($this);
+        if (!$ok) {
+            $this->enabled = $autoEnable;
+        }
 
-return $ok;
+        return $ok;
 
-}
-
+    }
 }

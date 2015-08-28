@@ -9,19 +9,21 @@ namespace Franzl\Lti;
  * @version 2.5.00
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3
  */
-class OAuthDataStore extends \OAuthDataStore {
+class OAuthDataStore extends \OAuthDataStore
+{
 
     /**
      * @var ToolProvider Tool Provider object.
      */
-    private $tool_provider = NULL;
+    private $tool_provider = null;
 
     /**
      * Class constructor.
      *
      * @param ToolProvider $tool_provider Tool_Provider object
      */
-    public function __construct($tool_provider) {
+    public function __construct($tool_provider)
+    {
 
         $this->tool_provider = $tool_provider;
 
@@ -34,10 +36,13 @@ class OAuthDataStore extends \OAuthDataStore {
      *
      * @return OAuthConsumer OAuthConsumer object
      */
-    function lookup_consumer($consumer_key) {
+    function lookup_consumer($consumer_key)
+    {
 
-        return new OAuthConsumer($this->tool_provider->consumer->getKey(),
-            $this->tool_provider->consumer->secret);
+        return new OAuthConsumer(
+            $this->tool_provider->consumer->getKey(),
+            $this->tool_provider->consumer->secret
+        );
 
     }
 
@@ -50,7 +55,8 @@ class OAuthDataStore extends \OAuthDataStore {
      *
      * @return OAuthToken OAuthToken object
      */
-    function lookup_token($consumer, $token_type, $token) {
+    function lookup_token($consumer, $token_type, $token)
+    {
 
         return new OAuthToken($consumer, '');
 
@@ -66,7 +72,8 @@ class OAuthDataStore extends \OAuthDataStore {
      *
      * @return boolean True if the nonce value already exists
      */
-    function lookup_nonce($consumer, $token, $value, $timestamp) {
+    function lookup_nonce($consumer, $token, $value, $timestamp)
+    {
 
         $nonce = new ConsumerNonce($this->tool_provider->consumer, $value);
         $ok = !$nonce->load();
@@ -89,9 +96,10 @@ class OAuthDataStore extends \OAuthDataStore {
      *
      * @return string Null value
      */
-    function new_request_token($consumer, $callback = NULL) {
+    function new_request_token($consumer, $callback = null)
+    {
 
-        return NULL;
+        return null;
 
     }
 
@@ -104,10 +112,10 @@ class OAuthDataStore extends \OAuthDataStore {
      *
      * @return string Null value
      */
-    function new_access_token($token, $consumer, $verifier = NULL) {
+    function new_access_token($token, $consumer, $verifier = null)
+    {
 
-        return NULL;
+        return null;
 
     }
-
 }

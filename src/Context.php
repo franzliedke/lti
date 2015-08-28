@@ -12,7 +12,8 @@ namespace Franzl\Lti;
  * @version 2.5.00
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3
  */
-class Context extends ResourceLink {
+class Context extends ResourceLink
+{
 
     /**
      * ID value for context being shared (if any).
@@ -20,7 +21,7 @@ class Context extends ResourceLink {
      * @deprecated Use primary_resource_link_id instead
      * @see LTI_Resource_Link::$primary_resource_link_id
      */
-    public $primary_context_id = NULL;
+    public $primary_context_id = null;
 
     /**
      * Class constructor.
@@ -28,11 +29,11 @@ class Context extends ResourceLink {
      * @param string $consumer Consumer key value
      * @param string $id       Resource link ID value
      */
-    public function __construct($consumer, $id) {
+    public function __construct($consumer, $id)
+    {
 
         parent::__construct($consumer, $id);
         $this->primary_context_id = &$this->primary_resource_link_id;
 
     }
-
 }
