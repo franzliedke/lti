@@ -1,5 +1,7 @@
 <?php
 
+namespace Franzl\Lti;
+
 /**
  * Abstract class to provide a connection to a persistent store for LTI objects
  *
@@ -7,7 +9,8 @@
  * @version 2.5.00
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3
  */
-abstract class LTI_Data_Connector {
+abstract class LTI_Data_Connector
+{
 
     /**
      * Default name for database table used to store tool consumers.
@@ -48,6 +51,7 @@ abstract class LTI_Data_Connector {
      * @return boolean True if the tool consumer object was successfully loaded
      */
     abstract public function Tool_Consumer_load($consumer);
+
     /**
      * Save tool consumer object.
      *
@@ -56,6 +60,7 @@ abstract class LTI_Data_Connector {
      * @return boolean True if the tool consumer object was successfully saved
      */
     abstract public function Tool_Consumer_save($consumer);
+
     /**
      * Delete tool consumer object.
      *
@@ -64,6 +69,7 @@ abstract class LTI_Data_Connector {
      * @return boolean True if the tool consumer object was successfully deleted
      */
     abstract public function Tool_Consumer_delete($consumer);
+
     /**
      * Load tool consumer objects.
      *
@@ -79,6 +85,7 @@ abstract class LTI_Data_Connector {
      * @return boolean True if the resource link object was successfully loaded
      */
     abstract public function Resource_Link_load($resource_link);
+
     /**
      * Save resource link object.
      *
@@ -87,6 +94,7 @@ abstract class LTI_Data_Connector {
      * @return boolean True if the resource link object was successfully saved
      */
     abstract public function Resource_Link_save($resource_link);
+
     /**
      * Delete resource link object.
      *
@@ -95,16 +103,18 @@ abstract class LTI_Data_Connector {
      * @return boolean True if the Resource_Link object was successfully deleted
      */
     abstract public function Resource_Link_delete($resource_link);
+
     /**
      * Get array of user objects.
      *
-     * @param LTI_Resource_Link $resource_link      Resource link object
-     * @param boolean     $local_only True if only users within the resource link are to be returned (excluding users sharing this resource link)
-     * @param int         $id_scope     Scope value to use for user IDs
+     * @param LTI_Resource_Link $resource_link Resource link object
+     * @param boolean $local_only True if only users within the resource link are to be returned (excluding users sharing this resource link)
+     * @param int $id_scope Scope value to use for user IDs
      *
      * @return array Array of LTI_User objects
      */
     abstract public function Resource_Link_getUserResultSourcedIDs($resource_link, $local_only, $id_scope);
+
     /**
      * Get array of shares defined for this resource link.
      *
@@ -122,6 +132,7 @@ abstract class LTI_Data_Connector {
      * @return boolean True if the nonce object was successfully loaded
      */
     abstract public function Consumer_Nonce_load($nonce);
+
     /**
      * Save nonce object.
      *
@@ -139,6 +150,7 @@ abstract class LTI_Data_Connector {
      * @return boolean True if the resource link share key object was successfully loaded
      */
     abstract public function Resource_Link_Share_Key_load($share_key);
+
     /**
      * Save resource link share key object.
      *
@@ -147,6 +159,7 @@ abstract class LTI_Data_Connector {
      * @return boolean True if the resource link share key object was successfully saved
      */
     abstract public function Resource_Link_Share_Key_save($share_key);
+
     /**
      * Delete resource link share key object.
      *
@@ -164,6 +177,7 @@ abstract class LTI_Data_Connector {
      * @return boolean True if the user object was successfully loaded
      */
     abstract public function User_load($user);
+
     /**
      * Save user object.
      *
@@ -172,6 +186,7 @@ abstract class LTI_Data_Connector {
      * @return boolean True if the user object was successfully saved
      */
     abstract public function User_save($user);
+
     /**
      * Delete user object.
      *
@@ -194,13 +209,14 @@ abstract class LTI_Data_Connector {
      * being a string containing the database type or a database connection object (e.g. the value returned by a call to
      * mysqli_connect() or a PDO object).  A bespoke data connector class can be specified in the optional third parameter.
      *
-     * @param mixed  $data_connector A data connector object, string or array
-     * @param mixed  $db             A database connection object or string (optional)
-     * @param string $type           The type of data connector (optional)
+     * @param mixed $data_connector A data connector object, string or array
+     * @param mixed $db A database connection object or string (optional)
+     * @param string $type The type of data connector (optional)
      *
      * @return LTI_Data_Connector Data connector object
      */
-    static function getDataConnector($data_connector, $db = NULL, $type = NULL) {
+    static function getDataConnector($data_connector, $db = NULL, $type = NULL)
+    {
 
         if (!is_null($data_connector)) {
             if (!is_object($data_connector) || !is_subclass_of($data_connector, get_class())) {
@@ -264,14 +280,15 @@ abstract class LTI_Data_Connector {
      *
      * @return string Random string
      */
-    static function getRandomString($length = 8) {
+    static function getRandomString($length = 8)
+    {
 
         $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
         $value = '';
         $charsLength = strlen($chars) - 1;
 
-        for ($i = 1 ; $i <= $length; $i++) {
+        for ($i = 1; $i <= $length; $i++) {
             $value .= $chars[rand(0, $charsLength)];
         }
 
@@ -285,12 +302,13 @@ abstract class LTI_Data_Connector {
      * Any single quotes in the value passed will be replaced with two single quotes.  If a null value is passed, a string
      * of 'NULL' is returned (which will never be enclosed in quotes irrespective of the value of the $addQuotes parameter.
      *
-     * @param string $value     Value to be quoted
+     * @param string $value Value to be quoted
      * @param string $addQuotes If true the returned string will be enclosed in single quotes (optional, default is true)
      *
      * @return boolean True if the user object was successfully deleted
      */
-    static function quoted($value, $addQuotes = TRUE) {
+    static function quoted($value, $addQuotes = TRUE)
+    {
 
         if (is_null($value)) {
             $value = 'NULL';

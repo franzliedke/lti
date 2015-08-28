@@ -1,5 +1,7 @@
 <?php
 
+namespace Franzl\Lti;
+
 /**
  * Class to represent a tool consumer user
  *
@@ -28,11 +30,11 @@ class LTI_User {
     /**
      * @var array Roles for user.
      */
-    public $roles = array();
+    public $roles = [];
     /**
      * @var array Groups for user.
      */
-    public $groups = array();
+    public $groups = [];
     /**
      * @var string User's result sourcedid.
      */
@@ -84,8 +86,8 @@ class LTI_User {
         $this->lastname = '';
         $this->fullname = '';
         $this->email = '';
-        $this->roles = array();
-        $this->groups = array();
+        $this->roles = [];
+        $this->groups = [];
         $this->lti_result_sourcedid = NULL;
         $this->created = NULL;
         $this->updated = NULL;
@@ -217,7 +219,7 @@ class LTI_User {
      */
     public function setNames($firstname, $lastname, $fullname) {
 
-        $names = array(0 => '', 1 => '');
+        $names = [0 => '', 1 => ''];
         if (!empty($fullname)) {
             $this->fullname = trim($fullname);
             $names = preg_split("/[\s]+/", $this->fullname, 2);

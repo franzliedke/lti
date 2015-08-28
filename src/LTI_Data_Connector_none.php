@@ -1,5 +1,7 @@
 <?php
 
+namespace Franzl\Lti;
+
 ###
 ###  Class to represent a dummy LTI Data Connector with no data persistence
 ###
@@ -49,7 +51,7 @@ class LTI_Data_Connector_None extends LTI_Data_Connector {
 ###
   public function Tool_Consumer_list() {
 
-    return array();
+    return [];
 
   }
 
@@ -95,7 +97,7 @@ class LTI_Data_Connector_None extends LTI_Data_Connector {
 ###
   public function Resource_Link_getUserResultSourcedIDs($resource_link, $local_only, $id_scope) {
 
-    return array();
+    return [];
 
   }
 
@@ -104,13 +106,13 @@ class LTI_Data_Connector_None extends LTI_Data_Connector {
 ###
   public function Resource_Link_getShares($resource_link) {
 
-    return array();
+    return [];
 
   }
 
 
 ###
-###  LTI_Consumer_Nonce methods
+###  Franzl\Lti\LTI_Consumer_Nonce methods
 ###
 
 ###

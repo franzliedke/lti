@@ -1,5 +1,7 @@
 <?php
 
+namespace Franzl\Lti;
+
 /**
  * Class to represent a tool consumer resource link
  *
@@ -171,7 +173,7 @@ class LTI_Resource_Link {
         $this->lti_context_id = NULL;
         $this->lti_resource_id = NULL;
         $this->title = '';
-        $this->settings = array();
+        $this->settings = [];
         $this->group_sets = NULL;
         $this->groups = NULL;
         $this->primary_consumer_key = NULL;
@@ -395,7 +397,7 @@ class LTI_Resource_Link {
                     }
                     break;
                 case self::EXT_WRITE:
-                    if ($urlLTI11 && $this->checkValueType($lti_outcome, array(self::EXT_TYPE_DECIMAL))) {
+                    if ($urlLTI11 && $this->checkValueType($lti_outcome, [self::EXT_TYPE_DECIMAL])) {
                         $do = 'replaceResult';
                     } else if ($this->checkValueType($lti_outcome)) {
                         $urlLTI11 = NULL;
@@ -453,7 +455,7 @@ EOF;
                     }
                 }
             } else {
-                $params = array();
+                $params = [];
                 $params['sourcedid'] = $sourcedid;
                 $params['result_resultscore_textstring'] = $value;
                 if (!empty($lti_outcome->language)) {
@@ -504,28 +506,28 @@ EOF;
      * @return mixed Array of LTI_User objects or False if the request was not successful
      */
     public function doMembershipsService($withGroups = FALSE) {
-        $users = array();
+        $users = [];
         $old_users = $this->getUserResultSourcedIDs(TRUE, LTI_Tool_Provider::ID_SCOPE_RESOURCE);
         $this->ext_response = NULL;
         $url = $this->getSetting('ext_ims_lis_memberships_url');
-        $params = array();
+        $params = [];
         $params['id'] = $this->getSetting('ext_ims_lis_memberships_id');
         $ok = FALSE;
         if ($withGroups) {
             $ok = $this->doService('basic-lis-readmembershipsforcontextwithgroups', $url, $params);
         }
         if ($ok) {
-            $this->group_sets = array();
-            $this->groups = array();
+            $this->group_sets = [];
+            $this->groups = [];
         } else {
             $ok = $this->doService('basic-lis-readmembershipsforcontext', $url, $params);
         }
 
         if ($ok) {
             if (!isset($this->ext_nodes['memberships']['member'])) {
-                $members = array();
+                $members = [];
             } else if (!isset($this->ext_nodes['memberships']['member'][0])) {
-                $members = array();
+                $members = [];
                 $members[0] = $this->ext_nodes['memberships']['member'];
             } else {
                 $members = $this->ext_nodes['memberships']['member'];
@@ -556,9 +558,9 @@ EOF;
 ### Set the user groups
 #
                 if (!isset($members[$i]['groups']['group'])) {
-                    $groups = array();
+                    $groups = [];
                 } else if (!isset($members[$i]['groups']['group'][0])) {
-                    $groups = array();
+                    $groups = [];
                     $groups[0] = $members[$i]['groups']['group'];
                 } else {
                     $groups = $members[$i]['groups']['group'];
@@ -568,8 +570,8 @@ EOF;
                     if (isset($group['set'])) {
                         $set_id = $group['set']['id'];
                         if (!isset($this->group_sets[$set_id])) {
-                            $this->group_sets[$set_id] = array('title' => $group['set']['title'], 'groups' => array(),
-                                                               'num_members' => 0, 'num_staff' => 0, 'num_learners' => 0);
+                            $this->group_sets[$set_id] = ['title' => $group['set']['title'], 'groups' => [],
+                                                               'num_members' => 0, 'num_staff' => 0, 'num_learners' => 0];
                         }
                         $this->group_sets[$set_id]['num_members']++;
                         if ($user->isStaff()) {
@@ -581,9 +583,9 @@ EOF;
                         if (!in_array($group['id'], $this->group_sets[$set_id]['groups'])) {
                             $this->group_sets[$set_id]['groups'][] = $group['id'];
                         }
-                        $this->groups[$group['id']] = array('title' => $group['title'], 'set' => $set_id);
+                        $this->groups[$group['id']] = ['title' => $group['title'], 'set' => $set_id];
                     } else {
-                        $this->groups[$group['id']] = array('title' => $group['title']);
+                        $this->groups[$group['id']] = ['title' => $group['title']];
                     }
                     $user->groups[] = $group['id'];
                 }
@@ -640,7 +642,7 @@ EOF;
         if (isset($do)) {
 
             $url = $this->getSetting('ext_ims_lti_tool_setting_url');
-            $params = array();
+            $params = [];
             $params['id'] = $this->getSetting('ext_ims_lti_tool_setting_id');
             if (is_null($value)) {
                 $value = '';
@@ -873,7 +875,7 @@ EOF;
 EOD;
 // Calculate body hash
             $hash = base64_encode(sha1($xmlRequest, TRUE));
-            $params = array('oauth_body_hash' => $hash);
+            $params = ['oauth_body_hash' => $hash];
 
 // Add OAuth signature
             $hmac_method = new OAuthSignatureMethod_HMAC_SHA1();
@@ -930,7 +932,7 @@ EOD;
                     if (isset($child->tagName)) {
                         $t = $child->tagName;
                         if (!isset($output[$t])) {
-                            $output[$t] = array();
+                            $output[$t] = [];
                         }
                         $output[$t][] = $v;
                     } else {
@@ -942,7 +944,7 @@ EOD;
                 }
                 if (is_array($output)) {
                     if ($node->attributes->length) {
-                        $a = array();
+                        $a = [];
                         foreach ($node->attributes as $attrName => $attrNode) {
                             $a[$attrName] = (string) $attrNode->value;
                         }

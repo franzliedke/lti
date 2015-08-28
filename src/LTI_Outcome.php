@@ -1,5 +1,7 @@
 <?php
 
+namespace Franzl\Lti;
+
 /**
  * Class to represent an outcome
  *

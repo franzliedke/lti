@@ -1,5 +1,7 @@
 <?php
 
+namespace Franzl\Lti;
+
 /**
 * Class to represent a tool consumer
 *
@@ -205,7 +207,7 @@ public function signParameters($url, $type, $version, $params) {
 
 if (!empty($url)) {
 // Check for query parameters which need to be included in the signature
-$query_params = array();
+$query_params = [];
 $query_string = parse_url($url, PHP_URL_QUERY);
 if (!is_null($query_string)) {
 $query_items = explode('&', $query_string);

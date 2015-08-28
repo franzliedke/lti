@@ -1,5 +1,7 @@
 <?php
 
+namespace Franzl\Lti;
+
 /**
  * Class to represent a content-item object
  *
@@ -100,7 +102,7 @@ class LTI_Content_Item {
      */
     public static function toJson($items) {
 
-        $data = array();
+        $data = [];
         if (!is_array($items)) {
             $data[] = json_encode($items);
         } else {

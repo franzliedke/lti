@@ -1,5 +1,7 @@
 <?php
 
+namespace Franzl\Lti;
+
 ###
 ###  Class to represent a PDO LTI Data Connector
 ###
@@ -218,7 +220,7 @@ class LTI_Data_Connector_PDO extends LTI_Data_Connector {
 ###
   public function Tool_Consumer_list() {
 
-    $consumers = array();
+    $consumers = [];
 
     $sql = 'SELECT consumer_key, name, secret, lti_version, consumer_name, consumer_version, consumer_guid, css_path, ' .
            'protected, enabled, enable_from, enable_until, last_access, created, updated ' .
@@ -300,10 +302,10 @@ class LTI_Data_Connector_PDO extends LTI_Data_Connector {
           $resource_link->settings = unserialize($row['settings']);  // check for old serialized setting
         }
         if (!is_array($resource_link->settings)) {
-          $resource_link->settings = array();
+          $resource_link->settings = [];
         }
       } else {
-        $resource_link->settings = array();
+        $resource_link->settings = [];
       }
       $resource_link->primary_consumer_key = $row['primary_consumer_key'];
       $resource_link->primary_resource_link_id = $row['primary_context_id'];
@@ -451,7 +453,7 @@ class LTI_Data_Connector_PDO extends LTI_Data_Connector {
 ###
   public function Resource_Link_getUserResultSourcedIDs($resource_link, $local_only, $id_scope) {
 
-    $users = array();
+    $users = [];
 
     if ($local_only) {
       $sql = 'SELECT u.consumer_key, u.context_id, u.user_id, u.lti_result_sourcedid ' .
@@ -496,7 +498,7 @@ class LTI_Data_Connector_PDO extends LTI_Data_Connector {
 ###
   public function Resource_Link_getShares($resource_link) {
 
-    $shares = array();
+    $shares = [];
 
     $key = $resource_link->getKey();
     $id = $resource_link->getId();
@@ -525,7 +527,7 @@ class LTI_Data_Connector_PDO extends LTI_Data_Connector {
 
 
 ###
-###  LTI_Consumer_Nonce methods
+###  Franzl\Lti\LTI_Consumer_Nonce methods
 ###
 
 ###

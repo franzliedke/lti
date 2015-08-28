@@ -1,5 +1,7 @@
 <?php
 
+namespace Franzl\Lti;
+
 /**
  * Class to represent a tool consumer nonce
  *
@@ -7,7 +9,8 @@
  * @version 2.5.00
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3
  */
-class LTI_Consumer_Nonce {
+class LTI_Consumer_Nonce
+{
 
     /**
      * Maximum age nonce values will be retained for (in minutes).
@@ -17,7 +20,7 @@ class LTI_Consumer_Nonce {
     /**
      * Date/time when the nonce value expires.
      */
-    public  $expires = NULL;
+    public $expires = NULL;
 
     /**
      * @var LTI_Tool_Consumer Tool Consumer to which this nonce applies.
@@ -32,9 +35,10 @@ class LTI_Consumer_Nonce {
      * Class constructor.
      *
      * @param LTI_Tool_Consumer $consumer Consumer object
-     * @param string            $value    Nonce value (optional, default is null)
+     * @param string $value Nonce value (optional, default is null)
      */
-    public function __construct($consumer, $value = NULL) {
+    public function __construct($consumer, $value = NULL)
+    {
 
         $this->consumer = $consumer;
         $this->value = $value;
@@ -47,7 +51,8 @@ class LTI_Consumer_Nonce {
      *
      * @return boolean True if the nonce value was successfully loaded
      */
-    public function load() {
+    public function load()
+    {
 
         return $this->consumer->getDataConnector()->Consumer_Nonce_load($this);
 
@@ -58,7 +63,8 @@ class LTI_Consumer_Nonce {
      *
      * @return boolean True if the nonce value was successfully saved
      */
-    public function save() {
+    public function save()
+    {
 
         return $this->consumer->getDataConnector()->Consumer_Nonce_save($this);
 
@@ -69,7 +75,8 @@ class LTI_Consumer_Nonce {
      *
      * @return LTI_Tool_Consumer Consumer for this nonce
      */
-    public function getConsumer() {
+    public function getConsumer()
+    {
 
         return $this->consumer;
 
@@ -80,7 +87,8 @@ class LTI_Consumer_Nonce {
      *
      * @return string Consumer key value
      */
-    public function getKey() {
+    public function getKey()
+    {
 
         return $this->consumer->getKey();
 
@@ -91,7 +99,8 @@ class LTI_Consumer_Nonce {
      *
      * @return string Outcome value
      */
-    public function getValue() {
+    public function getValue()
+    {
 
         return $this->value;
 

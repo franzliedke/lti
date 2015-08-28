@@ -1,5 +1,7 @@
 <?php
 
+namespace Franzl\Lti;
+
 ###
 ###  Class to represent a LTI Data Connector for MySQLi
 ###
@@ -243,7 +245,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
 ###
   public function Tool_Consumer_list() {
 
-    $consumers = array();
+    $consumers = [];
 
     $sql = 'SELECT consumer_key, name, secret, lti_version, consumer_name, consumer_version, consumer_guid, css_path, protected, enabled, enable_from, enable_until, last_access, created, updated ' .
            "FROM {$this->dbTableNamePrefix}" . LTI_Data_Connector::CONSUMER_TABLE_NAME . ' ' .
@@ -318,7 +320,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
           if ($result->fetch()) {
             $resource_link->settings = unserialize($settings);
             if (!is_array($resource_link->settings)) {
-              $resource_link->settings = array();
+              $resource_link->settings = [];
             }
             $resource_link->share_approved = (is_null($share_approved)) ? NULL : ($share_approved == 1);
             $resource_link->created = strtotime($created);
@@ -489,7 +491,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
 ###
   public function Resource_Link_getUserResultSourcedIDs($resource_link, $local_only, $id_scope) {
 
-    $users = array();
+    $users = [];
 
     $ok = FALSE;
     $key = $resource_link->getKey();
@@ -546,7 +548,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
 ###
   public function Resource_Link_getShares($resource_link) {
 
-    $shares = array();
+    $shares = [];
 
     $ok = FALSE;
     $sql = 'SELECT consumer_key, context_id, title, share_approved ' .
@@ -583,7 +585,7 @@ class LTI_Data_Connector_MySQLi extends LTI_Data_Connector {
 
 
 ###
-###  LTI_Consumer_Nonce methods
+###  Franzl\Lti\LTI_Consumer_Nonce methods
 ###
 
 ###
