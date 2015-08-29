@@ -1,13 +1,13 @@
 <?php
 
-namespace Franzl\Lti;
+namespace Franzl\Lti\OAuth;
 
-class OAuthUtil
+class Util
 {
     public static function urlencodeRfc3986($input)
     {
         if (is_array($input)) {
-            return array_map(['OAuthUtil', 'urlencodeRfc3986'], $input);
+            return array_map(['Util', 'urlencodeRfc3986'], $input);
         } else if (is_scalar($input)) {
             return str_replace(
                 '+',
@@ -38,7 +38,7 @@ class OAuthUtil
         $params = [];
         if (preg_match_all('/('.($only_allow_oauth_parameters ? 'oauth_' : '').'[a-z_-]*)=(:?"([^"]*)"|([^,]*))/', $header, $matches)) {
             foreach ($matches[1] as $i => $h) {
-                $params[$h] = OAuthUtil::urldecodeRfc3986(empty($matches[3][$i]) ? $matches[4][$i] : $matches[3][$i]);
+                $params[$h] = Util::urldecodeRfc3986(empty($matches[3][$i]) ? $matches[4][$i] : $matches[3][$i]);
             }
             if (isset($params['realm'])) {
                 unset($params['realm']);
@@ -110,8 +110,8 @@ class OAuthUtil
         $parsed_parameters = [];
         foreach ($pairs as $pair) {
             $split = explode('=', $pair, 2);
-            $parameter = OAuthUtil::urldecodeRfc3986($split[0]);
-            $value = isset($split[1]) ? OAuthUtil::urldecodeRfc3986($split[1]) : '';
+            $parameter = Util::urldecodeRfc3986($split[0]);
+            $value = isset($split[1]) ? Util::urldecodeRfc3986($split[1]) : '';
 
             if (isset($parsed_parameters[$parameter])) {
                 // We have already recieved parameter(s) with this name, so add to the list
@@ -138,8 +138,8 @@ class OAuthUtil
         }
 
         // Urlencode both keys and values
-        $keys = OAuthUtil::urlencodeRfc3986(array_keys($params));
-        $values = OAuthUtil::urlencodeRfc3986(array_values($params));
+        $keys = Util::urlencodeRfc3986(array_keys($params));
+        $values = Util::urlencodeRfc3986(array_values($params));
         $params = array_combine($keys, $values);
 
         // Parameters are sorted by name, using lexicographical byte value ordering.

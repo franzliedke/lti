@@ -2,6 +2,10 @@
 
 namespace Franzl\Lti;
 
+use Franzl\Lti\OAuth\Consumer;
+use Franzl\Lti\OAuth\Request;
+use Franzl\Lti\OAuth\SignatureMethodHmacSha1;
+
 /**
  * Class to represent a tool consumer resource link
  *
@@ -901,9 +905,9 @@ EOD;
             $params = ['oauth_body_hash' => $hash];
 
 // Add OAuth signature
-            $hmac_method = new OAuthSignatureMethodHmacSha1();
-            $consumer = new OAuthConsumer($this->consumer->getKey(), $this->consumer->secret, null);
-            $req = OAuthRequest::fromConsumerAndToken($consumer, null, 'POST', $url, $params);
+            $hmac_method = new SignatureMethodHmacSha1();
+            $consumer = new Consumer($this->consumer->getKey(), $this->consumer->secret, null);
+            $req = Request::fromConsumerAndToken($consumer, null, 'POST', $url, $params);
             $req->signRequest($hmac_method, $consumer, null);
             $params = $req->getParameters();
             $header = $req->toHeader();

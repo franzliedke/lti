@@ -1,6 +1,6 @@
 <?php
 
-namespace Franzl\Lti;
+namespace Franzl\Lti\OAuth;
 
 /**
  * The HMAC-SHA1 signature method uses the HMAC-SHA1 signature algorithm as defined in [RFC2104]
@@ -9,7 +9,7 @@ namespace Franzl\Lti;
  * character (ASCII code 38) even if empty.
  *   - Chapter 9.2 ("HMAC-SHA1")
  */
-class OAuthSignatureMethodHmacSha1 extends OAuthSignatureMethod
+class SignatureMethodHmacSha1 extends SignatureMethod
 {
     public function getName()
     {
@@ -21,12 +21,12 @@ class OAuthSignatureMethodHmacSha1 extends OAuthSignatureMethod
         $base_string = $request->getSignatureBaseString();
         $request->base_string = $base_string;
 
-        $key_parts = array(
+        $key_parts = [
             $consumer->secret,
             ($token) ? $token->secret : ""
-        );
+        ];
 
-        $key_parts = OAuthUtil::urlencodeRfc3986($key_parts);
+        $key_parts = Util::urlencodeRfc3986($key_parts);
         $key = implode('&', $key_parts);
 
         return base64_encode(hash_hmac('sha1', $base_string, $key, true));

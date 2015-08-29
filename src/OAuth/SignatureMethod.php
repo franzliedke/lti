@@ -1,12 +1,12 @@
 <?php
 
-namespace Franzl\Lti;
+namespace Franzl\Lti\OAuth;
 
 /**
  * A class for implementing a Signature Method
  * See section 9 ("Signing Requests") in the spec
  */
-abstract class OAuthSignatureMethod
+abstract class SignatureMethod
 {
     /**
      * Needs to return the name of the Signature Method (ie HMAC-SHA1)
@@ -17,20 +17,20 @@ abstract class OAuthSignatureMethod
     /**
      * Build up the signature
      * NOTE: The output of this function MUST NOT be urlencoded.
-     * the encoding is handled in OAuthRequest when the final
+     * the encoding is handled in Request when the final
      * request is serialized
-     * @param OAuthRequest $request
-     * @param OAuthConsumer $consumer
-     * @param OAuthToken $token
+     * @param Request $request
+     * @param Consumer $consumer
+     * @param Token $token
      * @return string
      */
     abstract public function buildSignature($request, $consumer, $token);
 
     /**
      * Verifies that a given signature is correct
-     * @param OAuthRequest $request
-     * @param OAuthConsumer $consumer
-     * @param OAuthToken $token
+     * @param Request $request
+     * @param Consumer $consumer
+     * @param Token $token
      * @param string $signature
      * @return bool
      */

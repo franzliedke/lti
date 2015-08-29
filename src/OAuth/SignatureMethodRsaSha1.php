@@ -1,6 +1,6 @@
 <?php
 
-namespace Franzl\Lti;
+namespace Franzl\Lti\OAuth;
 
 /**
  * The RSA-SHA1 signature method uses the RSASSA-PKCS1-v1_5 signature algorithm as defined in
@@ -10,7 +10,7 @@ namespace Franzl\Lti;
  * specification.
  *   - Chapter 9.3 ("RSA-SHA1")
  */
-abstract class OAuthSignatureMethodRsaSha1 extends OAuthSignatureMethod
+abstract class SignatureMethodRsaSha1 extends SignatureMethod
 {
     public function getName()
     {

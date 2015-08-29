@@ -2,6 +2,9 @@
 
 namespace Franzl\Lti;
 
+use Franzl\Lti\OAuth\Consumer;
+use Franzl\Lti\OAuth\Request;
+use Franzl\Lti\OAuth\SignatureMethodHmacSha1;
 use Franzl\Lti\Storage\AbstractStorage;
 
 /**
@@ -237,9 +240,9 @@ class ToolConsumer
             $params['lti_message_type'] = $type;
             $params['oauth_callback'] = 'about:blank';
     // Add OAuth signature
-            $hmac_method = new OAuthSignatureMethodHmacSha1();
-            $consumer = new OAuthConsumer($this->getKey(), $this->secret, null);
-            $req = OAuthRequest::fromConsumerAndToken($consumer, null, 'POST', $url, $params);
+            $hmac_method = new SignatureMethodHmacSha1();
+            $consumer = new Consumer($this->getKey(), $this->secret, null);
+            $req = Request::fromConsumerAndToken($consumer, null, 'POST', $url, $params);
             $req->signRequest($hmac_method, $consumer, null);
             $params = $req->getParameters();
     // Remove parameters being passed on the query string

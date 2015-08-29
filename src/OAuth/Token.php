@@ -1,8 +1,8 @@
 <?php
 
-namespace Franzl\Lti;
+namespace Franzl\Lti\OAuth;
 
-class OAuthToken
+class Token
 {
     // access tokens and request tokens
     public $key;
@@ -25,9 +25,9 @@ class OAuthToken
     public function toString()
     {
         return "oauth_token=" .
-        OAuthUtil::urlencodeRfc3986($this->key) .
+        Util::urlencodeRfc3986($this->key) .
         "&oauth_token_secret=" .
-        OAuthUtil::urlencodeRfc3986($this->secret);
+        Util::urlencodeRfc3986($this->secret);
     }
 
     public function __toString()

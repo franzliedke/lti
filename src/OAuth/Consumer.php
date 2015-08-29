@@ -1,8 +1,8 @@
 <?php
 
-namespace Franzl\Lti;
+namespace Franzl\Lti\OAuth;
 
-class OAuthConsumer
+class Consumer
 {
     public $key;
     public $secret;
@@ -16,6 +16,6 @@ class OAuthConsumer
 
     public function __toString()
     {
-        return "OAuthConsumer[key=$this->key,secret=$this->secret]";
+        return "Consumer[key=$this->key,secret=$this->secret]";
     }
 }

@@ -2,6 +2,11 @@
 
 namespace Franzl\Lti;
 
+use Franzl\Lti\OAuth\Consumer;
+use Franzl\Lti\OAuth\DataStore;
+use Franzl\Lti\OAuth\Request;
+use Franzl\Lti\OAuth\Server;
+use Franzl\Lti\OAuth\SignatureMethodHmacSha1;
 use Franzl\Lti\Storage\AbstractStorage;
 
 /**
@@ -666,17 +671,17 @@ EOD;
             }
             $this->consumer->last_access = $now;
             try {
-                $store = new OAuthDataStore($this);
-                $server = new OAuthServer($store);
-                $method = new OAuthSignatureMethodHmacSha1();
+                $store = new DataStore($this);
+                $server = new Server($store);
+                $method = new SignatureMethodHmacSha1();
                 $server->addSignatureMethod($method);
-                $request = OAuthRequest::fromRequest();
+                $request = Request::fromRequest();
                 $res = $server->verifyRequest($request);
             } catch (Exception $e) {
                 $this->isOK = false;
                 if (empty($this->reason)) {
                     if ($this->debugMode) {
-                        $consumer = new OAuthConsumer($this->consumer->getKey(), $this->consumer->secret);
+                        $consumer = new Consumer($this->consumer->getKey(), $this->consumer->secret);
                         $signature = $request->buildSignature($method, $consumer, false);
                         $this->reason = $e->getMessage();
                         if (empty($this->reason)) {

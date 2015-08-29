@@ -1,6 +1,9 @@
 <?php
 
-namespace Franzl\Lti;
+namespace Franzl\Lti\OAuth;
+
+use Franzl\Lti\ConsumerNonce;
+use Franzl\Lti\ToolProvider;
 
 /**
  * Class to represent an OAuth datastore
@@ -9,7 +12,7 @@ namespace Franzl\Lti;
  * @version 2.5.00
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3
  */
-class OAuthDataStore extends \OAuthDataStore
+class DataStore
 {
 
     /**
@@ -30,16 +33,16 @@ class OAuthDataStore extends \OAuthDataStore
     }
 
     /**
-     * Create an OAuthConsumer object for the tool consumer.
+     * Create an Consumer object for the tool consumer.
      *
      * @param string $consumer_key Consumer key value
      *
-     * @return OAuthConsumer OAuthConsumer object
+     * @return Consumer Consumer object
      */
     public function lookupConsumer($consumer_key)
     {
 
-        return new OAuthConsumer(
+        return new Consumer(
             $this->tool_provider->consumer->getKey(),
             $this->tool_provider->consumer->secret
         );
@@ -47,25 +50,25 @@ class OAuthDataStore extends \OAuthDataStore
     }
 
     /**
-     * Create an OAuthToken object for the tool consumer.
+     * Create an Token object for the tool consumer.
      *
-     * @param string $consumer   OAuthConsumer object
+     * @param string $consumer   Consumer object
      * @param string $token_type Token type
      * @param string $token      Token value
      *
-     * @return OAuthToken OAuthToken object
+     * @return Token Token object
      */
     public function lookupToken($consumer, $token_type, $token)
     {
 
-        return new OAuthToken($consumer, '');
+        return new Token($consumer, '');
 
     }
 
     /**
      * Lookup nonce value for the tool consumer.
      *
-     * @param OAuthConsumer $consumer  OAuthConsumer object
+     * @param Consumer $consumer  Consumer object
      * @param string        $token     Token value
      * @param string        $value     Nonce value
      * @param string        $timestamp Date/time of request
@@ -91,7 +94,7 @@ class OAuthDataStore extends \OAuthDataStore
     /**
      * Get new request token.
      *
-     * @param OAuthConsumer $consumer  OAuthConsumer object
+     * @param Consumer $consumer  Consumer object
      * @param string        $callback  Callback URL
      *
      * @return string Null value
@@ -107,7 +110,7 @@ class OAuthDataStore extends \OAuthDataStore
      * Get new access token.
      *
      * @param string        $token     Token value
-     * @param OAuthConsumer $consumer  OAuthConsumer object
+     * @param Consumer $consumer  Consumer object
      * @param string        $verifier  Verification code
      *
      * @return string Null value

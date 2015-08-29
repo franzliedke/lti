@@ -1,8 +1,8 @@
 <?php
 
-namespace Franzl\Lti;
+namespace Franzl\Lti\OAuth;
 
-class OAuthRequest
+class Request
 {
     protected $parameters;
     protected $http_method;
@@ -15,7 +15,7 @@ class OAuthRequest
     public function __construct($http_method, $http_url, $parameters = null)
     {
         $parameters = ($parameters) ? $parameters : [];
-        $parameters = array_merge(OAuthUtil::parseParameters(parse_url($http_url, PHP_URL_QUERY)), $parameters);
+        $parameters = array_merge(Util::parseParameters(parse_url($http_url, PHP_URL_QUERY)), $parameters);
         $this->parameters = $parameters;
         $this->http_method = $http_method;
         $this->http_url = $http_url;
@@ -43,10 +43,10 @@ class OAuthRequest
         // parsed parameter-list
         if (!$parameters) {
             // Find request headers
-            $request_headers = OAuthUtil::getHeaders();
+            $request_headers = Util::getHeaders();
 
             // Parse the query-string to find GET parameters
-            $parameters = OAuthUtil::parseParameters($_SERVER['QUERY_STRING']);
+            $parameters = Util::parseParameters($_SERVER['QUERY_STRING']);
 
             // It's a POST request of the proper content-type, so parse POST
             // parameters and add those overriding any duplicates from GET
@@ -57,7 +57,7 @@ class OAuthRequest
                     'application/x-www-form-urlencoded'
                 )
             ) {
-                $post_data = OAuthUtil::parseParameters(
+                $post_data = Util::parseParameters(
                     file_get_contents(self::$POST_INPUT)
                 );
                 $parameters = array_merge($parameters, $post_data);
@@ -66,7 +66,7 @@ class OAuthRequest
             // We have a Authorization-header with OAuth data. Parse the header
             // and add those overriding any duplicates from GET or POST
             if (isset($request_headers['Authorization']) && substr($request_headers['Authorization'], 0, 6) == 'OAuth ') {
-                $header_parameters = OAuthUtil::splitHeader(
+                $header_parameters = Util::splitHeader(
                     $request_headers['Authorization']
                 );
                 $parameters = array_merge($parameters, $header_parameters);
@@ -74,7 +74,7 @@ class OAuthRequest
 
         }
 
-        return new OAuthRequest($http_method, $http_url, $parameters);
+        return new Request($http_method, $http_url, $parameters);
     }
 
     /**
@@ -83,9 +83,9 @@ class OAuthRequest
     public static function fromConsumerAndToken($consumer, $token, $http_method, $http_url, $parameters = null)
     {
         $parameters = ($parameters) ?  $parameters : [];
-        $defaults = ["oauth_version" => OAuthRequest::$version,
-                          "oauth_nonce" => OAuthRequest::generateNonce(),
-                          "oauth_timestamp" => OAuthRequest::generateTimestamp(),
+        $defaults = ["oauth_version" => Request::$version,
+                          "oauth_nonce" => Request::generateNonce(),
+                          "oauth_timestamp" => Request::generateTimestamp(),
                           "oauth_consumer_key" => $consumer->key];
         if ($token) {
             $defaults['oauth_token'] = $token->key;
@@ -93,7 +93,7 @@ class OAuthRequest
 
         $parameters = array_merge($defaults, $parameters);
 
-        return new OAuthRequest($http_method, $http_url, $parameters);
+        return new Request($http_method, $http_url, $parameters);
     }
 
     public function setParameter($name, $value, $allow_duplicates = true)
@@ -142,7 +142,7 @@ class OAuthRequest
             unset($params['oauth_signature']);
         }
 
-        return OAuthUtil::buildHttpQuery($params);
+        return Util::buildHttpQuery($params);
     }
 
     /**
@@ -160,7 +160,7 @@ class OAuthRequest
             $this->getSignableParameters()
         ];
 
-        $parts = OAuthUtil::urlencodeRfc3986($parts);
+        $parts = Util::urlencodeRfc3986($parts);
 
         return implode('&', $parts);
     }
@@ -211,7 +211,7 @@ class OAuthRequest
      */
     public function toPostData()
     {
-        return OAuthUtil::buildHttpQuery($this->parameters);
+        return Util::buildHttpQuery($this->parameters);
     }
 
     /**
@@ -221,7 +221,7 @@ class OAuthRequest
     {
         $first = true;
         if ($realm) {
-            $out = 'Authorization: OAuth realm="' . OAuthUtil::urlencodeRfc3986($realm) . '"';
+            $out = 'Authorization: OAuth realm="' . Util::urlencodeRfc3986($realm) . '"';
             $first = false;
         } else {
             $out = 'Authorization: OAuth';
@@ -233,12 +233,12 @@ class OAuthRequest
                 continue;
             }
             if (is_array($v)) {
-                throw new OAuthException('Arrays not supported in headers');
+                throw new Exception('Arrays not supported in headers');
             }
             $out .= ($first) ? ' ' : ',';
-            $out .= OAuthUtil::urlencodeRfc3986($k) .
+            $out .= Util::urlencodeRfc3986($k) .
                 '="' .
-                OAuthUtil::urlencodeRfc3986($v) .
+                Util::urlencodeRfc3986($v) .
                 '"';
             $first = false;
         }
