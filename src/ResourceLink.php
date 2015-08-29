@@ -2,6 +2,9 @@
 
 namespace Franzl\Lti;
 
+use DOMDocument;
+use Exception;
+use Franzl\Lti\Http\ClientFactory;
 use Franzl\Lti\OAuth\Consumer;
 use Franzl\Lti\OAuth\Request;
 use Franzl\Lti\OAuth\SignatureMethodHmacSha1;
@@ -82,22 +85,6 @@ class ResourceLink
      * @var array User groups (NULL if the consumer does not support the groups enhancement)
      */
     public $groups = null;
-    /**
-     * @var string Request for last service request.
-     */
-    public $ext_request = null;
-    /**
-     * @var array Request headers for last service request.
-     */
-    public $ext_request_headers = null;
-    /**
-     * @var string Response from last service request.
-     */
-    public $ext_response = null;
-    /**
-     * @var array Response header from last service request.
-     */
-    public $ext_response_headers = null;
     /**
      * @var string Consumer key value for resource link being shared (if any).
      */
@@ -391,7 +378,6 @@ class ResourceLink
     {
 
         $response = false;
-        $this->ext_response = null;
 #
 ### Lookup service details from the source resource link appropriate to the user (in case the destination is being shared)
 #
@@ -530,7 +516,6 @@ EOF;
     {
         $users = [];
         $old_users = $this->getUserResultSourcedIDs(true, ToolProvider::ID_SCOPE_RESOURCE);
-        $this->ext_response = null;
         $url = $this->getSetting('ext_ims_lis_memberships_url');
         $params = [];
         $params['id'] = $this->getSetting('ext_ims_lis_memberships_id');
@@ -649,7 +634,6 @@ EOF;
     {
 
         $response = false;
-        $this->ext_response = null;
         switch ($action) {
             case self::EXT_READ:
                 $do = 'basic-lti-loadsetting';
@@ -825,7 +809,7 @@ EOF;
     /**
      * Send a service request to the tool consumer.
      *
-     * @param string $type   Message type value
+     * @param string $type   GuzzleClient type value
      * @param string $url    URL to send request to
      * @param array  $params Associative array of parameter values to be passed
      *
@@ -833,23 +817,18 @@ EOF;
      */
     private function doService($type, $url, $params)
     {
-
         $ok = false;
-        $this->ext_request = null;
-        $this->ext_request_headers = '';
-        $this->ext_response = null;
-        $this->ext_response_headers = '';
         if (!empty($url)) {
             $params = $this->consumer->signParameters($url, $type, $this->consumer->lti_version, $params);
-// Connect to tool consumer
-            $http = new HttpMessage($url, 'POST', $params);
-// Parse XML response
-            if ($http->send()) {
-                $this->ext_response = $http->response;
-                $this->ext_response_headers = $http->response_headers;
+
+            // Connect to tool consumer
+            $response = ClientFactory::make()->send($url, 'POST', $params);
+
+            // Parse XML response
+            if ($response->getStatusCode() < 400) {
                 try {
                     $this->ext_doc = new DOMDocument();
-                    $this->ext_doc->loadXML($http->response);
+                    $this->ext_doc->loadXML((string) $response->getBody());
                     $this->ext_nodes = $this->domNodeToArray($this->ext_doc->documentElement);
                     if (isset($this->ext_nodes['statusinfo']['codemajor']) && ($this->ext_nodes['statusinfo']['codemajor'] == 'Success')) {
                         $ok = true;
@@ -857,8 +836,6 @@ EOF;
                 } catch (Exception $e) {
                 }
             }
-            $this->ext_request = $http->request;
-            $this->ext_request_headers = $http->request_headers;
         }
 
         return $ok;
@@ -868,7 +845,7 @@ EOF;
     /**
      * Send a service request to the tool consumer.
      *
-     * @param string $type Message type value
+     * @param string $type GuzzleClient type value
      * @param string $url  URL to send request to
      * @param string $xml  XML of message request
      *
@@ -878,10 +855,6 @@ EOF;
     {
 
         $ok = false;
-        $this->ext_request = null;
-        $this->ext_request_headers = '';
-        $this->ext_response = null;
-        $this->ext_response_headers = '';
         if (!empty($url)) {
             $id = uniqid();
             $xmlRequest = <<< EOD
@@ -900,27 +873,28 @@ EOF;
   </imsx_POXBody>
 </imsx_POXEnvelopeRequest>
 EOD;
-// Calculate body hash
+            // Calculate body hash
             $hash = base64_encode(sha1($xmlRequest, true));
             $params = ['oauth_body_hash' => $hash];
 
-// Add OAuth signature
+            // Add OAuth signature
             $hmac_method = new SignatureMethodHmacSha1();
             $consumer = new Consumer($this->consumer->getKey(), $this->consumer->secret, null);
             $req = Request::fromConsumerAndToken($consumer, null, 'POST', $url, $params);
             $req->signRequest($hmac_method, $consumer, null);
             $params = $req->getParameters();
-            $header = $req->toHeader();
-            $header .= "\nContent-Type: application/xml";
-// Connect to tool consumer
-            $http = new HttpMessage($url, 'POST', $xmlRequest, $header);
-// Parse XML response
-            if ($http->send()) {
-                $this->ext_response = $http->response;
-                $this->ext_response_headers = $http->response_headers;
+
+            // Connect to tool consumer
+            $response = ClientFactory::make()->send($url, 'POST', $xmlRequest, [
+                'authorization' => $req->getAuthorizationHeader(),
+                'content-type' => 'application/xml',
+            ]);
+
+            // Parse XML response
+            if ($response->getStatusCode() < 400) {
                 try {
                     $this->ext_doc = new DOMDocument();
-                    $this->ext_doc->loadXML($http->response);
+                    $this->ext_doc->loadXML((string) $response->getBody());
                     $this->ext_nodes = $this->domNodeToArray($this->ext_doc->documentElement);
                     if (isset($this->ext_nodes['imsx_POXHeader']['imsx_POXResponseHeaderInfo']['imsx_statusInfo']['imsx_codeMajor']) &&
                         ($this->ext_nodes['imsx_POXHeader']['imsx_POXResponseHeaderInfo']['imsx_statusInfo']['imsx_codeMajor'] == 'success')) {
@@ -929,8 +903,6 @@ EOD;
                 } catch (Exception $e) {
                 }
             }
-            $this->ext_request = $http->request;
-            $this->ext_request_headers = $http->request_headers;
         }
 
         return $ok;

@@ -217,17 +217,16 @@ class Request
     /**
      * builds the Authorization: header
      */
-    public function toHeader($realm = null)
+    public function getAuthorizationHeader($realm = null)
     {
         $first = true;
         if ($realm) {
-            $out = 'Authorization: OAuth realm="' . Util::urlencodeRfc3986($realm) . '"';
+            $out = 'OAuth realm="' . Util::urlencodeRfc3986($realm) . '"';
             $first = false;
         } else {
-            $out = 'Authorization: OAuth';
+            $out = 'OAuth';
         }
 
-        $total = [];
         foreach ($this->parameters as $k => $v) {
             if (substr($k, 0, 5) != "oauth") {
                 continue;

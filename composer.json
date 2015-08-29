@@ -1,7 +1,7 @@
 {
   "name": "franzl/lti",
   "description": "An LTI Tool Provider library for PHP",
-  "minimum-stability": "dev",
+  "minimum-stability": "stable",
   "license": "LGPL-3.0+",
   "authors": [
     {
@@ -15,7 +15,9 @@
     }
   },
   "require": {
-    "php": ">=5.4.0"
+    "php": ">=5.5.0",
+    "psr/http-message": "~1.0",
+    "guzzlehttp/guzzle": "~6.0"
   },
   "require-dev": {
     "phpspec/phpspec": "^2.2",
