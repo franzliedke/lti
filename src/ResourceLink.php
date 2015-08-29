@@ -825,7 +825,8 @@ EOF;
             $response = ClientFactory::make()->send($url, 'POST', $params);
 
             // Parse XML response
-            if ($response->getStatusCode() < 400) {
+            if ($response->isSuccessful()) {
+                $response = $response->getWrappedResponse();
                 try {
                     $this->ext_doc = new DOMDocument();
                     $this->ext_doc->loadXML((string) $response->getBody());
@@ -891,7 +892,8 @@ EOD;
             ]);
 
             // Parse XML response
-            if ($response->getStatusCode() < 400) {
+            if ($response->isSuccessful()) {
+                $response = $response->getWrappedResponse();
                 try {
                     $this->ext_doc = new DOMDocument();
                     $this->ext_doc->loadXML((string) $response->getBody());

@@ -11,7 +11,7 @@ interface ClientInterface
      * @param string $method
      * @param array|string $body
      * @param array $headers
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return ResponseInterface
      */
     public function send($url, $method, $body, $headers = []);
 }
