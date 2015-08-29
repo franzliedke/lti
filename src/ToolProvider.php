@@ -867,11 +867,11 @@ EOD;
 ### Save the user instance
 #
             if (isset($_POST['lis_result_sourcedid'])) {
-                if ($this->user->lti_result_sourcedid != $_POST['lis_result_sourcedid']) {
-                    $this->user->lti_result_sourcedid = $_POST['lis_result_sourcedid'];
+                if ($this->user->ltiResultSourcedId != $_POST['lis_result_sourcedid']) {
+                    $this->user->ltiResultSourcedId = $_POST['lis_result_sourcedid'];
                     $this->user->save();
                 }
-            } else if (!empty($this->user->lti_result_sourcedid)) {
+            } else if (!empty($this->user->ltiResultSourcedId)) {
                 $this->user->delete();
             }
 #

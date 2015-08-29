@@ -11,72 +11,103 @@ namespace Franzl\Lti;
  */
 class User
 {
+    /**
+     * User's first name
+     *
+     * @var string
+     */
+    public $firstName = '';
 
     /**
-     * @var string User's first name.
+     * User's last name (surname or family name)
+     *
+     * @var string
      */
-    public $firstname = '';
+    public $lastName = '';
+
     /**
-     * @var string User's last name (surname or family name).
+     * User's full name
+     *
+     * @var string
      */
-    public $lastname = '';
+    public $fullName = '';
+
     /**
-     * @var string User's fullname.
-     */
-    public $fullname = '';
-    /**
-     * @var string User's email address.
+     * User's email address
+     *
+     * @var string
      */
     public $email = '';
+
     /**
-     * @var array Roles for user.
+     * Roles for user
+     *
+     * @var array
      */
     public $roles = [];
+
     /**
-     * @var array Groups for user.
+     * Groups for user
+     *
+     * @var array
      */
     public $groups = [];
+
     /**
-     * @var string User's result sourcedid.
+     * User's result sourcedid
+     *
+     * @var string
      */
-    public $lti_result_sourcedid = null;
+    public $ltiResultSourcedId = null;
+
     /**
-     * @var object Date/time the record was created.
+     * Date/time the record was created
+     *
+     * @var object
      */
     public $created = null;
+
     /**
-     * @var object Date/time the record was last updated.
+     * Date/time the record was last updated
+     *
+     * @var object
      */
     public $updated = null;
 
     /**
-     * @var ResourceLink Resource link object.
+     * Resource link object
+     *
+     * @var ResourceLink
      */
-    private $resource_link = null;
+    private $resourceLink = null;
+
     /**
-     * @var Context Resource link object.
+     * Context object
+     *
+     * @var Context
      */
     private $context = null;
+
     /**
-     * @var string User ID value.
+     * User ID value
+     *
+     * @var string
      */
     private $id = null;
 
     /**
      * Class constructor.
      *
-     * @param ResourceLink $resource_link Resource_Link object
+     * @param ResourceLink $resourceLink Resource_Link object
      * @param string      $id      User ID value
      */
-    public function __construct($resource_link, $id)
+    public function __construct($resourceLink, $id)
     {
-
         $this->initialise();
-        $this->resource_link = $resource_link;
-        $this->context = &$this->resource_link;
+        $this->resourceLink = $resourceLink;
+        $this->context = &$this->resourceLink;
         $this->id = $id;
         $this->load();
-
     }
 
     /**
@@ -84,17 +115,15 @@ class User
      */
     public function initialise()
     {
-
-        $this->firstname = '';
-        $this->lastname = '';
-        $this->fullname = '';
+        $this->firstName = '';
+        $this->lastName = '';
+        $this->fullName = '';
         $this->email = '';
         $this->roles = [];
         $this->groups = [];
-        $this->lti_result_sourcedid = null;
+        $this->ltiResultSourcedId = null;
         $this->created = null;
         $this->updated = null;
-
     }
 
     /**
@@ -104,12 +133,10 @@ class User
      */
     public function load()
     {
-
         $this->initialise();
-        if (!is_null($this->resource_link)) {
-            $this->resource_link->getConsumer()->getDataConnector()->User_load($this);
+        if (!is_null($this->resourceLink)) {
+            $this->resourceLink->getConsumer()->getDataConnector()->User_load($this);
         }
-
     }
 
     /**
@@ -119,15 +146,13 @@ class User
      */
     public function save()
     {
-
-        if (!empty($this->lti_result_sourcedid) && !is_null($this->resource_link)) {
-            $ok = $this->resource_link->getConsumer()->getDataConnector()->User_save($this);
+        if (!empty($this->ltiResultSourcedId) && !is_null($this->resourceLink)) {
+            $ok = $this->resourceLink->getConsumer()->getDataConnector()->User_save($this);
         } else {
             $ok = true;
         }
 
         return $ok;
-
     }
 
     /**
@@ -137,15 +162,9 @@ class User
      */
     public function delete()
     {
-
-        if (!is_null($this->resource_link)) {
-            $ok = $this->resource_link->getConsumer()->getDataConnector()->User_delete($this);
-        } else {
-            $ok = true;
-        }
-
-        return $ok;
-
+        return
+            is_null($this->resourceLink) ||
+            $this->resourceLink->getConsumer()->getDataConnector()->User_delete($this);
     }
 
     /**
@@ -155,9 +174,7 @@ class User
      */
     public function getResourceLink()
     {
-
-        return $this->resource_link;
-
+        return $this->resourceLink;
     }
 
     /**
@@ -170,43 +187,40 @@ class User
      */
     public function getContext()
     {
-
-        return $this->resource_link;
-
+        return $this->resourceLink;
     }
 
     /**
      * Get the user ID (which may be a compound of the tool consumer and resource link IDs).
      *
-     * @param int $id_scope Scope to use for user ID (optional, default is null for consumer default setting)
+     * @param int $idScope Scope to use for user ID (optional, default is null for consumer default setting)
      *
      * @return string User ID value
      */
-    public function getId($id_scope = null)
+    public function getId($idScope = null)
     {
-
-        if (empty($id_scope)) {
-            if (!is_null($this->resource_link)) {
-                $id_scope = $this->resource_link->getConsumer()->id_scope;
+        if (empty($idScope)) {
+            if (!is_null($this->resourceLink)) {
+                $idScope = $this->resourceLink->getConsumer()->id_scope;
             } else {
-                $id_scope = ToolProvider::ID_SCOPE_ID_ONLY;
+                $idScope = ToolProvider::ID_SCOPE_ID_ONLY;
             }
         }
-        switch ($id_scope) {
+        switch ($idScope) {
             case ToolProvider::ID_SCOPE_GLOBAL:
-                $id = $this->resource_link->getKey() . ToolProvider::ID_SCOPE_SEPARATOR . $this->id;
+                $id = $this->resourceLink->getKey() . ToolProvider::ID_SCOPE_SEPARATOR . $this->id;
                 break;
             case ToolProvider::ID_SCOPE_CONTEXT:
-                $id = $this->resource_link->getKey();
-                if ($this->resource_link->lti_context_id) {
-                    $id .= ToolProvider::ID_SCOPE_SEPARATOR . $this->resource_link->lti_context_id;
+                $id = $this->resourceLink->getKey();
+                if ($this->resourceLink->lti_context_id) {
+                    $id .= ToolProvider::ID_SCOPE_SEPARATOR . $this->resourceLink->lti_context_id;
                 }
                 $id .= ToolProvider::ID_SCOPE_SEPARATOR . $this->id;
                 break;
             case ToolProvider::ID_SCOPE_RESOURCE:
-                $id = $this->resource_link->getKey();
-                if ($this->resource_link->lti_resource_id) {
-                    $id .= ToolProvider::ID_SCOPE_SEPARATOR . $this->resource_link->lti_resource_id;
+                $id = $this->resourceLink->getKey();
+                if ($this->resourceLink->lti_resource_id) {
+                    $id .= ToolProvider::ID_SCOPE_SEPARATOR . $this->resourceLink->lti_resource_id;
                 }
                 $id .= ToolProvider::ID_SCOPE_SEPARATOR . $this->id;
                 break;
@@ -216,44 +230,41 @@ class User
         }
 
         return $id;
-
     }
 
     /**
      * Set the user's name.
      *
-     * @param string $firstname User's first name.
-     * @param string $lastname User's last name.
-     * @param string $fullname User's full name.
+     * @param string $firstName User's first name.
+     * @param string $lastName User's last name.
+     * @param string $fullName User's full name.
      */
-    public function setNames($firstname, $lastname, $fullname)
+    public function setNames($firstName, $lastName, $fullName)
     {
-
         $names = [0 => '', 1 => ''];
-        if (!empty($fullname)) {
-            $this->fullname = trim($fullname);
-            $names = preg_split("/[\s]+/", $this->fullname, 2);
+        if (!empty($fullName)) {
+            $this->fullName = trim($fullName);
+            $names = preg_split("/[\s]+/", $this->fullName, 2);
         }
-        if (!empty($firstname)) {
-            $this->firstname = trim($firstname);
-            $names[0] = $this->firstname;
+        if (!empty($firstName)) {
+            $this->firstName = trim($firstName);
+            $names[0] = $this->firstName;
         } else if (!empty($names[0])) {
-            $this->firstname = $names[0];
+            $this->firstName = $names[0];
         } else {
-            $this->firstname = 'User';
+            $this->firstName = 'User';
         }
-        if (!empty($lastname)) {
-            $this->lastname = trim($lastname);
-            $names[1] = $this->lastname;
+        if (!empty($lastName)) {
+            $this->lastName = trim($lastName);
+            $names[1] = $this->lastName;
         } else if (!empty($names[1])) {
-            $this->lastname = $names[1];
+            $this->lastName = $names[1];
         } else {
-            $this->lastname = $this->id;
+            $this->lastName = $this->id;
         }
-        if (empty($this->fullname)) {
-            $this->fullname = "{$this->firstname} {$this->lastname}";
+        if (empty($this->fullName)) {
+            $this->fullName = "{$this->firstName} {$this->lastName}";
         }
-
     }
 
     /**
@@ -264,7 +275,6 @@ class User
      */
     public function setEmail($email, $defaultEmail = null)
     {
-
         if (!empty($email)) {
             $this->email = $email;
         } else if (!empty($defaultEmail)) {
@@ -275,7 +285,6 @@ class User
         } else {
             $this->email = '';
         }
-
     }
 
     /**
@@ -285,10 +294,12 @@ class User
      */
     public function isAdmin()
     {
-
-        return $this->hasRole('Administrator') || $this->hasRole('urn:lti:sysrole:ims/lis/SysAdmin') ||
-        $this->hasRole('urn:lti:sysrole:ims/lis/Administrator') || $this->hasRole('urn:lti:instrole:ims/lis/Administrator');
-
+        return $this->hasRoles([
+            'Administrator',
+            'urn:lti:sysrole:ims/lis/SysAdmin',
+            'urn:lti:sysrole:ims/lis/Administrator',
+            'urn:lti:instrole:ims/lis/Administrator'
+        ]);
     }
 
     /**
@@ -298,9 +309,7 @@ class User
      */
     public function isStaff()
     {
-
-        return ($this->hasRole('Instructor') || $this->hasRole('ContentDeveloper') || $this->hasRole('TeachingAssistant'));
-
+        return $this->hasRoles(['Instructor', 'ContentDeveloper', 'TeachingAssistant']);
     }
 
     /**
@@ -310,14 +319,8 @@ class User
      */
     public function isLearner()
     {
-
         return $this->hasRole('Learner');
-
     }
-
-###
-###  PRIVATE METHODS
-###
 
     /**
      * Check whether the user has a specified role name.
@@ -328,12 +331,17 @@ class User
      */
     private function hasRole($role)
     {
-
         if (substr($role, 0, 4) != 'urn:') {
-            $role = 'urn:lti:role:ims/lis/' . $role;
+            $role = "urn:lti:role:ims/lis/$role";
         }
 
         return in_array($role, $this->roles);
+    }
 
+    private function hasRoles(array $roles)
+    {
+        $myRoles = array_filter($roles, [$this, 'hasRole']);
+
+        return count($roles) == count($myRoles);
     }
 }

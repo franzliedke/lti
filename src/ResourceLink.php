@@ -385,7 +385,7 @@ class ResourceLink
         $sourcedid = $lti_outcome->getSourcedid();
         if (!is_null($user)) {
             $source_resource_link = $user->getResourceLink();
-            $sourcedid = $user->lti_result_sourcedid;
+            $sourcedid = $user->ltiResultSourcedId;
         }
 #
 ### Use LTI 1.1 service in preference to extension service if it is available
@@ -599,7 +599,7 @@ EOF;
 ### If a result sourcedid is provided save the user
 #
                 if (isset($members[$i]['lis_result_sourcedid'])) {
-                    $user->lti_result_sourcedid = $members[$i]['lis_result_sourcedid'];
+                    $user->ltiResultSourcedId = $members[$i]['lis_result_sourcedid'];
                     $user->save();
                 }
                 $users[] = $user;

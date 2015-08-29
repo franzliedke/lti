@@ -498,7 +498,7 @@ class PDOStorage extends AbstractStorage
                 $user = new User($resource_link, $row['user_id']);
                 $user->consumer_key = $row['consumer_key'];
                 $user->context_id = $row['context_id'];
-                $user->lti_result_sourcedid = $row['lti_result_sourcedid'];
+                $user->ltiResultSourcedId = $row['lti_result_sourcedid'];
                 if (is_null($id_scope)) {
                     $users[] = $user;
                 } else {
@@ -719,7 +719,7 @@ class PDOStorage extends AbstractStorage
 
         if ($ok) {
             $row = array_change_key_case($row);
-            $user->lti_result_sourcedid = $row['lti_result_sourcedid'];
+            $user->ltiResultSourcedId = $row['lti_result_sourcedid'];
             $user->created = strtotime($row['created']);
             $user->updated = strtotime($row['updated']);
         }
@@ -752,7 +752,7 @@ class PDOStorage extends AbstractStorage
         $query->bindValue('key', $key, PDO::PARAM_STR);
         $query->bindValue('id', $id, PDO::PARAM_STR);
         $query->bindValue('user_id', $userId, PDO::PARAM_STR);
-        $query->bindValue('lti_result_sourcedid', $user->lti_result_sourcedid, PDO::PARAM_STR);
+        $query->bindValue('lti_result_sourcedid', $user->ltiResultSourcedId, PDO::PARAM_STR);
         $query->bindValue('now', $now, PDO::PARAM_STR);
         $ok = $query->execute();
         if ($ok) {
