@@ -2,8 +2,8 @@
 
 namespace Franzl\Lti\Http;
 
-use Exception;
 use GuzzleHttp\ClientInterface as GuzzleContract;
+use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Psr7\Request;
 
 class GuzzleClient implements ClientInterface
@@ -41,7 +41,7 @@ class GuzzleClient implements ClientInterface
 
         try {
             return new HttpResponse($this->guzzle->send($request));
-        } catch (Exception $e) {
+        } catch (TransferException $e) {
             return new ErrorResponse;
         }
     }
