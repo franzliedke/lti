@@ -209,9 +209,9 @@ abstract class AbstractStorage
      *
      * If a data connector object is passed, then this is returned unchanged.
      *
-     * If the $data_connector parameter is a string, this is used as the prefix.
+     * If the $storage parameter is a string, this is used as the prefix.
      *
-     * If the $data_connector parameter is an array, the first entry should be a prefix string and an optional second entry
+     * If the $storage parameter is an array, the first entry should be a prefix string and an optional second entry
      * being a string containing the database type or a database connection object (e.g. the value returned by a call to
      * mysqli_connect() or a PDO object).  A bespoke data connector class can be specified in the optional third parameter.
      *
@@ -221,7 +221,7 @@ abstract class AbstractStorage
      *
      * @return AbstractStorage Data connector object
      */
-    public static function getDataConnector($data_connector, $db = null, $type = null)
+    public static function getStorage($data_connector, $db = null, $type = null)
     {
 
         if (!is_null($data_connector)) {
@@ -255,16 +255,15 @@ abstract class AbstractStorage
                         if (is_object($db)) {
                             $type = get_class($db);
                         } else {
-                            $type = 'mysql';
+                            $type = 'PDO';
                         }
                     }
                 }
                 if (is_null($type)) {
-                    $type = 'mysql';
+                    $type = 'PDO';
                 }
                 $type = strtolower($type);
-                $type = "LTI_Data_Connector_{$type}";
-                require_once("{$type}.php");
+                $type = __NAMESPACE__ . "{$type}Storage";
                 if (is_null($db)) {
                     $data_connector = new $type($prefix);
                 } else {

@@ -101,7 +101,7 @@ class ToolConsumer
     public function __construct($key = null, $data_connector = '', $autoEnable = false)
     {
 
-        $this->data_connector = AbstractStorage::getDataConnector($data_connector);
+        $this->data_connector = AbstractStorage::getStorage($data_connector);
         if (!empty($key)) {
             $this->load($key, $autoEnable);
         } else {

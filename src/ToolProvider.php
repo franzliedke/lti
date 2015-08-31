@@ -20,171 +20,243 @@ class ToolProvider
 {
     /**
      * Default connection error message.
+     *
+     * @var string
      */
     const CONNECTION_ERROR_MESSAGE = 'Sorry, there was an error connecting you to the application.';
 
     /**
      * LTI version 1 for messages.
+     *
+     * @var string
      */
     const LTI_VERSION1 = 'LTI-1p0';
 
     /**
      * LTI version 2 for messages.
+     *
+     * @var string
      */
     const LTI_VERSION2 = 'LTI-2p0';
 
     /**
      * Use ID value only.
+     *
+     * @var int
      */
     const ID_SCOPE_ID_ONLY = 0;
 
     /**
      * Prefix an ID with the consumer key.
+     *
+     * @var int
      */
     const ID_SCOPE_GLOBAL = 1;
 
     /**
      * Prefix the ID with the consumer key and context ID.
+     *
+     * @var int
      */
     const ID_SCOPE_CONTEXT = 2;
 
     /**
      * Prefix the ID with the consumer key and resource ID.
+     *
+     * @var int
      */
     const ID_SCOPE_RESOURCE = 3;
 
     /**
      * Character used to separate each element of an ID.
+     *
+     * @var string
      */
     const ID_SCOPE_SEPARATOR = ':';
 
     /**
-     * @var ToolConsumer Tool Consumer object.
+     * Tool Consumer object.
+     *
+     * @var ToolConsumer
      */
     public $consumer = null;
 
     /**
-     * @var string Return URL provided by tool consumer.
+     * Return URL provided by tool consumer.
+     *
+     * @var string
      */
-    public $return_url = null;
+    public $returnUrl = null;
 
     /**
-     * @var User User object.
+     * User object.
+     *
+     * @var User
      */
     public $user = null;
 
     /**
-     * @var ResourceLink Resource link object.
+     * Resource link object.
+     *
+     * @var ResourceLink
      */
-    public $resource_link = null;
+    public $resourceLink = null;
 
     /**
-     * @var AbstractStorage Data connector object.
+     * Storage object.
+     *
+     * @var AbstractStorage
      */
-    public $data_connector = null;
+    public $storage = null;
 
     /**
-     * @var string Default email domain.
+     * Default email domain.
+     *
+     * @var string
      */
     public $defaultEmail = '';
 
     /**
-     * @var int Scope to use for user IDs.
+     * Scope to use for user IDs.
+     *
+     * @var int
      */
-    public $id_scope = self::ID_SCOPE_ID_ONLY;
+    public $idScope = self::ID_SCOPE_ID_ONLY;
 
     /**
-     * @var boolean Whether shared resource link arrangements are permitted.
+     * Whether shared resource link arrangements are permitted.
+     *
+     * @var bool
      */
     public $allowSharing = false;
 
     /**
-     * @var string Message for last request processed
+     * Message for last request processed.
+     *
+     * @var string
      */
     public $message = self::CONNECTION_ERROR_MESSAGE;
 
     /**
-     * @var array Details for error message relating to last request processed.
+     * Details for error message relating to last request processed.
+     *
+     * @var array
      */
     public $details = [];
 
     /**
-     * @var string URL to redirect user to on successful completion of the request.
+     * URL to redirect user to on successful completion of the request.
+     *
+     * @var string
      */
-    protected $redirectURL = null;
+    protected $redirectUrl = null;
 
     /**
-     * @var string URL to redirect user to on successful completion of the request.
+     * URL to redirect user to on successful completion of the request.
+     *
+     * @var string
      */
     protected $mediaTypes = null;
 
     /**
-     * @var string URL to redirect user to on successful completion of the request.
+     * URL to redirect user to on successful completion of the request.
+     *
+     * @var string
      */
     protected $documentTargets = null;
 
     /**
-     * @var string HTML to be displayed on a successful completion of the request.
+     * HTML to be displayed on a successful completion of the request.
+     *
+     * @var string
      */
     protected $output = null;
 
     /**
-     * @var string HTML to be displayed on an unsuccessful completion of the request and no return URL is available.
+     * HTML to be displayed on an unsuccessful completion of the request and no return URL is available.
+     *
+     * @var string
      */
-    protected $error_output = null;
+    protected $errorOutput = null;
 
     /**
-     * @var boolean Whether debug messages explaining the cause of errors are to be returned to the tool consumer.
+     * Whether debug messages explaining the cause of errors are to be returned to the tool consumer.
+     *
+     * @var bool
      */
     protected $debugMode = false;
 
     /**
-     * @var array Callback functions for handling requests.
+     * Callback functions for handling requests.
+     *
+     * @var array
      */
     private $callbackHandler = null;
 
     /**
-     * @var array LTI parameter constraints for auto validation checks.
+     * LTI parameter constraints for auto validation checks.
+     *
+     * @var array
      */
     private $constraints = null;
 
     /**
-     * @var array List of supported message types and associated callback type names
+     * List of supported message types and associated callback type names.
+     *
+     * @var array
      */
-    private $messageTypes = ['basic-lti-launch-request'    => 'launch',
-                             'ConfigureLaunchRequest'      => 'configure',
-                             'DashboardRequest'            => 'dashboard',
-                             'ContentItemSelectionRequest' => 'content-item'];
+    private $messageTypes = [
+        'basic-lti-launch-request'    => 'launch',
+        'ConfigureLaunchRequest'      => 'configure',
+        'DashboardRequest'            => 'dashboard',
+        'ContentItemSelectionRequest' => 'content-item'
+    ];
 
     /**
-     * @var array List of supported message types and associated class methods
+     * List of supported message types and associated class methods
+     *
+     * @var array
      */
-    private $methodNames = ['basic-lti-launch-request'    => 'onLaunch',
-                            'ConfigureLaunchRequest'      => 'onConfigure',
-                            'DashboardRequest'            => 'onDashboard',
-                            'ContentItemSelectionRequest' => 'onContentItem'];
+    private $methodNames = [
+        'basic-lti-launch-request'    => 'onLaunch',
+        'ConfigureLaunchRequest'      => 'onConfigure',
+        'DashboardRequest'            => 'onDashboard',
+        'ContentItemSelectionRequest' => 'onContentItem'
+    ];
 
     /**
-     * @var array Names of LTI parameters to be retained in the settings property.
+     * Names of LTI parameters to be retained in the settings property.
+     *
+     * @var array
      */
-    private $lti_settings_names = ['ext_resource_link_content', 'ext_resource_link_content_signature',
-        'lis_result_sourcedid', 'lis_outcome_service_url',
-        'ext_ims_lis_basic_outcome_url', 'ext_ims_lis_resultvalue_sourcedids',
-        'ext_ims_lis_memberships_id', 'ext_ims_lis_memberships_url',
-        'ext_ims_lti_tool_setting', 'ext_ims_lti_tool_setting_id', 'ext_ims_lti_tool_setting_url'];
+    private $ltiSettingsNames = [
+        'ext_resource_link_content',
+        'ext_resource_link_content_signature',
+        'lis_result_sourcedid',
+        'lis_outcome_service_url',
+        'ext_ims_lis_basic_outcome_url',
+        'ext_ims_lis_resultvalue_sourcedids',
+        'ext_ims_lis_memberships_id',
+        'ext_ims_lis_memberships_url',
+        'ext_ims_lti_tool_setting',
+        'ext_ims_lti_tool_setting_id',
+        'ext_ims_lti_tool_setting_url'
+    ];
 
     /**
-     * @var array Permitted LTI versions for messages.
+     * Permitted LTI versions for messages.
+     *
+     * @var array
      */
     private $LTI_VERSIONS = [self::LTI_VERSION1, self::LTI_VERSION2];
 
     /**
      * Class constructor
      *
-     * @param mixed $data_connector Object containing a database connection object (optional, default is a blank prefix and MySQL)
+     * @param AbstractStorage $storage Object containing a database connection object (optional, default is a blank prefix and MySQL)
      * @param mixed $callbackHandler String containing name of callback function for launch request, or associative array of callback functions for each request type
      */
-    public function __construct($data_connector = '', $callbackHandler = null)
+    public function __construct(AbstractStorage $storage = null, $callbackHandler = null)
     {
         $this->constraints = [];
         $this->callbackHandler = [];
@@ -197,16 +269,16 @@ class ToolProvider
         } else if (!empty($callbackHandler)) {
             $this->callbackHandler['launch'] = $callbackHandler;
         }
-        $this->data_connector = AbstractStorage::getDataConnector($data_connector);
+        $this->storage = AbstractStorage::getStorage($storage);
 
         // Set debug mode
         $this->debugMode = isset($_POST['custom_debug']) && (strtolower($_POST['custom_debug']) == 'true');
 
         // Set return URL if available
         if (isset($_POST['launch_presentation_return_url'])) {
-            $this->return_url = $_POST['launch_presentation_return_url'];
+            $this->returnUrl = $_POST['launch_presentation_return_url'];
         } else if (isset($_POST['content_item_return_url'])) {
-            $this->return_url = $_POST['content_item_return_url'];
+            $this->returnUrl = $_POST['content_item_return_url'];
         }
     }
 
@@ -229,7 +301,7 @@ class ToolProvider
      * Add a parameter constraint to be checked on launch
      *
      * @param string $name Name of parameter to be checked
-     * @param boolean $required True if parameter is required (optional, default is TRUE)
+     * @param bool $required True if parameter is required (optional, default is TRUE)
      * @param int $max_length Maximum permitted length of parameter value (optional, default is NULL)
      * @param array $message_types Array of message types to which the constraint applies (default is all)
      */
@@ -249,9 +321,9 @@ class ToolProvider
     public function getConsumers()
     {
         // Initialise data connector
-        $this->data_connector = AbstractStorage::getDataConnector($this->data_connector);
+        $this->storage = AbstractStorage::getStorage($this->storage);
 
-        return $this->data_connector->toolConsumerList();
+        return $this->storage->toolConsumerList();
     }
 
     /**
@@ -329,7 +401,7 @@ EOD;
     /**
      * Process a valid launch request
      *
-     * @return boolean True if no error
+     * @return bool True if no error
      */
     protected function onLaunch()
     {
@@ -339,7 +411,7 @@ EOD;
     /**
      * Process a valid configure request
      *
-     * @return boolean True if no error
+     * @return bool True if no error
      */
     protected function onConfigure()
     {
@@ -349,7 +421,7 @@ EOD;
     /**
      * Process a valid dashboard request
      *
-     * @return boolean True if no error
+     * @return bool True if no error
      */
     protected function onDashboard()
     {
@@ -359,7 +431,7 @@ EOD;
     /**
      * Process a valid content-item request
      *
-     * @return boolean True if no error
+     * @return bool True if no error
      */
     protected function onContentItem()
     {
@@ -369,7 +441,7 @@ EOD;
     /**
      * Process a response to an invalid request
      *
-     * @return boolean True if no further error processing required
+     * @return bool True if no further error processing required
      */
     protected function onError()
     {
@@ -379,9 +451,9 @@ EOD;
     /**
      * Call any callback function for the requested action.
      *
-     * This function may set the redirectURL and output properties.
+     * This function may set the redirectUrl and output properties.
      *
-     * @return boolean True if no error reported
+     * @return bool True if no error reported
      */
     private function doCallback()
     {
@@ -392,11 +464,11 @@ EOD;
     /**
      * Call any callback function for the requested action.
      *
-     * This function may set the redirectURL and output properties.
+     * This function may set the redirectUrl and output properties.
      *
      * @param string $type Callback type
      *
-     * @return boolean True if no error reported
+     * @return bool True if no error reported
      * @throws Exception
      */
     private function doCallbackMethod($type = null)
@@ -411,7 +483,7 @@ EOD;
             // Callback function may return HTML or a redirect URL
             if (is_string($result)) {
                 if ((substr($result, 0, 7) == 'http://') || (substr($result, 0, 8) == 'https://')) {
-                    $this->redirectURL = $result;
+                    $this->redirectUrl = $result;
                 } else {
                     if (is_null($this->output)) {
                         $this->output = '';
@@ -438,8 +510,8 @@ EOD;
         // FIXME: Should be executed when exception is caught
         if (false) {
             // If not valid, return an error message to the tool consumer if a return URL is provided
-            if (!empty($this->return_url)) {
-                $error_url = $this->return_url;
+            if (!empty($this->returnUrl)) {
+                $error_url = $this->returnUrl;
                 if (strpos($error_url, '?') === false) {
                     $error_url .= '?';
                 } else {
@@ -467,16 +539,16 @@ EOD;
                 }
                 exit;
             } else {
-                if (!is_null($this->error_output)) {
-                    echo $this->error_output;
+                if (!is_null($this->errorOutput)) {
+                    echo $this->errorOutput;
                 } else if ($this->debugMode && !empty($this->reason)) {
                     echo "Debug error: {$this->reason}";
                 } else {
                     echo "Error: {$this->message}";
                 }
             }
-        } else if (!is_null($this->redirectURL)) {
-            header("Location: {$this->redirectURL}");
+        } else if (!is_null($this->redirectUrl)) {
+            header("Location: {$this->redirectUrl}");
             exit;
         } else if (!is_null($this->output)) {
             echo $this->output;
@@ -488,7 +560,7 @@ EOD;
      *
      * The consumer, resource link and user objects will be initialised if the request is valid.
      *
-     * @return boolean True if the request has been successfully validated.
+     * @return bool True if the request has been successfully validated.
      * @throws Exception
      */
     private function authenticate()
@@ -564,7 +636,7 @@ EOD;
             throw new Exception('Missing consumer key');
         }
 
-        $this->consumer = new ToolConsumer($_POST['oauth_consumer_key'], $this->data_connector);
+        $this->consumer = new ToolConsumer($_POST['oauth_consumer_key'], $this->storage);
         if (is_null($this->consumer->created)) {
             throw new Exception('Invalid consumer key');
         }
@@ -665,11 +737,11 @@ EOD;
             if (isset($_POST['custom_content_item_id'])) {
                 $content_item_id = $_POST['custom_content_item_id'];
             }
-            $this->resource_link = new ResourceLink($this->consumer, trim($_POST['resource_link_id']), $content_item_id);
+            $this->resourceLink = new ResourceLink($this->consumer, trim($_POST['resource_link_id']), $content_item_id);
             if (isset($_POST['context_id'])) {
-                $this->resource_link->lti_context_id = trim($_POST['context_id']);
+                $this->resourceLink->lti_context_id = trim($_POST['context_id']);
             }
-            $this->resource_link->lti_resource_id = trim($_POST['resource_link_id']);
+            $this->resourceLink->lti_resource_id = trim($_POST['resource_link_id']);
             $title = '';
             if (isset($_POST['context_title'])) {
                 $title = trim($_POST['context_title']);
@@ -681,30 +753,30 @@ EOD;
                 $title .= trim($_POST['resource_link_title']);
             }
             if (empty($title)) {
-                $title = "Course {$this->resource_link->getId()}";
+                $title = "Course {$this->resourceLink->getId()}";
             }
-            $this->resource_link->title = $title;
+            $this->resourceLink->title = $title;
 
             // Save LTI parameters
-            foreach ($this->lti_settings_names as $name) {
+            foreach ($this->ltiSettingsNames as $name) {
                 if (isset($_POST[$name])) {
-                    $this->resource_link->setSetting($name, $_POST[$name]);
+                    $this->resourceLink->setSetting($name, $_POST[$name]);
                 } else {
-                    $this->resource_link->setSetting($name, null);
+                    $this->resourceLink->setSetting($name, null);
                 }
             }
 
             // Delete any existing custom parameters
-            foreach ($this->resource_link->getSettings() as $name => $value) {
+            foreach ($this->resourceLink->getSettings() as $name => $value) {
                 if (strpos($name, 'custom_') === 0) {
-                    $this->resource_link->setSetting($name);
+                    $this->resourceLink->setSetting($name);
                 }
             }
 
             // Save custom parameters
             foreach ($_POST as $name => $value) {
                 if (strpos($name, 'custom_') === 0) {
-                    $this->resource_link->setSetting($name, $value);
+                    $this->resourceLink->setSetting($name, $value);
                 }
             }
         }
@@ -714,7 +786,7 @@ EOD;
         if (isset($_POST['user_id'])) {
             $user_id = trim($_POST['user_id']);
         }
-        $this->user = new User($this->resource_link, $user_id);
+        $this->user = new User($this->resourceLink, $user_id);
 
         // Set the user name
         $firstname = (isset($_POST['lis_person_name_given'])) ? $_POST['lis_person_name_given'] : '';
@@ -798,12 +870,12 @@ EOD;
             $this->consumer->save();
         }
 
-        if (isset($this->resource_link)) {
+        if (isset($this->resourceLink)) {
             // Check if a share arrangement is in place for this resource link
             $this->checkForShare();
 
             // Persist changes to resource link
-            $this->resource_link->save();
+            $this->resourceLink->save();
         }
 
         return true;
@@ -818,8 +890,8 @@ EOD;
     {
         $doSaveResourceLink = true;
 
-        $key = $this->resource_link->primary_consumer_key;
-        $id = $this->resource_link->primary_resource_link_id;
+        $key = $this->resourceLink->primary_consumer_key;
+        $id = $this->resourceLink->primary_resource_link_id;
 
         $shareRequest = isset($_POST['custom_share_key']) && !empty($_POST['custom_share_key']);
         if ($shareRequest) {
@@ -827,21 +899,21 @@ EOD;
                 throw new Exception('Your sharing request has been refused because sharing is not being permitted');
             } else {
                 // Check if this is a new share key
-                $share_key = new ResourceLinkShareKey($this->resource_link, $_POST['custom_share_key']);
+                $share_key = new ResourceLinkShareKey($this->resourceLink, $_POST['custom_share_key']);
                 if (!is_null($share_key->primary_consumer_key) && !is_null($share_key->primary_resource_link_id)) {
                     // Update resource link with sharing primary resource link details
                     $key = $share_key->primary_consumer_key;
                     $id = $share_key->primary_resource_link_id;
 
-                    if ($key == $this->consumer->getKey() && $id == $this->resource_link->getId()) {
+                    if ($key == $this->consumer->getKey() && $id == $this->resourceLink->getId()) {
                         throw new Exception('It is not possible to share your resource link with yourself');
                     }
 
-                    $this->resource_link->primary_consumer_key = $key;
-                    $this->resource_link->primary_resource_link_id = $id;
-                    $this->resource_link->share_approved = $share_key->auto_approve;
+                    $this->resourceLink->primary_consumer_key = $key;
+                    $this->resourceLink->primary_resource_link_id = $id;
+                    $this->resourceLink->share_approved = $share_key->auto_approve;
 
-                    if (!$this->resource_link->save()) {
+                    if (!$this->resourceLink->save()) {
                         throw new Exception('An error occurred initialising your share arrangement');
                     }
 
@@ -872,7 +944,7 @@ EOD;
             throw new Exception('Unable to find primary resource link');
         }
 
-        $consumer = new ToolConsumer($key, $this->data_connector);
+        $consumer = new ToolConsumer($key, $this->storage);
 
         if (is_null($consumer->created)) {
             throw new Exception('Unable to load tool consumer');
@@ -885,9 +957,9 @@ EOD;
         }
 
         if ($doSaveResourceLink) {
-            $this->resource_link->save();
+            $this->resourceLink->save();
         }
-        $this->resource_link = $resource_link;
+        $this->resourceLink = $resource_link;
     }
 
     /**
