@@ -59,11 +59,6 @@ class ToolProvider
     const ID_SCOPE_SEPARATOR = ':';
 
     /**
-     * @var boolean True if the last request was successful.
-     */
-    public $isOK = true;
-
-    /**
      * @var ToolConsumer Tool Consumer object.
      */
     public $consumer = null;
@@ -107,11 +102,6 @@ class ToolProvider
      * @var string Message for last request processed
      */
     public $message = self::CONNECTION_ERROR_MESSAGE;
-
-    /**
-     * @var string Error message for last request processed.
-     */
-    public $reason = null;
 
     /**
      * @var array Details for error message relating to last request processed.
@@ -208,7 +198,6 @@ class ToolProvider
             $this->callbackHandler['launch'] = $callbackHandler;
         }
         $this->data_connector = AbstractStorage::getDataConnector($data_connector);
-        $this->isOK = !is_null($this->data_connector);
 
         // Set debug mode
         $this->debugMode = isset($_POST['custom_debug']) && (strtolower($_POST['custom_debug']) == 'true');
@@ -229,11 +218,10 @@ class ToolProvider
     public function handleRequest()
     {
         // Perform action
-        if ($this->isOK) {
-            if ($this->authenticate()) {
-                $this->doCallback();
-            }
+        if ($this->authenticate()) {
+            $this->doCallback();
         }
+
         $this->result();
     }
 
@@ -420,7 +408,7 @@ EOD;
         if (isset($this->callbackHandler[$callback])) {
             $result = call_user_func($this->callbackHandler[$callback], $this);
 
-            // Callback function may return HTML, a redirect URL, or a boolean value
+            // Callback function may return HTML or a redirect URL
             if (is_string($result)) {
                 if ((substr($result, 0, 7) == 'http://') || (substr($result, 0, 8) == 'https://')) {
                     $this->redirectURL = $result;
@@ -430,8 +418,6 @@ EOD;
                     }
                     $this->output .= $result;
                 }
-            } else if (is_bool($result)) {
-                $this->isOK = $result;
             }
         } else if (is_null($type)) {
             throw new Exception('Message type not supported');
@@ -447,56 +433,53 @@ EOD;
      */
     private function result()
     {
-        $ok = false;
-        if (!$this->isOK) {
-            $ok = $this->onError();
-        }
-        if (!$ok) {
-            if (!$this->isOK) {
-                // If not valid, return an error message to the tool consumer if a return URL is provided
-                if (!empty($this->return_url)) {
-                    $error_url = $this->return_url;
-                    if (strpos($error_url, '?') === false) {
-                        $error_url .= '?';
-                    } else {
-                        $error_url .= '&';
-                    }
-                    if ($this->debugMode && !is_null($this->reason)) {
-                        $error_url .= 'lti_errormsg=' . urlencode("Debug error: $this->reason");
-                    } else {
-                        $error_url .= 'lti_errormsg=' . urlencode($this->message);
-                        if (!is_null($this->reason)) {
-                            $error_url .= '&lti_errorlog=' . urlencode("Debug error: $this->reason");
-                        }
-                    }
-                    if (!is_null($this->consumer) && isset($_POST['lti_message_type']) && ($_POST['lti_message_type'] === 'ContentItemSelectionRequest')) {
-                        $form_params = [];
-                        if (isset($_POST['data'])) {
-                            $form_params['data'] = $_POST['data'];
-                        }
-                        $version = (isset($_POST['lti_version'])) ? $_POST['lti_version'] : ToolProvider::LTI_VERSION1;
-                        $form_params = $this->consumer->signParameters($error_url, 'ContentItemSelection', $version, $form_params);
-                        $page = ToolProvider::sendForm($error_url, $form_params);
-                        echo $page;
-                    } else {
-                        header("Location: {$error_url}");
-                    }
-                    exit;
+        // TODO: Call $this->onError(); hook
+
+        // FIXME: Should be executed when exception is caught
+        if (false) {
+            // If not valid, return an error message to the tool consumer if a return URL is provided
+            if (!empty($this->return_url)) {
+                $error_url = $this->return_url;
+                if (strpos($error_url, '?') === false) {
+                    $error_url .= '?';
                 } else {
-                    if (!is_null($this->error_output)) {
-                        echo $this->error_output;
-                    } else if ($this->debugMode && !empty($this->reason)) {
-                        echo "Debug error: {$this->reason}";
-                    } else {
-                        echo "Error: {$this->message}";
+                    $error_url .= '&';
+                }
+                if ($this->debugMode && !is_null($this->reason)) {
+                    $error_url .= 'lti_errormsg=' . urlencode("Debug error: $this->reason");
+                } else {
+                    $error_url .= 'lti_errormsg=' . urlencode($this->message);
+                    if (!is_null($this->reason)) {
+                        $error_url .= '&lti_errorlog=' . urlencode("Debug error: $this->reason");
                     }
                 }
-            } else if (!is_null($this->redirectURL)) {
-                header("Location: {$this->redirectURL}");
+                if (!is_null($this->consumer) && isset($_POST['lti_message_type']) && ($_POST['lti_message_type'] === 'ContentItemSelectionRequest')) {
+                    $form_params = [];
+                    if (isset($_POST['data'])) {
+                        $form_params['data'] = $_POST['data'];
+                    }
+                    $version = (isset($_POST['lti_version'])) ? $_POST['lti_version'] : ToolProvider::LTI_VERSION1;
+                    $form_params = $this->consumer->signParameters($error_url, 'ContentItemSelection', $version, $form_params);
+                    $page = ToolProvider::sendForm($error_url, $form_params);
+                    echo $page;
+                } else {
+                    header("Location: {$error_url}");
+                }
                 exit;
-            } else if (!is_null($this->output)) {
-                echo $this->output;
+            } else {
+                if (!is_null($this->error_output)) {
+                    echo $this->error_output;
+                } else if ($this->debugMode && !empty($this->reason)) {
+                    echo "Debug error: {$this->reason}";
+                } else {
+                    echo "Error: {$this->message}";
+                }
             }
+        } else if (!is_null($this->redirectURL)) {
+            header("Location: {$this->redirectURL}");
+            exit;
+        } else if (!is_null($this->output)) {
+            echo $this->output;
         }
     }
 
@@ -628,31 +611,29 @@ EOD;
         }
 
         // Validate other message parameter values
-        if ($this->isOK) {
-            if ($_POST['lti_message_type'] != 'ContentItemSelectionRequest') {
-                if (isset($_POST['launch_presentation_document_target'])) {
-                    $this->checkValue(
-                        $_POST['launch_presentation_document_target'],
-                        ['embed', 'frame', 'iframe', 'window', 'popup', 'overlay'],
-                        'Invalid value for launch_presentation_document_target parameter: %s.'
-                    );
-                }
-            } else {
-                if (isset($_POST['accept_unsigned'])) {
-                    $this->checkValue($_POST['accept_unsigned'], ['true', 'false'], 'Invalid value for accept_unsigned parameter: %s.');
-                }
-                if (isset($_POST['accept_multiple'])) {
-                    $this->checkValue($_POST['accept_multiple'], ['true', 'false'], 'Invalid value for accept_multiple parameter: %s.');
-                }
-                if (isset($_POST['accept_copy_advice'])) {
-                    $this->checkValue($_POST['accept_copy_advice'], ['true', 'false'], 'Invalid value for accept_copy_advice parameter: %s.');
-                }
-                if (isset($_POST['auto_create'])) {
-                    $this->checkValue($_POST['auto_create'], ['true', 'false'], 'Invalid value for auto_create parameter: %s.');
-                }
-                if (isset($_POST['can_confirm'])) {
-                    $this->checkValue($_POST['can_confirm'], ['true', 'false'], 'Invalid value for can_confirm parameter: %s.');
-                }
+        if ($_POST['lti_message_type'] != 'ContentItemSelectionRequest') {
+            if (isset($_POST['launch_presentation_document_target'])) {
+                $this->checkValue(
+                    $_POST['launch_presentation_document_target'],
+                    ['embed', 'frame', 'iframe', 'window', 'popup', 'overlay'],
+                    'Invalid value for launch_presentation_document_target parameter: %s.'
+                );
+            }
+        } else {
+            if (isset($_POST['accept_unsigned'])) {
+                $this->checkValue($_POST['accept_unsigned'], ['true', 'false'], 'Invalid value for accept_unsigned parameter: %s.');
+            }
+            if (isset($_POST['accept_multiple'])) {
+                $this->checkValue($_POST['accept_multiple'], ['true', 'false'], 'Invalid value for accept_multiple parameter: %s.');
+            }
+            if (isset($_POST['accept_copy_advice'])) {
+                $this->checkValue($_POST['accept_copy_advice'], ['true', 'false'], 'Invalid value for accept_copy_advice parameter: %s.');
+            }
+            if (isset($_POST['auto_create'])) {
+                $this->checkValue($_POST['auto_create'], ['true', 'false'], 'Invalid value for auto_create parameter: %s.');
+            }
+            if (isset($_POST['can_confirm'])) {
+                $this->checkValue($_POST['can_confirm'], ['true', 'false'], 'Invalid value for can_confirm parameter: %s.');
             }
         }
 
@@ -831,11 +812,10 @@ EOD;
     /**
      * Check if a share arrangement is in place.
      *
-     * @return boolean True if no error is reported
+     * @throws Exception
      */
     private function checkForShare()
     {
-        $ok = true;
         $doSaveResourceLink = true;
 
         $key = $this->resource_link->primary_consumer_key;
@@ -844,8 +824,7 @@ EOD;
         $shareRequest = isset($_POST['custom_share_key']) && !empty($_POST['custom_share_key']);
         if ($shareRequest) {
             if (!$this->allowSharing) {
-                $ok = false;
-                $this->reason = 'Your sharing request has been refused because sharing is not being permitted.';
+                throw new Exception('Your sharing request has been refused because sharing is not being permitted');
             } else {
                 // Check if this is a new share key
                 $share_key = new ResourceLinkShareKey($this->resource_link, $_POST['custom_share_key']);
@@ -853,66 +832,62 @@ EOD;
                     // Update resource link with sharing primary resource link details
                     $key = $share_key->primary_consumer_key;
                     $id = $share_key->primary_resource_link_id;
-                    $ok = ($key != $this->consumer->getKey()) || ($id != $this->resource_link->getId());
-                    if ($ok) {
-                        $this->resource_link->primary_consumer_key = $key;
-                        $this->resource_link->primary_resource_link_id = $id;
-                        $this->resource_link->share_approved = $share_key->auto_approve;
-                        $ok = $this->resource_link->save();
-                        if ($ok) {
-                            $doSaveResourceLink = false;
-                            $this->user->getResourceLink()->primary_consumer_key = $key;
-                            $this->user->getResourceLink()->primary_resource_link_id = $id;
-                            $this->user->getResourceLink()->share_approved = $share_key->auto_approve;
-                            $this->user->getResourceLink()->updated = time();
-                            // Remove share key
-                            $share_key->delete();
-                        } else {
-                            $this->reason = 'An error occurred initialising your share arrangement.';
-                        }
-                    } else {
-                        $this->reason = 'It is not possible to share your resource link with yourself.';
+
+                    if ($key == $this->consumer->getKey() && $id == $this->resource_link->getId()) {
+                        throw new Exception('It is not possible to share your resource link with yourself');
                     }
+
+                    $this->resource_link->primary_consumer_key = $key;
+                    $this->resource_link->primary_resource_link_id = $id;
+                    $this->resource_link->share_approved = $share_key->auto_approve;
+
+                    if (!$this->resource_link->save()) {
+                        throw new Exception('An error occurred initialising your share arrangement');
+                    }
+
+                    $doSaveResourceLink = false;
+                    $this->user->getResourceLink()->primary_consumer_key = $key;
+                    $this->user->getResourceLink()->primary_resource_link_id = $id;
+                    $this->user->getResourceLink()->share_approved = $share_key->auto_approve;
+                    $this->user->getResourceLink()->updated = time();
+                    // Remove share key
+                    $share_key->delete();
                 }
-                if ($ok) {
-                    $ok = !is_null($key);
-                    if (!$ok) {
-                        $this->reason = 'You have requested to share a resource link but none is available.';
-                    } else {
-                        $ok = (!is_null($this->user->getResourceLink()->share_approved) && $this->user->getResourceLink()->share_approved);
-                        if (!$ok) {
-                            $this->reason = 'Your share request is waiting to be approved.';
-                        }
-                    }
+
+                if (!is_null($key)) {
+                    throw new Exception('You have requested to share a resource link but none is available');
+                }
+
+                if (is_null($this->user->getResourceLink()->share_approved) || !$this->user->getResourceLink()->share_approved) {
+                    throw new Exception('Your share request is waiting to be approved');
                 }
             }
-        } else {
+        } else if (!is_null($key)) {
             // Check no share is in place
-            $ok = is_null($key);
-            if (!$ok) {
-                $this->reason = 'You have not requested to share a resource link but an arrangement is currently in place.';
-            }
+            throw new Exception('You have not requested to share a resource link but an arrangement is currently in place');
         }
 
         // Look up primary resource link
-        if ($ok && !is_null($key)) {
-            $consumer = new ToolConsumer($key, $this->data_connector);
-            $ok = !is_null($consumer->created);
-            if ($ok) {
-                $resource_link = new ResourceLink($consumer, $id);
-                $ok = !is_null($resource_link->created);
-            }
-            if ($ok) {
-                if ($doSaveResourceLink) {
-                    $this->resource_link->save();
-                }
-                $this->resource_link = $resource_link;
-            } else {
-                $this->reason = 'Unable to load resource link being shared.';
-            }
+        if (is_null($key)) {
+            throw new Exception('Unable to find primary resource link');
         }
 
-        return $ok;
+        $consumer = new ToolConsumer($key, $this->data_connector);
+
+        if (is_null($consumer->created)) {
+            throw new Exception('Unable to load tool consumer');
+        }
+
+        $resource_link = new ResourceLink($consumer, $id);
+
+        if (is_null($resource_link->created)) {
+            throw new Exception('Unable to load resource link being shared');
+        }
+
+        if ($doSaveResourceLink) {
+            $this->resource_link->save();
+        }
+        $this->resource_link = $resource_link;
     }
 
     /**
