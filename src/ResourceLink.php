@@ -140,7 +140,6 @@ class ResourceLink
      */
     public function __construct($consumer, $id, $current_id = null)
     {
-
         $this->consumer = $consumer;
         $this->id = $id;
         $this->previous_id = $this->id;
@@ -155,7 +154,6 @@ class ResourceLink
         } else {
             $this->initialise();
         }
-
     }
 
     /**
@@ -163,7 +161,6 @@ class ResourceLink
      */
     public function initialise()
     {
-
         $this->lti_context_id = null;
         $this->lti_resource_id = null;
         $this->title = '';
@@ -175,7 +172,6 @@ class ResourceLink
         $this->share_approved = null;
         $this->created = null;
         $this->updated = null;
-
     }
 
     /**
@@ -185,14 +181,12 @@ class ResourceLink
      */
     public function save()
     {
-
         $ok = $this->consumer->getDataConnector()->Resource_Link_save($this);
         if ($ok) {
             $this->settings_changed = false;
         }
 
         return $ok;
-
     }
 
     /**
@@ -202,9 +196,7 @@ class ResourceLink
      */
     public function delete()
     {
-
         return $this->consumer->getDataConnector()->Resource_Link_delete($this);
-
     }
 
     /**
@@ -214,9 +206,7 @@ class ResourceLink
      */
     public function getConsumer()
     {
-
         return $this->consumer;
-
     }
 
     /**
@@ -226,9 +216,7 @@ class ResourceLink
      */
     public function getKey()
     {
-
         return $this->consumer->getKey();
-
     }
 
     /**
@@ -240,7 +228,6 @@ class ResourceLink
      */
     public function getId($previous = false)
     {
-
         if ($previous) {
             $id = $this->previous_id;
         } else {
@@ -248,7 +235,6 @@ class ResourceLink
         }
 
         return $id;
-
     }
 
     /**
@@ -261,7 +247,6 @@ class ResourceLink
      */
     public function getSetting($name, $default = '')
     {
-
         if (array_key_exists($name, $this->settings)) {
             $value = $this->settings[$name];
         } else {
@@ -269,7 +254,6 @@ class ResourceLink
         }
 
         return $value;
-
     }
 
     /**
@@ -280,7 +264,6 @@ class ResourceLink
      */
     public function setSetting($name, $value = null)
     {
-
         $old_value = $this->getSetting($name);
         if ($value != $old_value) {
             if (!empty($value)) {
@@ -290,7 +273,6 @@ class ResourceLink
             }
             $this->settings_changed = true;
         }
-
     }
 
     /**
@@ -300,9 +282,7 @@ class ResourceLink
      */
     public function getSettings()
     {
-
         return $this->settings;
-
     }
 
     /**
@@ -312,7 +292,6 @@ class ResourceLink
      */
     public function saveSettings()
     {
-
         if ($this->settings_changed) {
             $ok = $this->save();
         } else {
@@ -320,7 +299,6 @@ class ResourceLink
         }
 
         return $ok;
-
     }
 
     /**
@@ -330,11 +308,9 @@ class ResourceLink
      */
     public function hasOutcomesService()
     {
-
         $url = $this->getSetting('ext_ims_lis_basic_outcome_url') . $this->getSetting('lis_outcome_service_url');
 
         return !empty($url);
-
     }
 
     /**
@@ -344,11 +320,9 @@ class ResourceLink
      */
     public function hasMembershipsService()
     {
-
         $url = $this->getSetting('ext_ims_lis_memberships_url');
 
         return !empty($url);
-
     }
 
     /**
@@ -358,11 +332,9 @@ class ResourceLink
      */
     public function hasSettingService()
     {
-
         $url = $this->getSetting('ext_ims_lti_tool_setting_url');
 
         return !empty($url);
-
     }
 
     /**
@@ -376,20 +348,17 @@ class ResourceLink
      */
     public function doOutcomesService($action, $lti_outcome, $user = null)
     {
-
         $response = false;
-#
-### Lookup service details from the source resource link appropriate to the user (in case the destination is being shared)
-#
+
+        // Lookup service details from the source resource link appropriate to the user (in case the destination is being shared)
         $source_resource_link = $this;
         $sourcedid = $lti_outcome->getSourcedid();
         if (!is_null($user)) {
             $source_resource_link = $user->getResourceLink();
             $sourcedid = $user->ltiResultSourcedId;
         }
-#
-### Use LTI 1.1 service in preference to extension service if it is available
-#
+
+        // Use LTI 1.1 service in preference to extension service if it is available
         $urlLTI11 = $source_resource_link->getSetting('lis_outcome_service_url');
         $urlExt = $source_resource_link->getSetting('ext_ims_lis_basic_outcome_url');
         if ($urlExt || $urlLTI11) {
@@ -500,7 +469,6 @@ EOF;
         }
 
         return $response;
-
     }
 
     /**
@@ -542,27 +510,23 @@ EOF;
 
             for ($i = 0; $i < count($members); $i++) {
                 $user = new User($this, $members[$i]['user_id']);
-#
-### Set the user name
-#
+
+                // Set the user name
                 $firstname = (isset($members[$i]['person_name_given'])) ? $members[$i]['person_name_given'] : '';
                 $lastname = (isset($members[$i]['person_name_family'])) ? $members[$i]['person_name_family'] : '';
                 $fullname = (isset($members[$i]['person_name_full'])) ? $members[$i]['person_name_full'] : '';
                 $user->setNames($firstname, $lastname, $fullname);
-#
-### Set the user email
-#
+
+                // Set the user email
                 $email = (isset($members[$i]['person_contact_email_primary'])) ? $members[$i]['person_contact_email_primary'] : '';
                 $user->setEmail($email, $this->consumer->defaultEmail);
-#
-### Set the user roles
-#
+
+                // Set the user roles
                 if (isset($members[$i]['roles'])) {
                     $user->roles = ToolProvider::parseRoles($members[$i]['roles']);
                 }
-#
-### Set the user groups
-#
+
+                // Set the user groups
                 if (!isset($members[$i]['groups']['group'])) {
                     $groups = [];
                 } else if (!isset($members[$i]['groups']['group'][0])) {
@@ -595,22 +559,19 @@ EOF;
                     }
                     $user->groups[] = $group['id'];
                 }
-#
-### If a result sourcedid is provided save the user
-#
+
+                // If a result sourcedid is provided save the user
                 if (isset($members[$i]['lis_result_sourcedid'])) {
                     $user->ltiResultSourcedId = $members[$i]['lis_result_sourcedid'];
                     $user->save();
                 }
                 $users[] = $user;
-#
-### Remove old user (if it exists)
-#
+
+                // Remove old user (if it exists)
                 unset($old_users[$user->getId(ToolProvider::ID_SCOPE_RESOURCE)]);
             }
-#
-### Delete any old users which were not in the latest list from the tool consumer
-#
+
+            // Delete any old users which were not in the latest list from the tool consumer
             foreach ($old_users as $id => $user) {
                 $user->delete();
             }
@@ -619,7 +580,6 @@ EOF;
         }
 
         return $users;
-
     }
 
     /**
@@ -632,7 +592,6 @@ EOF;
      */
     public function doSettingService($action, $value = null)
     {
-
         $response = false;
         switch ($action) {
             case self::EXT_READ:
@@ -678,7 +637,6 @@ EOF;
         }
 
         return $response;
-
     }
 
     /**
@@ -694,9 +652,7 @@ EOF;
      */
     public function getUserResultSourcedIDs($local_only = false, $id_scope = null)
     {
-
         return $this->consumer->getDataConnector()->Resource_Link_getUserResultSourcedIDs($this, $local_only, $id_scope);
-
     }
 
     /**
@@ -706,14 +662,8 @@ EOF;
      */
     public function getShares()
     {
-
         return $this->consumer->getDataConnector()->Resource_Link_getShares($this);
-
     }
-
-###
-###  PRIVATE METHODS
-###
 
     /**
      * Load the resource link from the database.
@@ -722,10 +672,8 @@ EOF;
      */
     private function load()
     {
-
         $this->initialise();
         return $this->consumer->getDataConnector()->Resource_Link_load($this);
-
     }
 
     /**
@@ -738,16 +686,17 @@ EOF;
      */
     private function checkValueType($lti_outcome, $supported_types = null)
     {
-
         if (empty($supported_types)) {
             $supported_types = explode(',', str_replace(' ', '', strtolower($this->getSetting('ext_ims_lis_resultvalue_sourcedids', self::EXT_TYPE_DECIMAL))));
         }
         $type = $lti_outcome->type;
         $value = $lti_outcome->getValue();
-// Check whether the type is supported or there is no value
+
+        // Check whether the type is supported or there is no value
         $ok = in_array($type, $supported_types) || (strlen($value) <= 0);
+
         if (!$ok) {
-// Convert numeric values to decimal
+            // Convert numeric values to decimal
             if ($type == self::EXT_TYPE_PERCENTAGE) {
                 if (substr($value, -1) == '%') {
                     $value = substr($value, 0, -1);
@@ -764,8 +713,8 @@ EOF;
                     $lti_outcome->setValue($parts[0] / $parts[1]);
                     $lti_outcome->type = self::EXT_TYPE_DECIMAL;
                 }
-// Convert letter_af to letter_af_plus or text
             } else if ($type == self::EXT_TYPE_LETTER_AF) {
+                // Convert letter_af to letter_af_plus or text
                 if (in_array(self::EXT_TYPE_LETTER_AF_PLUS, $supported_types)) {
                     $ok = true;
                     $lti_outcome->type = self::EXT_TYPE_LETTER_AF_PLUS;
@@ -773,8 +722,8 @@ EOF;
                     $ok = true;
                     $lti_outcome->type = self::EXT_TYPE_TEXT;
                 }
-// Convert letter_af_plus to letter_af or text
             } else if ($type == self::EXT_TYPE_LETTER_AF_PLUS) {
+                // Convert letter_af_plus to letter_af or text
                 if (in_array(self::EXT_TYPE_LETTER_AF, $supported_types) && (strlen($value) == 1)) {
                     $ok = true;
                     $lti_outcome->type = self::EXT_TYPE_LETTER_AF;
@@ -782,8 +731,8 @@ EOF;
                     $ok = true;
                     $lti_outcome->type = self::EXT_TYPE_TEXT;
                 }
-// Convert text to decimal
             } else if ($type == self::EXT_TYPE_TEXT) {
+                // Convert text to decimal
                 $ok = is_numeric($value) && ($value >= 0) && ($value <=1);
                 if ($ok) {
                     $lti_outcome->type = self::EXT_TYPE_DECIMAL;
@@ -803,7 +752,6 @@ EOF;
         }
 
         return $ok;
-
     }
 
     /**
@@ -840,7 +788,6 @@ EOF;
         }
 
         return $ok;
-
     }
 
     /**
@@ -854,7 +801,6 @@ EOF;
      */
     private function doLTI11Service($type, $url, $xml)
     {
-
         $ok = false;
         if (!empty($url)) {
             $id = uniqid();
@@ -908,7 +854,6 @@ EOD;
         }
 
         return $ok;
-
     }
 
     /**
@@ -920,7 +865,6 @@ EOD;
      */
     private function domNodeToArray($node)
     {
-
         $output = '';
         switch ($node->nodeType) {
             case XML_CDATA_SECTION_NODE:
@@ -962,6 +906,5 @@ EOD;
         }
 
         return $output;
-
     }
 }
