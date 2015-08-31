@@ -8,6 +8,7 @@ use Franzl\Lti\OAuth\Request;
 use Franzl\Lti\OAuth\Server;
 use Franzl\Lti\OAuth\SignatureMethodHmacSha1;
 use Franzl\Lti\Storage\AbstractStorage;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Class to represent an LTI Tool Provider
@@ -270,27 +271,31 @@ class ToolProvider
             $this->callbackHandler['launch'] = $callbackHandler;
         }
         $this->storage = AbstractStorage::getStorage($storage);
-
-        // Set debug mode
-        $this->debugMode = isset($_POST['custom_debug']) && (strtolower($_POST['custom_debug']) == 'true');
-
-        // Set return URL if available
-        if (isset($_POST['launch_presentation_return_url'])) {
-            $this->returnUrl = $_POST['launch_presentation_return_url'];
-        } else if (isset($_POST['content_item_return_url'])) {
-            $this->returnUrl = $_POST['content_item_return_url'];
-        }
     }
 
     /**
      * Process an incoming request
      *
+     * @param ServerRequestInterface $request
      * @return mixed Returns TRUE or FALSE, a redirection URL or HTML
+     * @throws Exception
      */
-    public function handleRequest()
+    public function handleRequest(ServerRequestInterface $request)
     {
+        $requestBody = (array) $request->getParsedBody();
+
+        // Set debug mode
+        $this->debugMode = isset($requestBody['custom_debug']) && (strtolower($requestBody['custom_debug']) == 'true');
+
+        // Set return URL if available
+        if (isset($requestBody['launch_presentation_return_url'])) {
+            $this->returnUrl = $requestBody['launch_presentation_return_url'];
+        } else if (isset($requestBody['content_item_return_url'])) {
+            $this->returnUrl = $requestBody['content_item_return_url'];
+        }
+
         // Perform action
-        if ($this->authenticate()) {
+        if ($this->authenticate($requestBody)) {
             $this->doCallback();
         }
 
@@ -560,17 +565,18 @@ EOD;
      *
      * The consumer, resource link and user objects will be initialised if the request is valid.
      *
+     * @param array $requestBody
      * @return bool True if the request has been successfully validated.
      * @throws Exception
      */
-    private function authenticate()
+    private function authenticate(array $requestBody)
     {
         // Get the consumer
         $doSaveConsumer = false;
 
         // Check all required launch parameters
-        $version = isset($_POST['lti_version']) ? $_POST['lti_version'] : '';
-        $messageType = isset($_POST['lti_message_type']) ? $_POST['lti_message_type'] : '';
+        $version = isset($requestBody['lti_version']) ? $requestBody['lti_version'] : '';
+        $messageType = isset($requestBody['lti_message_type']) ? $requestBody['lti_message_type'] : '';
 
         if (!in_array($version, $this->LTI_VERSIONS)) {
             throw new Exception('Invalid or missing lti_version parameter');
@@ -579,12 +585,12 @@ EOD;
         switch ($messageType) {
             case 'basic-lti-launch-request':
             case 'DashboardRequest':
-                if (!isset($_POST['resource_link_id']) || (strlen(trim($_POST['resource_link_id'])) == 0)) {
+                if (!isset($requestBody['resource_link_id']) || (strlen(trim($requestBody['resource_link_id'])) == 0)) {
                     throw new Exception('Missing resource link ID');
                 }
                 break;
             case 'ContentItemSelectionRequest':
-                $acceptMediaTypes = isset($_POST['accept_media_types']) ? trim($_POST['accept_media_types']) : '';
+                $acceptMediaTypes = isset($requestBody['accept_media_types']) ? trim($requestBody['accept_media_types']) : '';
                 if (strlen($acceptMediaTypes) == 0) {
                     throw new Exception('No accept_media_types found');
                 }
@@ -598,7 +604,7 @@ EOD;
 
                 $this->mediaTypes = $mediaTypes;
 
-                $acceptDocumentTargets = isset($_POST['accept_presentation_document_targets']) ? trim($_POST['accept_presentation_document_targets']) : '';
+                $acceptDocumentTargets = isset($requestBody['accept_presentation_document_targets']) ? trim($requestBody['accept_presentation_document_targets']) : '';
                 if (strlen($acceptDocumentTargets) == 0) {
                     throw new Exception('No accept_presentation_document_targets found');
                 }
@@ -620,7 +626,7 @@ EOD;
 
                 $this->documentTargets = $documentTargets;
 
-                $returnUrl = isset($_POST['content_item_return_url']) ? trim($_POST['content_item_return_url']) : '';
+                $returnUrl = isset($requestBody['content_item_return_url']) ? trim($requestBody['content_item_return_url']) : '';
 
                 if (strlen($returnUrl) == 0) {
                     throw new Exception('Missing content_item_return_url parameter');
@@ -632,11 +638,11 @@ EOD;
         }
 
         // Check consumer key
-        if (!isset($_POST['oauth_consumer_key'])) {
+        if (!isset($requestBody['oauth_consumer_key'])) {
             throw new Exception('Missing consumer key');
         }
 
-        $this->consumer = new ToolConsumer($_POST['oauth_consumer_key'], $this->storage);
+        $this->consumer = new ToolConsumer($requestBody['oauth_consumer_key'], $this->storage);
         if (is_null($this->consumer->created)) {
             throw new Exception('Invalid consumer key');
         }
@@ -659,7 +665,7 @@ EOD;
         $server->verifyRequest($request);
 
         if ($this->consumer->protected) {
-            $consumerGuid = isset($_POST['tool_consumer_instance_guid']) ? $_POST['tool_consumer_instance_guid'] : '';
+            $consumerGuid = isset($requestBody['tool_consumer_instance_guid']) ? $requestBody['tool_consumer_instance_guid'] : '';
 
             if (empty($consumerGuid)) {
                 throw new Exception('A tool consumer GUID must be included in the launch request');
@@ -683,29 +689,29 @@ EOD;
         }
 
         // Validate other message parameter values
-        if ($_POST['lti_message_type'] != 'ContentItemSelectionRequest') {
-            if (isset($_POST['launch_presentation_document_target'])) {
+        if ($requestBody['lti_message_type'] != 'ContentItemSelectionRequest') {
+            if (isset($requestBody['launch_presentation_document_target'])) {
                 $this->checkValue(
-                    $_POST['launch_presentation_document_target'],
+                    $requestBody['launch_presentation_document_target'],
                     ['embed', 'frame', 'iframe', 'window', 'popup', 'overlay'],
                     'Invalid value for launch_presentation_document_target parameter: %s.'
                 );
             }
         } else {
-            if (isset($_POST['accept_unsigned'])) {
-                $this->checkValue($_POST['accept_unsigned'], ['true', 'false'], 'Invalid value for accept_unsigned parameter: %s.');
+            if (isset($requestBody['accept_unsigned'])) {
+                $this->checkValue($requestBody['accept_unsigned'], ['true', 'false'], 'Invalid value for accept_unsigned parameter: %s.');
             }
-            if (isset($_POST['accept_multiple'])) {
-                $this->checkValue($_POST['accept_multiple'], ['true', 'false'], 'Invalid value for accept_multiple parameter: %s.');
+            if (isset($requestBody['accept_multiple'])) {
+                $this->checkValue($requestBody['accept_multiple'], ['true', 'false'], 'Invalid value for accept_multiple parameter: %s.');
             }
-            if (isset($_POST['accept_copy_advice'])) {
-                $this->checkValue($_POST['accept_copy_advice'], ['true', 'false'], 'Invalid value for accept_copy_advice parameter: %s.');
+            if (isset($requestBody['accept_copy_advice'])) {
+                $this->checkValue($requestBody['accept_copy_advice'], ['true', 'false'], 'Invalid value for accept_copy_advice parameter: %s.');
             }
-            if (isset($_POST['auto_create'])) {
-                $this->checkValue($_POST['auto_create'], ['true', 'false'], 'Invalid value for auto_create parameter: %s.');
+            if (isset($requestBody['auto_create'])) {
+                $this->checkValue($requestBody['auto_create'], ['true', 'false'], 'Invalid value for auto_create parameter: %s.');
             }
-            if (isset($_POST['can_confirm'])) {
-                $this->checkValue($_POST['can_confirm'], ['true', 'false'], 'Invalid value for can_confirm parameter: %s.');
+            if (isset($requestBody['can_confirm'])) {
+                $this->checkValue($requestBody['can_confirm'], ['true', 'false'], 'Invalid value for can_confirm parameter: %s.');
             }
         }
 
@@ -715,13 +721,13 @@ EOD;
             if (empty($constraint['messages']) || in_array($messageType, $constraint['messages'])) {
                 $ok = true;
                 if ($constraint['required']) {
-                    if (!isset($_POST[$name]) || (strlen(trim($_POST[$name])) <= 0)) {
+                    if (!isset($requestBody[$name]) || (strlen(trim($requestBody[$name])) <= 0)) {
                         $invalid_parameters[] = "{$name} (missing)";
                         $ok = false;
                     }
                 }
-                if ($ok && !is_null($constraint['max_length']) && isset($_POST[$name])) {
-                    if (strlen(trim($_POST[$name])) > $constraint['max_length']) {
+                if ($ok && !is_null($constraint['max_length']) && isset($requestBody[$name])) {
+                    if (strlen(trim($requestBody[$name])) > $constraint['max_length']) {
                         $invalid_parameters[] = "{$name} (too long)";
                     }
                 }
@@ -732,25 +738,25 @@ EOD;
         }
 
         // Set the request context/resource link
-        if (isset($_POST['resource_link_id'])) {
+        if (isset($requestBody['resource_link_id'])) {
             $content_item_id = '';
-            if (isset($_POST['custom_content_item_id'])) {
-                $content_item_id = $_POST['custom_content_item_id'];
+            if (isset($requestBody['custom_content_item_id'])) {
+                $content_item_id = $requestBody['custom_content_item_id'];
             }
-            $this->resourceLink = new ResourceLink($this->consumer, trim($_POST['resource_link_id']), $content_item_id);
-            if (isset($_POST['context_id'])) {
-                $this->resourceLink->lti_context_id = trim($_POST['context_id']);
+            $this->resourceLink = new ResourceLink($this->consumer, trim($requestBody['resource_link_id']), $content_item_id);
+            if (isset($requestBody['context_id'])) {
+                $this->resourceLink->lti_context_id = trim($requestBody['context_id']);
             }
-            $this->resourceLink->lti_resource_id = trim($_POST['resource_link_id']);
+            $this->resourceLink->lti_resource_id = trim($requestBody['resource_link_id']);
             $title = '';
-            if (isset($_POST['context_title'])) {
-                $title = trim($_POST['context_title']);
+            if (isset($requestBody['context_title'])) {
+                $title = trim($requestBody['context_title']);
             }
-            if (isset($_POST['resource_link_title']) && (strlen(trim($_POST['resource_link_title'])) > 0)) {
+            if (isset($requestBody['resource_link_title']) && (strlen(trim($requestBody['resource_link_title'])) > 0)) {
                 if (!empty($title)) {
                     $title .= ': ';
                 }
-                $title .= trim($_POST['resource_link_title']);
+                $title .= trim($requestBody['resource_link_title']);
             }
             if (empty($title)) {
                 $title = "Course {$this->resourceLink->getId()}";
@@ -759,8 +765,8 @@ EOD;
 
             // Save LTI parameters
             foreach ($this->ltiSettingsNames as $name) {
-                if (isset($_POST[$name])) {
-                    $this->resourceLink->setSetting($name, $_POST[$name]);
+                if (isset($requestBody[$name])) {
+                    $this->resourceLink->setSetting($name, $requestBody[$name]);
                 } else {
                     $this->resourceLink->setSetting($name, null);
                 }
@@ -774,7 +780,7 @@ EOD;
             }
 
             // Save custom parameters
-            foreach ($_POST as $name => $value) {
+            foreach ($requestBody as $name => $value) {
                 if (strpos($name, 'custom_') === 0) {
                     $this->resourceLink->setSetting($name, $value);
                 }
@@ -783,30 +789,30 @@ EOD;
 
         // Set the user instance
         $user_id = '';
-        if (isset($_POST['user_id'])) {
-            $user_id = trim($_POST['user_id']);
+        if (isset($requestBody['user_id'])) {
+            $user_id = trim($requestBody['user_id']);
         }
         $this->user = new User($this->resourceLink, $user_id);
 
         // Set the user name
-        $firstname = (isset($_POST['lis_person_name_given'])) ? $_POST['lis_person_name_given'] : '';
-        $lastname = (isset($_POST['lis_person_name_family'])) ? $_POST['lis_person_name_family'] : '';
-        $fullname = (isset($_POST['lis_person_name_full'])) ? $_POST['lis_person_name_full'] : '';
+        $firstname = (isset($requestBody['lis_person_name_given'])) ? $requestBody['lis_person_name_given'] : '';
+        $lastname = (isset($requestBody['lis_person_name_family'])) ? $requestBody['lis_person_name_family'] : '';
+        $fullname = (isset($requestBody['lis_person_name_full'])) ? $requestBody['lis_person_name_full'] : '';
         $this->user->setNames($firstname, $lastname, $fullname);
 
         // Set the user email
-        $email = (isset($_POST['lis_person_contact_email_primary'])) ? $_POST['lis_person_contact_email_primary'] : '';
+        $email = (isset($requestBody['lis_person_contact_email_primary'])) ? $requestBody['lis_person_contact_email_primary'] : '';
         $this->user->setEmail($email, $this->defaultEmail);
 
         // Set the user roles
-        if (isset($_POST['roles'])) {
-            $this->user->roles = ToolProvider::parseRoles($_POST['roles']);
+        if (isset($requestBody['roles'])) {
+            $this->user->roles = ToolProvider::parseRoles($requestBody['roles']);
         }
 
         // Save the user instance
-        if (isset($_POST['lis_result_sourcedid'])) {
-            if ($this->user->ltiResultSourcedId != $_POST['lis_result_sourcedid']) {
-                $this->user->ltiResultSourcedId = $_POST['lis_result_sourcedid'];
+        if (isset($requestBody['lis_result_sourcedid'])) {
+            if ($this->user->ltiResultSourcedId != $requestBody['lis_result_sourcedid']) {
+                $this->user->ltiResultSourcedId = $requestBody['lis_result_sourcedid'];
                 $this->user->save();
             }
         } else if (!empty($this->user->ltiResultSourcedId)) {
@@ -815,50 +821,50 @@ EOD;
 
         // Initialise the consumer and check for changes
         $this->consumer->defaultEmail = $this->defaultEmail;
-        if ($this->consumer->lti_version != $_POST['lti_version']) {
-            $this->consumer->lti_version = $_POST['lti_version'];
+        if ($this->consumer->lti_version != $requestBody['lti_version']) {
+            $this->consumer->lti_version = $requestBody['lti_version'];
             $doSaveConsumer = true;
         }
-        if (isset($_POST['tool_consumer_instance_name'])) {
-            if ($this->consumer->consumer_name != $_POST['tool_consumer_instance_name']) {
-                $this->consumer->consumer_name = $_POST['tool_consumer_instance_name'];
+        if (isset($requestBody['tool_consumer_instance_name'])) {
+            if ($this->consumer->consumer_name != $requestBody['tool_consumer_instance_name']) {
+                $this->consumer->consumer_name = $requestBody['tool_consumer_instance_name'];
                 $doSaveConsumer = true;
             }
         }
-        if (isset($_POST['tool_consumer_info_product_family_code'])) {
-            $version = $_POST['tool_consumer_info_product_family_code'];
-            if (isset($_POST['tool_consumer_info_version'])) {
-                $version .= "-{$_POST['tool_consumer_info_version']}";
+        if (isset($requestBody['tool_consumer_info_product_family_code'])) {
+            $version = $requestBody['tool_consumer_info_product_family_code'];
+            if (isset($requestBody['tool_consumer_info_version'])) {
+                $version .= "-{$requestBody['tool_consumer_info_version']}";
             }
             // do not delete any existing consumer version if none is passed
             if ($this->consumer->consumer_version != $version) {
                 $this->consumer->consumer_version = $version;
                 $doSaveConsumer = true;
             }
-        } else if (isset($_POST['ext_lms']) && ($this->consumer->consumer_name != $_POST['ext_lms'])) {
-            $this->consumer->consumer_version = $_POST['ext_lms'];
+        } else if (isset($requestBody['ext_lms']) && ($this->consumer->consumer_name != $requestBody['ext_lms'])) {
+            $this->consumer->consumer_version = $requestBody['ext_lms'];
             $doSaveConsumer = true;
         }
-        if (isset($_POST['tool_consumer_instance_guid'])) {
+        if (isset($requestBody['tool_consumer_instance_guid'])) {
             if (is_null($this->consumer->consumer_guid)) {
-                $this->consumer->consumer_guid = $_POST['tool_consumer_instance_guid'];
+                $this->consumer->consumer_guid = $requestBody['tool_consumer_instance_guid'];
                 $doSaveConsumer = true;
             } else if (!$this->consumer->protected) {
-                $doSaveConsumer = ($this->consumer->consumer_guid != $_POST['tool_consumer_instance_guid']);
+                $doSaveConsumer = ($this->consumer->consumer_guid != $requestBody['tool_consumer_instance_guid']);
                 if ($doSaveConsumer) {
-                    $this->consumer->consumer_guid = $_POST['tool_consumer_instance_guid'];
+                    $this->consumer->consumer_guid = $requestBody['tool_consumer_instance_guid'];
                 }
             }
         }
-        if (isset($_POST['launch_presentation_css_url'])) {
-            if ($this->consumer->css_path != $_POST['launch_presentation_css_url']) {
-                $this->consumer->css_path = $_POST['launch_presentation_css_url'];
+        if (isset($requestBody['launch_presentation_css_url'])) {
+            if ($this->consumer->css_path != $requestBody['launch_presentation_css_url']) {
+                $this->consumer->css_path = $requestBody['launch_presentation_css_url'];
                 $doSaveConsumer = true;
             }
-        } else if (isset($_POST['ext_launch_presentation_css_url']) &&
-            ($this->consumer->css_path != $_POST['ext_launch_presentation_css_url'])
+        } else if (isset($requestBody['ext_launch_presentation_css_url']) &&
+            ($this->consumer->css_path != $requestBody['ext_launch_presentation_css_url'])
         ) {
-            $this->consumer->css_path = $_POST['ext_launch_presentation_css_url'];
+            $this->consumer->css_path = $requestBody['ext_launch_presentation_css_url'];
             $doSaveConsumer = true;
         } else if (!empty($this->consumer->css_path)) {
             $this->consumer->css_path = null;
@@ -872,7 +878,7 @@ EOD;
 
         if (isset($this->resourceLink)) {
             // Check if a share arrangement is in place for this resource link
-            $this->checkForShare();
+            $this->checkForShare($requestBody);
 
             // Persist changes to resource link
             $this->resourceLink->save();
@@ -884,22 +890,23 @@ EOD;
     /**
      * Check if a share arrangement is in place.
      *
+     * @param array $requestBody
      * @throws Exception
      */
-    private function checkForShare()
+    private function checkForShare(array $requestBody)
     {
         $doSaveResourceLink = true;
 
         $key = $this->resourceLink->primary_consumer_key;
         $id = $this->resourceLink->primary_resource_link_id;
 
-        $shareRequest = isset($_POST['custom_share_key']) && !empty($_POST['custom_share_key']);
+        $shareRequest = isset($requestBody['custom_share_key']) && !empty($requestBody['custom_share_key']);
         if ($shareRequest) {
             if (!$this->allowSharing) {
                 throw new Exception('Your sharing request has been refused because sharing is not being permitted');
             } else {
                 // Check if this is a new share key
-                $share_key = new ResourceLinkShareKey($this->resourceLink, $_POST['custom_share_key']);
+                $share_key = new ResourceLinkShareKey($this->resourceLink, $requestBody['custom_share_key']);
                 if (!is_null($share_key->primary_consumer_key) && !is_null($share_key->primary_resource_link_id)) {
                     // Update resource link with sharing primary resource link details
                     $key = $share_key->primary_consumer_key;
