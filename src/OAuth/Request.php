@@ -2,6 +2,8 @@
 
 namespace Franzl\Lti\OAuth;
 
+use Psr\Http\Message\ServerRequestInterface;
+
 class Request
 {
     protected $parameters;
@@ -75,6 +77,32 @@ class Request
         }
 
         return new Request($http_method, $http_url, $parameters);
+    }
+
+    /**
+     * attempt to build up a request from a PSR-7 compatible request
+     *
+     * @param ServerRequestInterface $request
+     * @return Request
+     */
+    public static function fromPsrRequest(ServerRequestInterface $request)
+    {
+        $url = (string) $request->getUri();
+        $httpMethod = $request->getMethod();
+
+        // Let's find the parameters relevant to this request
+        $parameters = (array) $request->getParsedBody() + $request->getQueryParams();
+
+        // We have a Authorization-header with OAuth data. Parse the header
+        // and add those overriding any duplicates from GET or POST
+        if (substr($request->getHeaderLine('Authorization'), 0, 6) == 'OAuth ') {
+            $header_parameters = Util::splitHeader(
+                $request->getHeaderLine('Authorization')
+            );
+            $parameters = array_merge($parameters, $header_parameters);
+        }
+
+        return new Request($httpMethod, $url, $parameters);
     }
 
     /**

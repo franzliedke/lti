@@ -288,7 +288,7 @@ class ToolProvider
         }
 
         // Perform action
-        if ($this->authenticate($requestBody)) {
+        if ($this->authenticate($request)) {
             $this->doCallback();
         }
 
@@ -558,12 +558,15 @@ EOD;
      *
      * The consumer, resource link and user objects will be initialised if the request is valid.
      *
-     * @param array $requestBody
+     * @param ServerRequestInterface $request
      * @return bool True if the request has been successfully validated.
      * @throws Exception
+     * @internal param array $requestBody
      */
-    private function authenticate(array $requestBody)
+    private function authenticate(ServerRequestInterface $request)
     {
+        $requestBody = (array) $request->getParsedBody();
+
         // Get the consumer
         $doSaveConsumer = false;
 
@@ -654,7 +657,7 @@ EOD;
         $server = new Server($store);
         $method = new SignatureMethodHmacSha1();
         $server->addSignatureMethod($method);
-        $request = Request::fromRequest();
+        $request = Request::fromPsrRequest($request);
         $server->verifyRequest($request);
 
         if ($this->consumer->protected) {
