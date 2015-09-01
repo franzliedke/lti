@@ -194,7 +194,7 @@ class ResourceLink
      */
     public function delete()
     {
-        return $this->consumer->getStorage()->Resource_Link_delete($this);
+        return $this->consumer->getStorage()->resourceLinkDelete($this);
     }
 
     /**
@@ -650,7 +650,7 @@ EOF;
      */
     public function getUserResultSourcedIDs($local_only = false, $id_scope = null)
     {
-        return $this->consumer->getStorage()->Resource_Link_getUserResultSourcedIDs($this, $local_only, $id_scope);
+        return $this->consumer->getStorage()->resourceLinkGetUserResultSourcedIDs($this, $local_only, $id_scope);
     }
 
     /**
@@ -660,7 +660,7 @@ EOF;
      */
     public function getShares()
     {
-        return $this->consumer->getStorage()->Resource_Link_getShares($this);
+        return $this->consumer->getStorage()->resourceLinkGetShares($this);
     }
 
     /**
