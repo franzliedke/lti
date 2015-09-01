@@ -139,13 +139,6 @@ class ToolProvider
     public $message = self::CONNECTION_ERROR_MESSAGE;
 
     /**
-     * Details for error message relating to last request processed.
-     *
-     * @var array
-     */
-    public $details = [];
-
-    /**
      * URL to redirect user to on successful completion of the request.
      *
      * @var string
