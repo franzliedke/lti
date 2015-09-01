@@ -30,9 +30,10 @@ class GuzzleClient implements ClientInterface
      * @param string $method
      * @param array|string $body
      * @param array $headers
+     * @param array $options
      * @return ResponseInterface
      */
-    public function send($url, $method, $body, $headers = [])
+    public function send($url, $method, $body, $headers = [], $options = [])
     {
         if (is_array($body)) {
             $body = http_build_query($body);
@@ -40,9 +41,23 @@ class GuzzleClient implements ClientInterface
         $request = new Request($method, $url, $headers, $body);
 
         try {
-            return new HttpResponse($this->guzzle->send($request));
+            return new HttpResponse($this->guzzle->send($request, $options));
         } catch (TransferException $e) {
             return new ErrorResponse;
         }
+    }
+
+    /**
+     * Send a HTTP request, signed with OAuth.
+     *
+     * @param string $url
+     * @param string $method
+     * @param array|string $body
+     * @param array $headers
+     * @return ResponseInterface
+     */
+    public function sendSigned($url, $method, $body, $headers = [])
+    {
+        return $this->send($url, $method, $body, $headers, ['auth' => 'oauth']);
     }
 }
