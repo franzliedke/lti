@@ -17,7 +17,7 @@ class Server
 
     public function addSignatureMethod($signature_method)
     {
-        $this->signature_methods[$signature_method->get_name()] =
+        $this->signature_methods[$signature_method->getName()] =
             $signature_method;
     }
 
@@ -85,7 +85,7 @@ class Server
      */
     private function getVersion(&$request)
     {
-        $version = $request->get_parameter("oauth_version");
+        $version = $request->getParameter("oauth_version");
         if (!$version) {
             // Service Providers MUST assume the protocol version to be 1.0 if this parameter is not present.
             // Chapter 7.0 ("Accessing Protected Ressources")
@@ -138,7 +138,7 @@ class Server
             throw new Exception("Invalid consumer key");
         }
 
-        $consumer = $this->data_store->lookup_consumer($consumer_key);
+        $consumer = $this->data_store->lookupConsumer($consumer_key);
         if (!$consumer) {
             throw new Exception("Invalid consumer");
         }
@@ -155,7 +155,7 @@ class Server
             ? $request->getParameter('oauth_token')
             : null;
 
-        $token = $this->data_store->lookup_token(
+        $token = $this->data_store->lookupToken(
             $consumer,
             $token_type,
             $token_field
@@ -186,7 +186,7 @@ class Server
         $signature_method = $this->getSignatureMethod($request);
 
         $signature = $request->getParameter('oauth_signature');
-        $valid_sig = $signature_method->check_signature(
+        $valid_sig = $signature_method->checkSignature(
             $request,
             $consumer,
             $token,
@@ -230,7 +230,7 @@ class Server
         }
 
         // verify that the nonce is uniqueish
-        $found = $this->data_store->lookup_nonce(
+        $found = $this->data_store->lookupNonce(
             $consumer,
             $token,
             $nonce,

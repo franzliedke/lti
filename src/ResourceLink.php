@@ -671,7 +671,7 @@ EOF;
     private function load()
     {
         $this->initialise();
-        return $this->consumer->getStorage()->Resource_Link_load($this);
+        return $this->consumer->getStorage()->resourceLinkLoad($this);
     }
 
     /**

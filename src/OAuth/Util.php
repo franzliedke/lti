@@ -7,7 +7,7 @@ class Util
     public static function urlencodeRfc3986($input)
     {
         if (is_array($input)) {
-            return array_map(['Util', 'urlencodeRfc3986'], $input);
+            return array_map([__CLASS__, 'urlencodeRfc3986'], $input);
         } else if (is_scalar($input)) {
             return str_replace(
                 '+',
