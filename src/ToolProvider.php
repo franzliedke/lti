@@ -947,26 +947,25 @@ EOD;
         }
 
         // Look up primary resource link
-        if (is_null($key)) {
-            throw new Exception('Unable to find primary resource link');
+        if (!is_null($key)) {
+            $consumer = new ToolConsumer($key, $this->storage);
+
+            // TODO: Move to load function
+            if (is_null($consumer->created)) {
+                throw new Exception('Unable to load tool consumer');
+            }
+
+            $resource_link = new ResourceLink($consumer, $id);
+
+            if (is_null($resource_link->created)) {
+                throw new Exception('Unable to load resource link being shared');
+            }
+
+            if ($doSaveResourceLink) {
+                $this->resourceLink->save();
+            }
+            $this->resourceLink = $resource_link;
         }
-
-        $consumer = new ToolConsumer($key, $this->storage);
-
-        if (is_null($consumer->created)) {
-            throw new Exception('Unable to load tool consumer');
-        }
-
-        $resource_link = new ResourceLink($consumer, $id);
-
-        if (is_null($resource_link->created)) {
-            throw new Exception('Unable to load resource link being shared');
-        }
-
-        if ($doSaveResourceLink) {
-            $this->resourceLink->save();
-        }
-        $this->resourceLink = $resource_link;
     }
 
     /**
