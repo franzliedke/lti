@@ -179,7 +179,7 @@ class ResourceLink
      */
     public function save()
     {
-        $ok = $this->consumer->getStorage()->Resource_Link_save($this);
+        $ok = $this->consumer->getStorage()->resourceLinkSave($this);
         if ($ok) {
             $this->settings_changed = false;
         }
