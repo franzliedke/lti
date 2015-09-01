@@ -971,10 +971,12 @@ EOD;
     /**
      * Validate a parameter value from an array of permitted values.
      *
-     * @return void
+     * @param string $value
+     * @param array $values
+     * @param string $reason
      * @throws Exception
      */
-    private function checkValue($value, $values, $reason = '')
+    private function checkValue($value, array $values, $reason = '')
     {
         $ok = in_array($value, $values);
         if (!$ok && !empty($reason)) {
