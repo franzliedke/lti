@@ -107,16 +107,16 @@ class PDOStorage extends AbstractStorage
         $time = time();
         $now = date("{$this->date_format} {$this->time_format}", $time);
         $from = null;
-        if (!is_null($consumer->enable_from)) {
-            $from = date("{$this->date_format} {$this->time_format}", $consumer->enable_from);
+        if (!is_null($consumer->enableFrom)) {
+            $from = date("{$this->date_format} {$this->time_format}", $consumer->enableFrom);
         }
         $until = null;
-        if (!is_null($consumer->enable_until)) {
-            $until = date("{$this->date_format} {$this->time_format}", $consumer->enable_until);
+        if (!is_null($consumer->enableUntil)) {
+            $until = date("{$this->date_format} {$this->time_format}", $consumer->enableUntil);
         }
         $last = null;
-        if (!is_null($consumer->last_access)) {
-            $last = date($this->date_format, $consumer->last_access);
+        if (!is_null($consumer->lastAccess)) {
+            $last = date($this->date_format, $consumer->lastAccess);
         }
         $key = $consumer->getKey();
         if (is_null($consumer->created)) {
@@ -128,11 +128,11 @@ class PDOStorage extends AbstractStorage
             $query->bindValue('key', $key, PDO::PARAM_STR);
             $query->bindValue('name', $consumer->name, PDO::PARAM_STR);
             $query->bindValue('secret', $consumer->secret, PDO::PARAM_STR);
-            $query->bindValue('lti_version', $consumer->lti_version, PDO::PARAM_STR);
-            $query->bindValue('consumer_name', $consumer->consumer_name, PDO::PARAM_STR);
-            $query->bindValue('consumer_version', $consumer->consumer_version, PDO::PARAM_STR);
-            $query->bindValue('consumer_guid', $consumer->consumer_guid, PDO::PARAM_STR);
-            $query->bindValue('css_path', $consumer->css_path, PDO::PARAM_STR);
+            $query->bindValue('lti_version', $consumer->ltiVersion, PDO::PARAM_STR);
+            $query->bindValue('consumer_name', $consumer->consumerName, PDO::PARAM_STR);
+            $query->bindValue('consumer_version', $consumer->consumerVersion, PDO::PARAM_STR);
+            $query->bindValue('consumer_guid', $consumer->consumerGuid, PDO::PARAM_STR);
+            $query->bindValue('css_path', $consumer->cssPath, PDO::PARAM_STR);
             $query->bindValue('protected', $protected, PDO::PARAM_INT);
             $query->bindValue('enabled', $enabled, PDO::PARAM_INT);
             $query->bindValue('enable_from', $from, PDO::PARAM_STR);
@@ -150,11 +150,11 @@ class PDOStorage extends AbstractStorage
             $query->bindValue('key', $key, PDO::PARAM_STR);
             $query->bindValue('name', $consumer->name, PDO::PARAM_STR);
             $query->bindValue('secret', $consumer->secret, PDO::PARAM_STR);
-            $query->bindValue('lti_version', $consumer->lti_version, PDO::PARAM_STR);
-            $query->bindValue('consumer_name', $consumer->consumer_name, PDO::PARAM_STR);
-            $query->bindValue('consumer_version', $consumer->consumer_version, PDO::PARAM_STR);
-            $query->bindValue('consumer_guid', $consumer->consumer_guid, PDO::PARAM_STR);
-            $query->bindValue('css_path', $consumer->css_path, PDO::PARAM_STR);
+            $query->bindValue('lti_version', $consumer->ltiVersion, PDO::PARAM_STR);
+            $query->bindValue('consumer_name', $consumer->consumerName, PDO::PARAM_STR);
+            $query->bindValue('consumer_version', $consumer->consumerVersion, PDO::PARAM_STR);
+            $query->bindValue('consumer_guid', $consumer->consumerGuid, PDO::PARAM_STR);
+            $query->bindValue('css_path', $consumer->cssPath, PDO::PARAM_STR);
             $query->bindValue('protected', $protected, PDO::PARAM_INT);
             $query->bindValue('enabled', $enabled, PDO::PARAM_INT);
             $query->bindValue('enable_from', $from, PDO::PARAM_STR);
@@ -252,24 +252,24 @@ class PDOStorage extends AbstractStorage
                 $consumer->name = $row['name'];
                 $consumer->secret = $row['secret'];
                 ;
-                $consumer->lti_version = $row['lti_version'];
-                $consumer->consumer_name = $row['consumer_name'];
-                $consumer->consumer_version = $row['consumer_version'];
-                $consumer->consumer_guid = $row['consumer_guid'];
-                $consumer->css_path = $row['css_path'];
+                $consumer->ltiVersion = $row['lti_version'];
+                $consumer->consumerName = $row['consumer_name'];
+                $consumer->consumerVersion = $row['consumer_version'];
+                $consumer->consumerGuid = $row['consumer_guid'];
+                $consumer->cssPath = $row['css_path'];
                 $consumer->protected = ($row['protected'] == 1);
                 $consumer->enabled = ($row['enabled'] == 1);
-                $consumer->enable_from = null;
+                $consumer->enableFrom = null;
                 if (!is_null($row['enable_from'])) {
-                    $consumer->enable_from = strtotime($row['enable_from']);
+                    $consumer->enableFrom = strtotime($row['enable_from']);
                 }
-                $consumer->enable_until = null;
+                $consumer->enableUntil = null;
                 if (!is_null($row['enable_until'])) {
-                    $consumer->enable_until = strtotime($row['enable_until']);
+                    $consumer->enableUntil = strtotime($row['enable_until']);
                 }
-                $consumer->last_access = null;
+                $consumer->lastAccess = null;
                 if (!is_null($row['last_access'])) {
-                    $consumer->last_access = strtotime($row['last_access']);
+                    $consumer->lastAccess = strtotime($row['last_access']);
                 }
                 $consumer->created = strtotime($row['created']);
                 $consumer->updated = strtotime($row['updated']);

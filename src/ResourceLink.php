@@ -179,7 +179,7 @@ class ResourceLink
      */
     public function save()
     {
-        $ok = $this->consumer->getDataConnector()->Resource_Link_save($this);
+        $ok = $this->consumer->getStorage()->Resource_Link_save($this);
         if ($ok) {
             $this->settings_changed = false;
         }
@@ -194,7 +194,7 @@ class ResourceLink
      */
     public function delete()
     {
-        return $this->consumer->getDataConnector()->Resource_Link_delete($this);
+        return $this->consumer->getStorage()->Resource_Link_delete($this);
     }
 
     /**
@@ -650,7 +650,7 @@ EOF;
      */
     public function getUserResultSourcedIDs($local_only = false, $id_scope = null)
     {
-        return $this->consumer->getDataConnector()->Resource_Link_getUserResultSourcedIDs($this, $local_only, $id_scope);
+        return $this->consumer->getStorage()->Resource_Link_getUserResultSourcedIDs($this, $local_only, $id_scope);
     }
 
     /**
@@ -660,7 +660,7 @@ EOF;
      */
     public function getShares()
     {
-        return $this->consumer->getDataConnector()->Resource_Link_getShares($this);
+        return $this->consumer->getStorage()->Resource_Link_getShares($this);
     }
 
     /**
@@ -671,7 +671,7 @@ EOF;
     private function load()
     {
         $this->initialise();
-        return $this->consumer->getDataConnector()->Resource_Link_load($this);
+        return $this->consumer->getStorage()->Resource_Link_load($this);
     }
 
     /**
@@ -765,7 +765,7 @@ EOF;
     {
         $ok = false;
         if (!empty($url)) {
-            $params = $this->consumer->signParameters($url, $type, $this->consumer->lti_version, $params);
+            $params = $this->consumer->signParameters($url, $type, $this->consumer->ltiVersion, $params);
 
             // Connect to tool consumer
             $response = ClientFactory::make()->send($url, 'POST', $params);

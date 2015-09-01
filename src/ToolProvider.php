@@ -649,13 +649,13 @@ EOD;
 
         $now = time();
         $today = date('Y-m-d', $now);
-        if (is_null($this->consumer->last_access)) {
+        if (is_null($this->consumer->lastAccess)) {
             $doSaveConsumer = true;
         } else {
-            $last = date('Y-m-d', $this->consumer->last_access);
+            $last = date('Y-m-d', $this->consumer->lastAccess);
             $doSaveConsumer = $doSaveConsumer || ($last != $today);
         }
-        $this->consumer->last_access = $now;
+        $this->consumer->lastAccess = $now;
 
         $store = new DataStore($this);
         $server = new Server($store);
@@ -671,7 +671,7 @@ EOD;
                 throw new Exception('A tool consumer GUID must be included in the launch request');
             }
 
-            if ($this->consumer->consumer_guid !== $consumerGuid) {
+            if ($this->consumer->consumerGuid !== $consumerGuid) {
                 throw new Exception('Request is from an invalid tool consumer');
             }
         }
@@ -680,11 +680,11 @@ EOD;
             throw new Exception('Tool consumer has not been enabled by the tool provider');
         }
 
-        if (!is_null($this->consumer->enable_from) && ($this->consumer->enable_from > $now)) {
+        if (!is_null($this->consumer->enableFrom) && ($this->consumer->enableFrom > $now)) {
             throw new Exception('Tool consumer access is not yet available');
         }
 
-        if (!is_null($this->consumer->enable_until) && ($this->consumer->enable_until <= $now)) {
+        if (!is_null($this->consumer->enableUntil) && ($this->consumer->enableUntil <= $now)) {
             throw new Exception('Tool consumer access has expired');
         }
 
@@ -821,13 +821,13 @@ EOD;
 
         // Initialise the consumer and check for changes
         $this->consumer->defaultEmail = $this->defaultEmail;
-        if ($this->consumer->lti_version != $requestBody['lti_version']) {
-            $this->consumer->lti_version = $requestBody['lti_version'];
+        if ($this->consumer->ltiVersion != $requestBody['lti_version']) {
+            $this->consumer->ltiVersion = $requestBody['lti_version'];
             $doSaveConsumer = true;
         }
         if (isset($requestBody['tool_consumer_instance_name'])) {
-            if ($this->consumer->consumer_name != $requestBody['tool_consumer_instance_name']) {
-                $this->consumer->consumer_name = $requestBody['tool_consumer_instance_name'];
+            if ($this->consumer->consumerName != $requestBody['tool_consumer_instance_name']) {
+                $this->consumer->consumerName = $requestBody['tool_consumer_instance_name'];
                 $doSaveConsumer = true;
             }
         }
@@ -837,37 +837,37 @@ EOD;
                 $version .= "-{$requestBody['tool_consumer_info_version']}";
             }
             // do not delete any existing consumer version if none is passed
-            if ($this->consumer->consumer_version != $version) {
-                $this->consumer->consumer_version = $version;
+            if ($this->consumer->consumerVersion != $version) {
+                $this->consumer->consumerVersion = $version;
                 $doSaveConsumer = true;
             }
-        } else if (isset($requestBody['ext_lms']) && ($this->consumer->consumer_name != $requestBody['ext_lms'])) {
-            $this->consumer->consumer_version = $requestBody['ext_lms'];
+        } else if (isset($requestBody['ext_lms']) && ($this->consumer->consumerName != $requestBody['ext_lms'])) {
+            $this->consumer->consumerVersion = $requestBody['ext_lms'];
             $doSaveConsumer = true;
         }
         if (isset($requestBody['tool_consumer_instance_guid'])) {
-            if (is_null($this->consumer->consumer_guid)) {
-                $this->consumer->consumer_guid = $requestBody['tool_consumer_instance_guid'];
+            if (is_null($this->consumer->consumerGuid)) {
+                $this->consumer->consumerGuid = $requestBody['tool_consumer_instance_guid'];
                 $doSaveConsumer = true;
             } else if (!$this->consumer->protected) {
-                $doSaveConsumer = ($this->consumer->consumer_guid != $requestBody['tool_consumer_instance_guid']);
+                $doSaveConsumer = ($this->consumer->consumerGuid != $requestBody['tool_consumer_instance_guid']);
                 if ($doSaveConsumer) {
-                    $this->consumer->consumer_guid = $requestBody['tool_consumer_instance_guid'];
+                    $this->consumer->consumerGuid = $requestBody['tool_consumer_instance_guid'];
                 }
             }
         }
         if (isset($requestBody['launch_presentation_css_url'])) {
-            if ($this->consumer->css_path != $requestBody['launch_presentation_css_url']) {
-                $this->consumer->css_path = $requestBody['launch_presentation_css_url'];
+            if ($this->consumer->cssPath != $requestBody['launch_presentation_css_url']) {
+                $this->consumer->cssPath = $requestBody['launch_presentation_css_url'];
                 $doSaveConsumer = true;
             }
         } else if (isset($requestBody['ext_launch_presentation_css_url']) &&
-            ($this->consumer->css_path != $requestBody['ext_launch_presentation_css_url'])
+            ($this->consumer->cssPath != $requestBody['ext_launch_presentation_css_url'])
         ) {
-            $this->consumer->css_path = $requestBody['ext_launch_presentation_css_url'];
+            $this->consumer->cssPath = $requestBody['ext_launch_presentation_css_url'];
             $doSaveConsumer = true;
-        } else if (!empty($this->consumer->css_path)) {
-            $this->consumer->css_path = null;
+        } else if (!empty($this->consumer->cssPath)) {
+            $this->consumer->cssPath = null;
             $doSaveConsumer = true;
         }
 

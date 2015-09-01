@@ -135,7 +135,7 @@ class User
     {
         $this->initialise();
         if (!is_null($this->resourceLink)) {
-            $this->resourceLink->getConsumer()->getDataConnector()->User_load($this);
+            $this->resourceLink->getConsumer()->getStorage()->User_load($this);
         }
     }
 
@@ -147,7 +147,7 @@ class User
     public function save()
     {
         if (!empty($this->ltiResultSourcedId) && !is_null($this->resourceLink)) {
-            $ok = $this->resourceLink->getConsumer()->getDataConnector()->User_save($this);
+            $ok = $this->resourceLink->getConsumer()->getStorage()->User_save($this);
         } else {
             $ok = true;
         }
@@ -164,7 +164,7 @@ class User
     {
         return
             is_null($this->resourceLink) ||
-            $this->resourceLink->getConsumer()->getDataConnector()->User_delete($this);
+            $this->resourceLink->getConsumer()->getStorage()->User_delete($this);
     }
 
     /**

@@ -54,7 +54,7 @@ class ConsumerNonce
     public function load()
     {
 
-        return $this->consumer->getDataConnector()->Consumer_Nonce_load($this);
+        return $this->consumer->getStorage()->Consumer_Nonce_load($this);
 
     }
 
@@ -66,7 +66,7 @@ class ConsumerNonce
     public function save()
     {
 
-        return $this->consumer->getDataConnector()->Consumer_Nonce_save($this);
+        return $this->consumer->getStorage()->Consumer_Nonce_save($this);
 
     }
 
