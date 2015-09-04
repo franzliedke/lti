@@ -3,6 +3,7 @@
 namespace Franzl\Lti;
 
 use DOMDocument;
+use DOMElement;
 use Exception;
 use Franzl\Lti\Http\ClientFactory;
 use Franzl\Lti\OAuth\Consumer;
@@ -16,15 +17,16 @@ use Franzl\Lti\OAuth\Consumer;
  */
 class ResourceLink
 {
-
     /**
      * Read action.
      */
     const EXT_READ = 1;
+
     /**
      * Write (create/update) action.
      */
     const EXT_WRITE = 2;
+
     /**
      * Delete action.
      */
@@ -34,120 +36,175 @@ class ResourceLink
      * Decimal outcome type.
      */
     const EXT_TYPE_DECIMAL = 'decimal';
+
     /**
      * Percentage outcome type.
      */
     const EXT_TYPE_PERCENTAGE = 'percentage';
+
     /**
      * Ratio outcome type.
      */
     const EXT_TYPE_RATIO = 'ratio';
+
     /**
      * Letter (A-F) outcome type.
      */
     const EXT_TYPE_LETTER_AF = 'letteraf';
+
     /**
      * Letter (A-F) with optional +/- outcome type.
      */
     const EXT_TYPE_LETTER_AF_PLUS = 'letterafplus';
+
     /**
      * Pass/fail outcome type.
      */
     const EXT_TYPE_PASS_FAIL = 'passfail';
+
     /**
      * Free text outcome type.
      */
     const EXT_TYPE_TEXT = 'freetext';
 
     /**
-     * @var string Context ID as supplied in the last connection request.
+     * Context ID as supplied in the last connection request.
+     *
+     * @var string
      */
     public $lti_context_id = null;
+
     /**
-     * @var string Resource link ID as supplied in the last connection request.
+     * Resource link ID as supplied in the last connection request.
+     *
+     * @var string
      */
     public $lti_resource_id = null;
+
     /**
-     * @var string Context title.
+     * Context title.
+     *
+     * @var string
      */
     public $title = null;
+
     /**
-     * @var array Setting values (LTI parameters, custom parameters and local parameters).
+     * Setting values (LTI parameters, custom parameters and local parameters).
+     *
+     * @var array
      */
     public $settings = null;
+
     /**
-     * @var array User group sets (NULL if the consumer does not support the groups enhancement)
+     * User group sets (NULL if the consumer does not support the groups enhancement)
+     *
+     * @var array
      */
-    public $group_sets = null;
+    public $groupSets = null;
+
     /**
-     * @var array User groups (NULL if the consumer does not support the groups enhancement)
+     * User groups (NULL if the consumer does not support the groups enhancement)
+     *
+     * @var array
      */
     public $groups = null;
+
     /**
-     * @var string Consumer key value for resource link being shared (if any).
+     * Consumer key value for resource link being shared (if any).
+     *
+     * @var string
      */
     public $primary_consumer_key = null;
+
     /**
-     * @var string ID value for resource link being shared (if any).
+     * ID value for resource link being shared (if any).
+     *
+     * @var string
      */
     public $primary_resource_link_id = null;
+
     /**
-     * @var boolean Whether the sharing request has been approved by the primary resource link.
+     * Whether the sharing request has been approved by the primary resource link.
+     *
+     * @var boolean
      */
     public $share_approved = null;
+
     /**
-     * @var object Date/time when the object was created.
+     * Date/time when the object was created.
+     *
+     * @var object
      */
     public $created = null;
+
     /**
-     * @var object Date/time when the object was last updated.
+     * Date/time when the object was last updated.
+     *
+     * @var object
      */
     public $updated = null;
 
     /**
-     * @var ToolConsumer Tool Consumer for this resource link.
+     * Tool Consumer for this resource link.
+     *
+     * @var ToolConsumer
      */
     private $consumer = null;
+
     /**
-     * @var string ID for this resource link.
+     * ID for this resource link.
+     *
+     * @var string
      */
     private $id = null;
+
     /**
-     * @var string Previous ID for this resource link.
+     * Previous ID for this resource link.
+     *
+     * @var string
      */
-    private $previous_id = null;
+    private $previousId = null;
+
     /**
-     * @var boolean Whether the settings value have changed since last saved.
+     * Whether the settings value have changed since last saved.
+     *
+     * @var boolean
      */
-    private $settings_changed = false;
+    private $settingsChanged = false;
+
     /**
-     * @var string XML document for the last extension service request.
+     * XML document for the last extension service request.
+     *
+     * @var string
      */
-    private $ext_doc = null;
+    private $extDoc = null;
+
     /**
-     * @var array XML node array for the last extension service request.
+     * XML node array for the last extension service request.
+     *
+     * @var array
      */
-    private $ext_nodes = null;
+    private $extNodes = null;
 
     /**
      * Class constructor.
      *
      * @param string $consumer         Consumer key value
      * @param string $id               Resource link ID value
-     * @param string $current_id       Current ID of resource link (optional, default is NULL)
+     * @param string $currentId        Current ID of resource link (optional, default is NULL)
      */
-    public function __construct($consumer, $id, $current_id = null)
+    public function __construct($consumer, $id, $currentId = null)
     {
         $this->consumer = $consumer;
         $this->id = $id;
-        $this->previous_id = $this->id;
+        $this->previousId = $this->id;
         if (!empty($id)) {
             $this->load();
-            if (is_null($this->created) && !empty($current_id)) {
-                $this->id = $current_id;
+            if (is_null($this->created) && !empty($currentId)) {
+                $this->id = $currentId;
                 $this->load();
                 $this->id = $id;
-                $this->previous_id = $current_id;
+                $this->previousId = $currentId;
             }
         } else {
             $this->initialise();
@@ -163,7 +220,7 @@ class ResourceLink
         $this->lti_resource_id = null;
         $this->title = '';
         $this->settings = [];
-        $this->group_sets = null;
+        $this->groupSets = null;
         $this->groups = null;
         $this->primary_consumer_key = null;
         $this->primary_resource_link_id = null;
@@ -181,7 +238,7 @@ class ResourceLink
     {
         $ok = $this->consumer->getStorage()->resourceLinkSave($this);
         if ($ok) {
-            $this->settings_changed = false;
+            $this->settingsChanged = false;
         }
 
         return $ok;
@@ -226,13 +283,7 @@ class ResourceLink
      */
     public function getId($previous = false)
     {
-        if ($previous) {
-            $id = $this->previous_id;
-        } else {
-            $id = $this->id;
-        }
-
-        return $id;
+        return $previous ? $this->previousId : $this->id;
     }
 
     /**
@@ -245,13 +296,7 @@ class ResourceLink
      */
     public function getSetting($name, $default = '')
     {
-        if (array_key_exists($name, $this->settings)) {
-            $value = $this->settings[$name];
-        } else {
-            $value = $default;
-        }
-
-        return $value;
+        return isset($this->settings[$name]) ? $this->settings[$name] : $default;
     }
 
     /**
@@ -262,14 +307,14 @@ class ResourceLink
      */
     public function setSetting($name, $value = null)
     {
-        $old_value = $this->getSetting($name);
-        if ($value != $old_value) {
+        $oldValue = $this->getSetting($name);
+        if ($value != $oldValue) {
             if (!empty($value)) {
                 $this->settings[$name] = $value;
             } else {
                 unset($this->settings[$name]);
             }
-            $this->settings_changed = true;
+            $this->settingsChanged = true;
         }
     }
 
@@ -290,13 +335,7 @@ class ResourceLink
      */
     public function saveSettings()
     {
-        if ($this->settings_changed) {
-            $ok = $this->save();
-        } else {
-            $ok = true;
-        }
-
-        return $ok;
+        return !$this->settingsChanged || $this->save();
     }
 
     /**
@@ -416,11 +455,11 @@ EOF;
                 if ($this->doLTI11Service($do, $urlLTI11, $xml)) {
                     switch ($action) {
                         case self::EXT_READ:
-                            if (!isset($this->ext_nodes['imsx_POXBody']["{$do}Response"]['result']['resultScore']['textString'])) {
+                            if (!isset($this->extNodes['imsx_POXBody']["{$do}Response"]['result']['resultScore']['textString'])) {
                                 break;
                             }
 
-                            $lti_outcome->setValue($this->ext_nodes['imsx_POXBody']["{$do}Response"]['result']['resultScore']['textString']);
+                            $lti_outcome->setValue($this->extNodes['imsx_POXBody']["{$do}Response"]['result']['resultScore']['textString']);
                             // no break
                         case self::EXT_WRITE:
                         case self::EXT_DELETE:
@@ -450,8 +489,8 @@ EOF;
                 if ($this->doService($do, $urlExt, $params)) {
                     switch ($action) {
                         case self::EXT_READ:
-                            if (isset($this->ext_nodes['result']['resultscore']['textstring'])) {
-                                $response = $this->ext_nodes['result']['resultscore']['textstring'];
+                            if (isset($this->extNodes['result']['resultscore']['textstring'])) {
+                                $response = $this->extNodes['result']['resultscore']['textstring'];
                             }
                             break;
                         case self::EXT_WRITE:
@@ -490,20 +529,20 @@ EOF;
             $ok = $this->doService('basic-lis-readmembershipsforcontextwithgroups', $url, $params);
         }
         if ($ok) {
-            $this->group_sets = [];
+            $this->groupSets = [];
             $this->groups = [];
         } else {
             $ok = $this->doService('basic-lis-readmembershipsforcontext', $url, $params);
         }
 
         if ($ok) {
-            if (!isset($this->ext_nodes['memberships']['member'])) {
+            if (!isset($this->extNodes['memberships']['member'])) {
                 $members = [];
-            } else if (!isset($this->ext_nodes['memberships']['member'][0])) {
+            } else if (!isset($this->extNodes['memberships']['member'][0])) {
                 $members = [];
-                $members[0] = $this->ext_nodes['memberships']['member'];
+                $members[0] = $this->extNodes['memberships']['member'];
             } else {
-                $members = $this->ext_nodes['memberships']['member'];
+                $members = $this->extNodes['memberships']['member'];
             }
 
             for ($i = 0; $i < count($members); $i++) {
@@ -537,19 +576,19 @@ EOF;
                     $group = $groups[$j];
                     if (isset($group['set'])) {
                         $set_id = $group['set']['id'];
-                        if (!isset($this->group_sets[$set_id])) {
-                            $this->group_sets[$set_id] = ['title' => $group['set']['title'], 'groups' => [],
+                        if (!isset($this->groupSets[$set_id])) {
+                            $this->groupSets[$set_id] = ['title' => $group['set']['title'], 'groups' => [],
                                                                'num_members' => 0, 'num_staff' => 0, 'num_learners' => 0];
                         }
-                        $this->group_sets[$set_id]['num_members']++;
+                        $this->groupSets[$set_id]['num_members']++;
                         if ($user->isStaff()) {
-                            $this->group_sets[$set_id]['num_staff']++;
+                            $this->groupSets[$set_id]['num_staff']++;
                         }
                         if ($user->isLearner()) {
-                            $this->group_sets[$set_id]['num_learners']++;
+                            $this->groupSets[$set_id]['num_learners']++;
                         }
-                        if (!in_array($group['id'], $this->group_sets[$set_id]['groups'])) {
-                            $this->group_sets[$set_id]['groups'][] = $group['id'];
+                        if (!in_array($group['id'], $this->groupSets[$set_id]['groups'])) {
+                            $this->groupSets[$set_id]['groups'][] = $group['id'];
                         }
                         $this->groups[$group['id']] = ['title' => $group['title'], 'set' => $set_id];
                     } else {
@@ -614,8 +653,8 @@ EOF;
             if ($this->doService($do, $url, $params)) {
                 switch ($action) {
                     case self::EXT_READ:
-                        if (isset($this->ext_nodes['setting']['value'])) {
-                            $response = $this->ext_nodes['setting']['value'];
+                        if (isset($this->extNodes['setting']['value'])) {
+                            $response = $this->extNodes['setting']['value'];
                             if (is_array($response)) {
                                 $response = '';
                             }
@@ -774,10 +813,10 @@ EOF;
             if ($response->isSuccessful()) {
                 $response = $response->getWrappedResponse();
                 try {
-                    $this->ext_doc = new DOMDocument();
-                    $this->ext_doc->loadXML((string) $response->getBody());
-                    $this->ext_nodes = $this->domNodeToArray($this->ext_doc->documentElement);
-                    if (isset($this->ext_nodes['statusinfo']['codemajor']) && ($this->ext_nodes['statusinfo']['codemajor'] == 'Success')) {
+                    $this->extDoc = new DOMDocument();
+                    $this->extDoc->loadXML((string) $response->getBody());
+                    $this->extNodes = $this->domNodeToArray($this->extDoc->documentElement);
+                    if (isset($this->extNodes['statusinfo']['codemajor']) && ($this->extNodes['statusinfo']['codemajor'] == 'Success')) {
                         $ok = true;
                     }
                 } catch (Exception $e) {
@@ -834,11 +873,11 @@ EOD;
             if ($response->isSuccessful()) {
                 $response = $response->getWrappedResponse();
                 try {
-                    $this->ext_doc = new DOMDocument();
-                    $this->ext_doc->loadXML((string) $response->getBody());
-                    $this->ext_nodes = $this->domNodeToArray($this->ext_doc->documentElement);
-                    if (isset($this->ext_nodes['imsx_POXHeader']['imsx_POXResponseHeaderInfo']['imsx_statusInfo']['imsx_codeMajor']) &&
-                        ($this->ext_nodes['imsx_POXHeader']['imsx_POXResponseHeaderInfo']['imsx_statusInfo']['imsx_codeMajor'] == 'success')) {
+                    $this->extDoc = new DOMDocument();
+                    $this->extDoc->loadXML((string) $response->getBody());
+                    $this->extNodes = $this->domNodeToArray($this->extDoc->documentElement);
+                    if (isset($this->extNodes['imsx_POXHeader']['imsx_POXResponseHeaderInfo']['imsx_statusInfo']['imsx_codeMajor']) &&
+                        ($this->extNodes['imsx_POXHeader']['imsx_POXResponseHeaderInfo']['imsx_statusInfo']['imsx_codeMajor'] == 'success')) {
                         $ok = true;
                     }
                 } catch (Exception $e) {
@@ -856,7 +895,7 @@ EOD;
      *
      * @return array Array of XML document elements
      */
-    private function domNodeToArray($node)
+    private function domNodeToArray(DOMElement $node)
     {
         $output = '';
         switch ($node->nodeType) {
