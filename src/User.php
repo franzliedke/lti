@@ -82,13 +82,6 @@ class User
     private $resourceLink = null;
 
     /**
-     * Context object
-     *
-     * @var Context
-     */
-    private $context = null;
-
-    /**
      * User ID value
      *
      * @var string
@@ -105,7 +98,6 @@ class User
     {
         $this->initialise();
         $this->resourceLink = $resourceLink;
-        $this->context = &$this->resourceLink;
         $this->id = $id;
         $this->load();
     }
@@ -173,19 +165,6 @@ class User
      * @return ResourceLink Resource link object
      */
     public function getResourceLink()
-    {
-        return $this->resourceLink;
-    }
-
-    /**
-     * Get context.
-     *
-     * @deprecated Use getResourceLink() instead
-     * @see LTI_User::getResourceLink()
-     *
-     * @return ResourceLink Context object
-     */
-    public function getContext()
     {
         return $this->resourceLink;
     }
