@@ -37,17 +37,19 @@ class WriteResult extends LTI11Action implements Action
         $value = $this->outcome->getValue() ?: '';
 
         $xml = <<<EOF
-<resultRecord>
-    <sourcedGUID>
-        <sourcedId>{$sourcedId}</sourcedId>
-    </sourcedGUID>
-    <result>
-        <resultScore>
-            <language>{$language}</language>
-            <textString>{$value}</textString>
-        </resultScore>
-    </result>
-</resultRecord>
+<replaceResultRequest>
+    <resultRecord>
+        <sourcedGUID>
+            <sourcedId>{$sourcedId}</sourcedId>
+        </sourcedGUID>
+        <result>
+            <resultScore>
+                <language>{$language}</language>
+                <textString>{$value}</textString>
+            </resultScore>
+        </result>
+    </resultRecord>
+</replaceResultRequest>
 EOF;
 
         return $this->wrapXML($xml);

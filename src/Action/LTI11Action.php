@@ -7,7 +7,6 @@ abstract class LTI11Action implements Action
     protected function wrapXML($xml)
     {
         $id = uniqid();
-        $type = $this->getServiceName();
         $request = <<< EOD
 <?xml version = "1.0" encoding = "UTF-8"?>
 <imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
@@ -18,9 +17,7 @@ abstract class LTI11Action implements Action
     </imsx_POXRequestHeaderInfo>
   </imsx_POXHeader>
   <imsx_POXBody>
-    <{$type}Request>
 {$xml}
-    </{$type}Request>
   </imsx_POXBody>
 </imsx_POXEnvelopeRequest>
 EOD;
