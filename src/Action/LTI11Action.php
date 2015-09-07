@@ -25,6 +25,6 @@ abstract class LTI11Action implements Action
 </imsx_POXEnvelopeRequest>
 EOD;
 
-        return $xml;
+        return $request;
     }
 }
