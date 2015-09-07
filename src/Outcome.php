@@ -11,36 +11,53 @@ namespace Franzl\Lti;
  */
 class Outcome
 {
-
     /**
-     * @var string Language value.
+     * Language value.
+     *
+     * @var string
      */
     public $language = null;
+
     /**
-     * @var string Outcome status value.
+     * Outcome status value.
+     *
+     * @var string
      */
     public $status = null;
+
     /**
-     * @var object Outcome date value.
+     * Outcome date value.
+     *
+     * @var object
      */
     public $date = null;
+
     /**
-     * @var string Outcome type value.
+     * Outcome type value.
+     *
+     * @var string
      */
     public $type = null;
+
     /**
-     * @var string Outcome data source value.
+     * Outcome data source value.
+     *
+     * @var string
      */
     public $data_source = null;
 
     /**
-     * @var string Result sourcedid.
+     * Result sourcedid.
      *
+     * @var string
      * @deprecated Use User object instead
      */
     private $sourcedid = null;
+
     /**
-     * @var string Outcome value.
+     * Outcome value.
+     *
+     * @var string
      */
     private $value = null;
 
@@ -52,13 +69,11 @@ class Outcome
      */
     public function __construct($sourcedid = null, $value = null)
     {
-
         $this->sourcedid = $sourcedid;
         $this->value = $value;
         $this->language = 'en-US';
         $this->date = gmdate('Y-m-d\TH:i:s\Z', time());
         $this->type = 'decimal';
-
     }
 
     /**
@@ -70,9 +85,7 @@ class Outcome
      */
     public function getSourcedid()
     {
-
         return $this->sourcedid;
-
     }
 
     /**
@@ -82,9 +95,7 @@ class Outcome
      */
     public function getValue()
     {
-
         return $this->value;
-
     }
 
     /**
@@ -94,8 +105,6 @@ class Outcome
      */
     public function setValue($value)
     {
-
         $this->value = $value;
-
     }
 }

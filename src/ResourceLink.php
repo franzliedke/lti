@@ -5,6 +5,7 @@ namespace Franzl\Lti;
 use DOMDocument;
 use DOMElement;
 use Exception;
+use Franzl\Lti\Action\Action;
 use Franzl\Lti\Http\ClientFactory;
 use Franzl\Lti\OAuth\Consumer;
 
@@ -17,21 +18,6 @@ use Franzl\Lti\OAuth\Consumer;
  */
 class ResourceLink
 {
-    /**
-     * Read action.
-     */
-    const EXT_READ = 1;
-
-    /**
-     * Write (create/update) action.
-     */
-    const EXT_WRITE = 2;
-
-    /**
-     * Delete action.
-     */
-    const EXT_DELETE = 3;
-
     /**
      * Decimal outcome type.
      */
@@ -171,13 +157,6 @@ class ResourceLink
      * @var boolean
      */
     private $settingsChanged = false;
-
-    /**
-     * XML document for the last extension service request.
-     *
-     * @var string
-     */
-    private $extDoc = null;
 
     /**
      * XML node array for the last extension service request.
@@ -377,135 +356,21 @@ class ResourceLink
     /**
      * Perform an Outcomes service request.
      *
-     * @param int $action The action type constant
-     * @param Outcome $lti_outcome Outcome object
+     * @param Action $action The action type constant
      * @param User $user User object
-     *
-     * @return boolean True if the request was successfully processed
+     * @return bool True if the request was successfully processed
      */
-    public function doOutcomesService($action, $lti_outcome, $user = null)
+    public function doOutcomesService(Action $action, User $user)
     {
-        $response = false;
-
         // Lookup service details from the source resource link appropriate to the user (in case the destination is being shared)
-        $source_resource_link = $this;
-        $sourcedid = $lti_outcome->getSourcedid();
-        if (!is_null($user)) {
-            $source_resource_link = $user->getResourceLink();
-            $sourcedid = $user->ltiResultSourcedId;
+        $source_resource_link = $user->getResourceLink();
+        $url = $source_resource_link->getSetting('lis_outcome_service_url');
+
+        if ($this->doLTI11Service($action, $url)) {
+            return $action->handleResponse($this->extNodes, $this);
         }
 
-        // Use LTI 1.1 service in preference to extension service if it is available
-        $urlLTI11 = $source_resource_link->getSetting('lis_outcome_service_url');
-        $urlExt = $source_resource_link->getSetting('ext_ims_lis_basic_outcome_url');
-        if ($urlExt || $urlLTI11) {
-            switch ($action) {
-                case self::EXT_READ:
-                    if ($urlLTI11 && ($lti_outcome->type == self::EXT_TYPE_DECIMAL)) {
-                        $do = 'readResult';
-                    } else if ($urlExt) {
-                        $urlLTI11 = null;
-                        $do = 'basic-lis-readresult';
-                    }
-                    break;
-                case self::EXT_WRITE:
-                    if ($urlLTI11 && $this->checkValueType($lti_outcome, [self::EXT_TYPE_DECIMAL])) {
-                        $do = 'replaceResult';
-                    } else if ($this->checkValueType($lti_outcome)) {
-                        $urlLTI11 = null;
-                        $do = 'basic-lis-updateresult';
-                    }
-                    break;
-                case self::EXT_DELETE:
-                    if ($urlLTI11 && ($lti_outcome->type == self::EXT_TYPE_DECIMAL)) {
-                        $do = 'deleteResult';
-                    } else if ($urlExt) {
-                        $urlLTI11 = null;
-                        $do = 'basic-lis-deleteresult';
-                    }
-                    break;
-            }
-        }
-        if (isset($do)) {
-            $value = $lti_outcome->getValue();
-            if (is_null($value)) {
-                $value = '';
-            }
-            if ($urlLTI11) {
-                $xml = '';
-                if ($action == self::EXT_WRITE) {
-                    $xml = <<<EOF
-
-        <result>
-          <resultScore>
-            <language>{$lti_outcome->language}</language>
-            <textString>{$value}</textString>
-          </resultScore>
-        </result>
-EOF;
-                }
-                $sourcedid = htmlentities($sourcedid);
-                $xml = <<<EOF
-      <resultRecord>
-        <sourcedGUID>
-          <sourcedId>{$sourcedid}</sourcedId>
-        </sourcedGUID>{$xml}
-      </resultRecord>
-EOF;
-                if ($this->doLTI11Service($do, $urlLTI11, $xml)) {
-                    switch ($action) {
-                        case self::EXT_READ:
-                            if (!isset($this->extNodes['imsx_POXBody']["{$do}Response"]['result']['resultScore']['textString'])) {
-                                break;
-                            }
-
-                            $lti_outcome->setValue($this->extNodes['imsx_POXBody']["{$do}Response"]['result']['resultScore']['textString']);
-                            // no break
-                        case self::EXT_WRITE:
-                        case self::EXT_DELETE:
-                            $response = true;
-                            break;
-                    }
-                }
-            } else {
-                $params = [];
-                $params['sourcedid'] = $sourcedid;
-                $params['result_resultscore_textstring'] = $value;
-                if (!empty($lti_outcome->language)) {
-                    $params['result_resultscore_language'] = $lti_outcome->language;
-                }
-                if (!empty($lti_outcome->status)) {
-                    $params['result_statusofresult'] = $lti_outcome->status;
-                }
-                if (!empty($lti_outcome->date)) {
-                    $params['result_date'] = $lti_outcome->date;
-                }
-                if (!empty($lti_outcome->type)) {
-                    $params['result_resultvaluesourcedid'] = $lti_outcome->type;
-                }
-                if (!empty($lti_outcome->data_source)) {
-                    $params['result_datasource'] = $lti_outcome->data_source;
-                }
-                if ($this->doService($do, $urlExt, $params)) {
-                    switch ($action) {
-                        case self::EXT_READ:
-                            if (isset($this->extNodes['result']['resultscore']['textstring'])) {
-                                $response = $this->extNodes['result']['resultscore']['textstring'];
-                            }
-                            break;
-                        case self::EXT_WRITE:
-                        case self::EXT_DELETE:
-                            $response = true;
-                            break;
-                    }
-                }
-            }
-            if (is_array($response) && (count($response) <= 0)) {
-                $response = '';
-            }
-        }
-
-        return $response;
+        return false;
     }
 
     /**
@@ -622,55 +487,25 @@ EOF;
     /**
      * Perform a Setting service request.
      *
-     * @param int    $action The action type constant
+     * @param Action $action The action
      * @param string $value  The setting value (optional, default is null)
      *
      * @return mixed The setting value for a read action, true if a write or delete action was successful, otherwise false
      */
-    public function doSettingService($action, $value = null)
+    public function doSettingService(Action $action, $value = null)
     {
         $response = false;
-        switch ($action) {
-            case self::EXT_READ:
-                $do = 'basic-lti-loadsetting';
-                break;
-            case self::EXT_WRITE:
-                $do = 'basic-lti-savesetting';
-                break;
-            case self::EXT_DELETE:
-                $do = 'basic-lti-deletesetting';
-                break;
-        }
-        if (isset($do)) {
-            $url = $this->getSetting('ext_ims_lti_tool_setting_url');
-            $params = [];
-            $params['id'] = $this->getSetting('ext_ims_lti_tool_setting_id');
-            if (is_null($value)) {
-                $value = '';
-            }
-            $params['setting'] = $value;
 
-            if ($this->doService($do, $url, $params)) {
-                switch ($action) {
-                    case self::EXT_READ:
-                        if (isset($this->extNodes['setting']['value'])) {
-                            $response = $this->extNodes['setting']['value'];
-                            if (is_array($response)) {
-                                $response = '';
-                            }
-                        }
-                        break;
-                    case self::EXT_WRITE:
-                        $this->setSetting('ext_ims_lti_tool_setting', $value);
-                        $this->saveSettings();
-                        $response = true;
-                        break;
-                    case self::EXT_DELETE:
-                        $response = true;
-                        break;
-                }
-            }
+        $name = $action->getServiceName();
 
+        $url = $this->getSetting('ext_ims_lti_tool_setting_url');
+        $params = [
+            'id' => $this->getSetting('ext_ims_lti_tool_setting_id'),
+            'setting' => $value ?: '',
+        ];
+
+        if ($this->doService($name, $url, $params)) {
+            $response = $action->handleResponse($this->extNodes, $this);
         }
 
         return $response;
@@ -813,9 +648,9 @@ EOF;
             if ($response->isSuccessful()) {
                 $response = $response->getWrappedResponse();
                 try {
-                    $this->extDoc = new DOMDocument();
-                    $this->extDoc->loadXML((string) $response->getBody());
-                    $this->extNodes = $this->domNodeToArray($this->extDoc->documentElement);
+                    $extDoc = new DOMDocument();
+                    $extDoc->loadXML((string) $response->getBody());
+                    $this->extNodes = $this->domNodeToArray($extDoc->documentElement);
                     if (isset($this->extNodes['statusinfo']['codemajor']) && ($this->extNodes['statusinfo']['codemajor'] == 'Success')) {
                         $ok = true;
                     }
@@ -830,62 +665,61 @@ EOF;
     /**
      * Send a service request to the tool consumer.
      *
-     * @param string $type GuzzleClient type value
-     * @param string $url  URL to send request to
-     * @param string $xml  XML of message request
-     *
-     * @return boolean True if the request successfully obtained a response
+     * @param Action $action
+     * @param string $url URL to send request to
+     * @return bool True if the request successfully obtained a response
      */
-    private function doLTI11Service($type, $url, $xml)
+    private function doLTI11Service(Action $action, $url)
     {
         $ok = false;
-        if (!empty($url)) {
-            $id = uniqid();
-            $xmlRequest = <<< EOD
-<?xml version = "1.0" encoding = "UTF-8"?>
-<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
-  <imsx_POXHeader>
-    <imsx_POXRequestHeaderInfo>
-      <imsx_version>V1.0</imsx_version>
-      <imsx_messageIdentifier>{$id}</imsx_messageIdentifier>
-    </imsx_POXRequestHeaderInfo>
-  </imsx_POXHeader>
-  <imsx_POXBody>
-    <{$type}Request>
-{$xml}
-    </{$type}Request>
-  </imsx_POXBody>
-</imsx_POXEnvelopeRequest>
-EOD;
-            // Calculate body hash
-            $hash = base64_encode(sha1($xmlRequest, true));
-            $params = ['oauth_body_hash' => $hash];
+        $xmlRequest = $action->asXML();
 
-            // Add OAuth signature
-            $consumer = new Consumer($this->consumer->getKey(), $this->consumer->secret, null);
+        // Calculate body hash
+        $hash = base64_encode(sha1($xmlRequest, true));
+        $params = ['oauth_body_hash' => $hash];
 
-            // Connect to tool consumer
-            $response = ClientFactory::make()->sendSigned($url, 'POST', $xmlRequest, [
-                'content-type' => 'application/xml',
-            ]);
+        // Add OAuth signature
+        $consumer = new Consumer($this->consumer->getKey(), $this->consumer->secret, null);
 
-            // Parse XML response
-            if ($response->isSuccessful()) {
-                $response = $response->getWrappedResponse();
-                try {
-                    $this->extDoc = new DOMDocument();
-                    $this->extDoc->loadXML((string) $response->getBody());
-                    $this->extNodes = $this->domNodeToArray($this->extDoc->documentElement);
-                    if (isset($this->extNodes['imsx_POXHeader']['imsx_POXResponseHeaderInfo']['imsx_statusInfo']['imsx_codeMajor']) &&
-                        ($this->extNodes['imsx_POXHeader']['imsx_POXResponseHeaderInfo']['imsx_statusInfo']['imsx_codeMajor'] == 'success')) {
-                        $ok = true;
-                    }
-                } catch (Exception $e) {
+        // Connect to tool consumer
+        $response = ClientFactory::make()->sendSigned($url, 'POST', $xmlRequest, [
+            'content-type' => 'application/xml',
+        ]);
+
+        // Parse XML response
+        if ($response->isSuccessful()) {
+            $response = $response->getWrappedResponse();
+            try {
+                $extDoc = new DOMDocument();
+                $extDoc->loadXML((string) $response->getBody());
+                $this->extNodes = $this->domNodeToArray($extDoc->documentElement);
+                if (isset($this->extNodes['imsx_POXHeader']['imsx_POXResponseHeaderInfo']['imsx_statusInfo']['imsx_codeMajor']) &&
+                    ($this->extNodes['imsx_POXHeader']['imsx_POXResponseHeaderInfo']['imsx_statusInfo']['imsx_codeMajor'] == 'success')) {
+                    $ok = true;
                 }
+            } catch (Exception $e) {
             }
         }
 
         return $ok;
+    }
+
+    protected function doServiceCall(Action $action, $url)
+    {
+        $httpClient = ClientFactory::make();
+        $body = $action->asXML();
+        $headers = [];
+
+        $call = $httpClient->sendSigned($url, 'POST', $body, $headers);
+
+        if ($call->isSuccessful()) {
+            $response = (string) $call->getWrappedResponse()->getBody();
+            try {
+                $extDoc = new DOMDocument();
+                $extDoc->loadXML($response);
+                $action->handleResponse($this->domNodeToArray($extDoc->documentElement), $this);
+            } catch (Exception $e) {}
+        }
     }
 
     /**
