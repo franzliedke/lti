@@ -10,7 +10,8 @@ class ClientFactory
 {
     public static function make()
     {
-        $stack = HandlerStack::create(new Oauth1([
+        $stack = HandlerStack::create();
+        $stack->push(new Oauth1([
             'consumer_key'    => 'my_key',
             'consumer_secret' => 'my_secret',
         ]));
