@@ -718,7 +718,9 @@ class ResourceLink
                 $extDoc = new DOMDocument();
                 $extDoc->loadXML($response);
                 $action->handleResponse($this->domNodeToArray($extDoc->documentElement), $this);
-            } catch (Exception $e) {}
+            } catch (Exception $e) {
+                // Pass
+            }
         }
     }
 
