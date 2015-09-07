@@ -12,8 +12,8 @@ class ClientFactory
     {
         $stack = HandlerStack::create();
         $stack->push(new Oauth1([
-            'consumer_key'    => 'my_key',
-            'consumer_secret' => 'my_secret',
+            'consumer_key'    => 'abc',
+            'consumer_secret' => 'secret',
         ]));
 
         return new GuzzleClient(new Client(['handler' => $stack]));
