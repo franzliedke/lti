@@ -289,7 +289,7 @@ class ToolProvider
 
         // Perform action
         if ($this->authenticate($request)) {
-            $this->doCallback();
+            $this->doCallback($requestBody);
         }
 
         $this->result();
@@ -451,11 +451,12 @@ EOD;
      *
      * This function may set the redirectUrl and output properties.
      *
+     * @param array $body The request body
      * @return bool True if no error reported
      */
-    private function doCallback()
+    private function doCallback(array $body)
     {
-        $method = $this->methodNames[$_POST['lti_message_type']];
+        $method = $this->methodNames[$body['lti_message_type']];
         $this->$method();
     }
 
