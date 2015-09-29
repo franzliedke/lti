@@ -11,9 +11,9 @@ class WriteSetting implements Action
         return 'basic-lti-savesetting';
     }
 
-    public function asXML()
+    public function getBody()
     {
-        // TODO: Implement asXML() method.
+        // TODO: Implement getBody() method.
     }
 
     public function handleResponse(array $nodes, ResourceLink $link)

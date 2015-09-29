@@ -30,7 +30,7 @@ class ReadResult extends LTI11Action implements Action
         return 'readResult';
     }
 
-    public function asXML()
+    public function getBody()
     {
         $sourcedId = htmlentities($this->user->ltiResultSourcedId);
 
@@ -49,13 +49,12 @@ EOF;
 
     public function handleResponse(array $nodes, ResourceLink $link)
     {
-        if (isset($nodes['imsx_POXBody']['readResultResponse']['result']['resultScore']['textString'])) {
-            $this->outcome->setValue(
-                $nodes['imsx_POXBody']['readResultResponse']['result']['resultScore']['textString']
-            );
-            return true;
+        $value = array_get($nodes, 'imsx_POXBody.readResultResponse.result.resultScore.textString');
+
+        if ($value) {
+            $this->outcome->setValue($value);
         }
 
-        return false;
+        return true;
     }
 }

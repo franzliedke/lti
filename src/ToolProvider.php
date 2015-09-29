@@ -639,7 +639,8 @@ EOD;
             throw new Exception('Missing consumer key');
         }
 
-        $this->consumer = new ToolConsumer($requestBody['oauth_consumer_key'], $this->storage);
+        $this->consumer = $this->storage->loadToolConsumer($requestBody['oauth_consumer_key']);
+        // TODO: Load method should throw exception in case of failure
         if (is_null($this->consumer->created)) {
             throw new Exception('Invalid consumer key');
         }
@@ -736,20 +737,16 @@ EOD;
 
         // Set the request context/resource link
         if (isset($requestBody['resource_link_id'])) {
-            $content_item_id = '';
-            if (isset($requestBody['custom_content_item_id'])) {
-                $content_item_id = $requestBody['custom_content_item_id'];
-            }
+            $content_item_id = array_get($requestBody, 'custom_content_item_id', '');
+            $this->resourceLink = $this->storage->loadResourceLink(trim($requestBody['resource_link_id']));
             $this->resourceLink = new ResourceLink($this->consumer, trim($requestBody['resource_link_id']), $content_item_id);
             if (isset($requestBody['context_id'])) {
                 $this->resourceLink->lti_context_id = trim($requestBody['context_id']);
             }
             $this->resourceLink->lti_resource_id = trim($requestBody['resource_link_id']);
-            $title = '';
-            if (isset($requestBody['context_title'])) {
-                $title = trim($requestBody['context_title']);
-            }
-            if (isset($requestBody['resource_link_title']) && (strlen(trim($requestBody['resource_link_title'])) > 0)) {
+
+            $title = array_get($requestBody, 'context_title', '');
+            if (!empty($requestBody['resource_link_title'])) {
                 if (!empty($title)) {
                     $title .= ': ';
                 }
@@ -792,13 +789,13 @@ EOD;
         $this->user = new User($this->resourceLink, $user_id);
 
         // Set the user name
-        $firstname = (isset($requestBody['lis_person_name_given'])) ? $requestBody['lis_person_name_given'] : '';
-        $lastname = (isset($requestBody['lis_person_name_family'])) ? $requestBody['lis_person_name_family'] : '';
-        $fullname = (isset($requestBody['lis_person_name_full'])) ? $requestBody['lis_person_name_full'] : '';
+        $firstname = array_get($requestBody, 'lis_person_name_given', '');
+        $lastname = array_get($requestBody, 'lis_person_name_family', '');
+        $fullname = array_get($requestBody, 'lis_person_name_full', '');
         $this->user->setNames($firstname, $lastname, $fullname);
 
         // Set the user email
-        $email = (isset($requestBody['lis_person_contact_email_primary'])) ? $requestBody['lis_person_contact_email_primary'] : '';
+        $email = array_get($requestBody, 'lis_person_contact_email_primary', '');
         $this->user->setEmail($email, $this->defaultEmail);
 
         // Set the user roles
@@ -878,7 +875,7 @@ EOD;
             $this->checkForShare($requestBody);
 
             // Persist changes to resource link
-            $this->resourceLink->save();
+            $this->storage->saveResourceLink($this->resourceLink);
         }
 
         return true;
@@ -917,7 +914,7 @@ EOD;
                     $this->resourceLink->primary_resource_link_id = $id;
                     $this->resourceLink->share_approved = $share_key->auto_approve;
 
-                    if (!$this->resourceLink->save()) {
+                    if (! $this->storage->saveResourceLink($this->resourceLink)) {
                         throw new Exception('An error occurred initialising your share arrangement');
                     }
 
@@ -945,7 +942,7 @@ EOD;
 
         // Look up primary resource link
         if (!is_null($key)) {
-            $consumer = new ToolConsumer($key, $this->storage);
+            $consumer = $this->storage->loadToolConsumer($key);
 
             // TODO: Move to load function
             if (is_null($consumer->created)) {
@@ -959,7 +956,7 @@ EOD;
             }
 
             if ($doSaveResourceLink) {
-                $this->resourceLink->save();
+                $this->storage->saveResourceLink($this->resourceLink);
             }
             $this->resourceLink = $resource_link;
         }

@@ -6,6 +6,10 @@ namespace Franzl\Lti\Storage;
 ###  Class to represent a dummy LTI Data Connector with no data persistence
 ###
 
+use Franzl\Lti\ResourceLink;
+use Franzl\Lti\ToolConsumer;
+use Franzl\Lti\User;
+
 class DummyStorage extends AbstractStorage
 {
 
@@ -28,6 +32,17 @@ class DummyStorage extends AbstractStorage
 
     }
 
+    public function loadToolConsumer($key)
+    {
+        $consumer = ToolConsumer::build($key);
+
+        $consumer->secret = 'secret';
+        $consumer->enabled = true;
+        $consumer->created = $consumer->updated = time();
+
+        return $consumer;
+    }
+
     ###
     #    Save the tool consumer to the database
     ###
@@ -37,6 +52,13 @@ class DummyStorage extends AbstractStorage
         $consumer->updated = time();
         return true;
 
+    }
+
+    public function saveToolConsumer(ToolConsumer $consumer)
+    {
+        $consumer->updated = time();
+
+        return true;
     }
 
     ###
@@ -50,6 +72,13 @@ class DummyStorage extends AbstractStorage
 
     }
 
+    public function deleteToolConsumer(ToolConsumer $consumer)
+    {
+        $consumer->initialise();
+
+        return true;
+    }
+
     ###
     #    Load all tool consumers from the database
     ###
@@ -58,6 +87,11 @@ class DummyStorage extends AbstractStorage
 
         return [];
 
+    }
+
+    public function listToolConsumers()
+    {
+        return [];
     }
 
     ###
@@ -77,6 +111,14 @@ class DummyStorage extends AbstractStorage
 
     }
 
+    public function loadResourceLink($id)
+    {
+        $link = ResourceLink::build($id);
+        $link->created = $link->updated = time();
+
+        return $link;
+    }
+
     ###
     #    Save the resource link to the database
     ###
@@ -88,6 +130,13 @@ class DummyStorage extends AbstractStorage
 
     }
 
+    public function saveResourceLink(ResourceLink $link)
+    {
+        $link->updated = time();
+
+        return true;
+    }
+
     ###
     #    Delete the resource link from the database
     ###
@@ -97,6 +146,13 @@ class DummyStorage extends AbstractStorage
         $resource_link->initialise();
         return true;
 
+    }
+
+    public function deleteResourceLink(ResourceLink $link)
+    {
+        $link->initialise();
+
+        return true;
     }
 
     ###
@@ -199,6 +255,13 @@ class DummyStorage extends AbstractStorage
 
     }
 
+    public function loadUser($key)
+    {
+        $user = new User(null, $key);
+
+        return $user;
+    }
+
     ###
     #    Save the user to the database
     ###
@@ -210,6 +273,13 @@ class DummyStorage extends AbstractStorage
 
     }
 
+    public function saveUser(User $user)
+    {
+        $user->updated = time();
+
+        return true;
+    }
+
     ###
     #    Delete the user from the database
     ###
@@ -219,5 +289,12 @@ class DummyStorage extends AbstractStorage
         $user->initialise();
         return true;
 
+    }
+
+    public function deleteUser(User $user)
+    {
+        $user->initialise();
+
+        return true;
     }
 }

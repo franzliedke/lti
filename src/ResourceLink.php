@@ -224,16 +224,6 @@ class ResourceLink
     }
 
     /**
-     * Delete the resource link from the database.
-     *
-     * @return boolean True if the resource link was successfully deleted.
-     */
-    public function delete()
-    {
-        return $this->consumer->getStorage()->resourceLinkDelete($this);
-    }
-
-    /**
      * Get tool consumer.
      *
      * @return object ToolConsumer object for this resource link.
@@ -378,108 +368,20 @@ class ResourceLink
      *
      * The user table is updated with the new list of user objects.
      *
-     * @param boolean $withGroups True is group information is to be requested as well
-     *
+     * @param Action $action
      * @return mixed Array of User objects or False if the request was not successful
+     *
      */
-    public function doMembershipsService($withGroups = false)
+    public function doMembershipsService(Action $action)
     {
         $users = [];
-        $old_users = $this->getUserResultSourcedIDs(true, ToolProvider::ID_SCOPE_RESOURCE);
         $url = $this->getSetting('ext_ims_lis_memberships_url');
-        $params = [];
-        $params['id'] = $this->getSetting('ext_ims_lis_memberships_id');
-        $ok = false;
-        if ($withGroups) {
-            $ok = $this->doService('basic-lis-readmembershipsforcontextwithgroups', $url, $params);
-        }
-        if ($ok) {
-            $this->groupSets = [];
-            $this->groups = [];
-        } else {
-            $ok = $this->doService('basic-lis-readmembershipsforcontext', $url, $params);
-        }
+        $params = [
+            'id' => $this->getSetting('ext_ims_lis_memberships_id')
+        ];
 
-        if ($ok) {
-            if (!isset($this->extNodes['memberships']['member'])) {
-                $members = [];
-            } else if (!isset($this->extNodes['memberships']['member'][0])) {
-                $members = [];
-                $members[0] = $this->extNodes['memberships']['member'];
-            } else {
-                $members = $this->extNodes['memberships']['member'];
-            }
+        $ok = $this->doService($action, $url, $params);
 
-            for ($i = 0; $i < count($members); $i++) {
-                $user = new User($this, $members[$i]['user_id']);
-
-                // Set the user name
-                $firstname = (isset($members[$i]['person_name_given'])) ? $members[$i]['person_name_given'] : '';
-                $lastname = (isset($members[$i]['person_name_family'])) ? $members[$i]['person_name_family'] : '';
-                $fullname = (isset($members[$i]['person_name_full'])) ? $members[$i]['person_name_full'] : '';
-                $user->setNames($firstname, $lastname, $fullname);
-
-                // Set the user email
-                $email = (isset($members[$i]['person_contact_email_primary'])) ? $members[$i]['person_contact_email_primary'] : '';
-                $user->setEmail($email, $this->consumer->defaultEmail);
-
-                // Set the user roles
-                if (isset($members[$i]['roles'])) {
-                    $user->roles = ToolProvider::parseRoles($members[$i]['roles']);
-                }
-
-                // Set the user groups
-                if (!isset($members[$i]['groups']['group'])) {
-                    $groups = [];
-                } else if (!isset($members[$i]['groups']['group'][0])) {
-                    $groups = [];
-                    $groups[0] = $members[$i]['groups']['group'];
-                } else {
-                    $groups = $members[$i]['groups']['group'];
-                }
-                for ($j = 0; $j < count($groups); $j++) {
-                    $group = $groups[$j];
-                    if (isset($group['set'])) {
-                        $set_id = $group['set']['id'];
-                        if (!isset($this->groupSets[$set_id])) {
-                            $this->groupSets[$set_id] = ['title' => $group['set']['title'], 'groups' => [],
-                                                               'num_members' => 0, 'num_staff' => 0, 'num_learners' => 0];
-                        }
-                        $this->groupSets[$set_id]['num_members']++;
-                        if ($user->isStaff()) {
-                            $this->groupSets[$set_id]['num_staff']++;
-                        }
-                        if ($user->isLearner()) {
-                            $this->groupSets[$set_id]['num_learners']++;
-                        }
-                        if (!in_array($group['id'], $this->groupSets[$set_id]['groups'])) {
-                            $this->groupSets[$set_id]['groups'][] = $group['id'];
-                        }
-                        $this->groups[$group['id']] = ['title' => $group['title'], 'set' => $set_id];
-                    } else {
-                        $this->groups[$group['id']] = ['title' => $group['title']];
-                    }
-                    $user->groups[] = $group['id'];
-                }
-
-                // If a result sourcedid is provided save the user
-                if (isset($members[$i]['lis_result_sourcedid'])) {
-                    $user->ltiResultSourcedId = $members[$i]['lis_result_sourcedid'];
-                    $user->save();
-                }
-                $users[] = $user;
-
-                // Remove old user (if it exists)
-                unset($old_users[$user->getId(ToolProvider::ID_SCOPE_RESOURCE)]);
-            }
-
-            // Delete any old users which were not in the latest list from the tool consumer
-            foreach ($old_users as $id => $user) {
-                $user->delete();
-            }
-        } else {
-            $users = false;
-        }
 
         return $users;
     }
@@ -637,29 +539,27 @@ class ResourceLink
      */
     private function doService($type, $url, $params)
     {
-        $ok = false;
-        if (!empty($url)) {
-            $params = $this->consumer->signParameters($url, $type, $this->consumer->ltiVersion, $params);
+        $params = $this->consumer->signParameters($url, $type, $this->consumer->ltiVersion, $params);
 
-            // Connect to tool consumer
-            $response = ClientFactory::make()->send($url, 'POST', $params);
+        // Connect to tool consumer
+        $response = ClientFactory::make()->send($url, 'POST', $params);
 
-            // Parse XML response
-            if ($response->isSuccessful()) {
-                $response = $response->getWrappedResponse();
-                try {
-                    $extDoc = new DOMDocument();
-                    $extDoc->loadXML((string) $response->getBody());
-                    $this->extNodes = $this->domNodeToArray($extDoc->documentElement);
-                    if (isset($this->extNodes['statusinfo']['codemajor']) && ($this->extNodes['statusinfo']['codemajor'] == 'Success')) {
-                        $ok = true;
-                    }
-                } catch (Exception $e) {
-                }
+        // Parse XML response
+        if ($response->isSuccessful()) {
+            $response = $response->getWrappedResponse();
+            try {
+                $extDoc = new DOMDocument();
+                $extDoc->loadXML((string) $response->getBody());
+                $this->extNodes = $this->domNodeToArray($extDoc->documentElement);
+
+                $codeMajor = 'statusinfo,codemajor';
+                return array_get($this->extNodes, $codeMajor) == 'Success';
+            } catch (Exception $e) {
+                // Pass
             }
         }
 
-        return $ok;
+        return false;
     }
 
     /**
@@ -671,8 +571,7 @@ class ResourceLink
      */
     private function doLTI11Service(Action $action, $url)
     {
-        $ok = false;
-        $xmlRequest = $action->asXML();
+        $xmlRequest = $action->getBody();
 
         // Calculate body hash
         $hash = base64_encode(sha1($xmlRequest, true));
@@ -693,22 +592,24 @@ class ResourceLink
                 $extDoc = new DOMDocument();
                 $extDoc->loadXML((string) $response->getBody());
                 $this->extNodes = $this->domNodeToArray($extDoc->documentElement);
-                if (isset($this->extNodes['imsx_POXHeader']['imsx_POXResponseHeaderInfo']['imsx_statusInfo']['imsx_codeMajor']) &&
-                    ($this->extNodes['imsx_POXHeader']['imsx_POXResponseHeaderInfo']['imsx_statusInfo']['imsx_codeMajor'] == 'success')) {
-                    $ok = true;
-                }
+
+                $codeMajor = 'imsx_POXHeader.imsx_POXResponseHeaderInfo.imsx_statusInfo.imsx_codeMajor';
+                return array_get($this->extNodes, $codeMajor) == 'success';
             } catch (Exception $e) {
+                // Pass
             }
         }
 
-        return $ok;
+        return false;
     }
 
     protected function doServiceCall(Action $action, $url)
     {
         $httpClient = ClientFactory::make();
-        $body = $action->asXML();
-        $headers = [];
+        $body = $action->getBody();
+        $headers = [
+            'content-type' => $action->getContentType(),
+        ];
 
         $call = $httpClient->sendSigned($url, 'POST', $body, $headers);
 

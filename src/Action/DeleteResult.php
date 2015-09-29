@@ -23,7 +23,7 @@ class DeleteResult extends LTI11Action implements Action
         return 'deleteResult';
     }
 
-    public function asXML()
+    public function getBody()
     {
         $sourcedId = htmlentities($this->user->ltiResultSourcedId);
 

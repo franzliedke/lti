@@ -11,9 +11,9 @@ class ReadSetting implements Action
         return 'basic-lti-loadsetting';
     }
 
-    public function asXML()
+    public function getBody()
     {
-        // TODO: Implement asXML() method.
+        // TODO: Implement getBody() method.
     }
 
     public function handleResponse(array $nodes, ResourceLink $link)

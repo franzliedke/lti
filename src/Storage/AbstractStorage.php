@@ -58,6 +58,8 @@ abstract class AbstractStorage
      */
     abstract public function toolConsumerLoad($consumer);
 
+    abstract public function loadToolConsumer($key);
+
     /**
      * Save tool consumer object.
      *
@@ -66,6 +68,8 @@ abstract class AbstractStorage
      * @return boolean True if the tool consumer object was successfully saved
      */
     abstract public function toolConsumerSave($consumer);
+
+    abstract public function saveToolConsumer(ToolConsumer $consumer);
 
     /**
      * Delete tool consumer object.
@@ -76,12 +80,16 @@ abstract class AbstractStorage
      */
     abstract public function toolConsumerDelete($consumer);
 
+    abstract public function deleteToolConsumer(ToolConsumer $consumer);
+
     /**
      * Load tool consumer objects.
      *
      * @return array Array of all defined ToolConsumer objects
      */
     abstract public function toolConsumerList();
+
+    abstract public function listToolConsumers();
 
     /**
      * Load resource link object.
@@ -92,6 +100,8 @@ abstract class AbstractStorage
      */
     abstract public function resourceLinkLoad($resource_link);
 
+    abstract public function loadResourceLink($key);
+
     /**
      * Save resource link object.
      *
@@ -101,6 +111,8 @@ abstract class AbstractStorage
      */
     abstract public function resourceLinkSave($resource_link);
 
+    abstract public function saveResourceLink(ResourceLink $link);
+
     /**
      * Delete resource link object.
      *
@@ -109,6 +121,8 @@ abstract class AbstractStorage
      * @return boolean True if the Resource_Link object was successfully deleted
      */
     abstract public function resourceLinkDelete($resource_link);
+
+    abstract public function deleteResourceLink(ResourceLink $link);
 
     /**
      * Get array of user objects.
@@ -184,6 +198,8 @@ abstract class AbstractStorage
      */
     abstract public function userLoad($user);
 
+    abstract public function loadUser($key);
+
     /**
      * Save user object.
      *
@@ -193,6 +209,8 @@ abstract class AbstractStorage
      */
     abstract public function userSave($user);
 
+    abstract public function saveUser(User $user);
+
     /**
      * Delete user object.
      *
@@ -201,6 +219,8 @@ abstract class AbstractStorage
      * @return boolean True if the user object was successfully deleted
      */
     abstract public function userDelete($user);
+
+    abstract public function deleteUser(User $user);
 
     /**
      * Create data connector object.

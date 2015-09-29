@@ -1,6 +1,7 @@
 <?php
 
 namespace Franzl\Lti\OAuth;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * A class for implementing a Signature Method
@@ -25,6 +26,8 @@ abstract class SignatureMethod
      * @return string
      */
     abstract public function buildSignature($request, $consumer, $token);
+
+    abstract public function build($request);
 
     /**
      * Verifies that a given signature is correct
@@ -54,5 +57,15 @@ abstract class SignatureMethod
         }
 
         return $result == 0;
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     * @param string $signature
+     * @return bool
+     */
+    public function check(ServerRequestInterface $request, $signature)
+    {
+        //
     }
 }

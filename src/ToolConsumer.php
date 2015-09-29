@@ -159,6 +159,14 @@ class ToolConsumer
         }
     }
 
+    public static function build($key)
+    {
+        $consumer = new static();
+        $consumer->initialise();
+        $consumer->key = $key;
+        return $consumer;
+    }
+
     /**
      * Initialise the tool consumer.
      */

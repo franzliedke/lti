@@ -4,6 +4,11 @@ namespace Franzl\Lti\Action;
 
 abstract class LTI11Action implements Action
 {
+    public function getContentType()
+    {
+        return 'application/xml';
+    }
+
     protected function wrapXML($xml)
     {
         $id = uniqid();

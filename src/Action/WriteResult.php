@@ -30,7 +30,7 @@ class WriteResult extends LTI11Action implements Action
         return 'replaceResult';
     }
 
-    public function asXML()
+    public function getBody()
     {
         $sourcedId = htmlentities($this->user->ltiResultSourcedId);
         $language = $this->outcome->language;
