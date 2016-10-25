@@ -6,7 +6,7 @@ use Exception;
 use Franzl\Lti\OAuth\DataStore;
 use Franzl\Lti\OAuth\Request;
 use Franzl\Lti\OAuth\Server;
-use Franzl\Lti\OAuth\SignatureMethodHmacSha1;
+use Franzl\Lti\OAuth\Signature\SignatureMethodHmacSha1;
 use Franzl\Lti\Storage\AbstractStorage;
 use Psr\Http\Message\ServerRequestInterface;
 

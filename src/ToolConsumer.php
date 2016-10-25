@@ -4,7 +4,7 @@ namespace Franzl\Lti;
 
 use Franzl\Lti\OAuth\Consumer;
 use Franzl\Lti\OAuth\Request;
-use Franzl\Lti\OAuth\SignatureMethodHmacSha1;
+use Franzl\Lti\OAuth\Signature\SignatureMethodHmacSha1;
 use Franzl\Lti\Storage\AbstractStorage;
 
 /**

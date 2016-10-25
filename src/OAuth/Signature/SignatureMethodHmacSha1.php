@@ -1,6 +1,11 @@
 <?php
 
-namespace Franzl\Lti\OAuth;
+namespace Franzl\Lti\OAuth\Signature;
+
+use Franzl\Lti\OAuth\Consumer;
+use Franzl\Lti\OAuth\Request;
+use Franzl\Lti\OAuth\Token;
+use Franzl\Lti\OAuth\Util;
 
 /**
  * The HMAC-SHA1 signature method uses the HMAC-SHA1 signature algorithm as defined in [RFC2104]
@@ -16,7 +21,7 @@ class SignatureMethodHmacSha1 extends SignatureMethod
         return "HMAC-SHA1";
     }
 
-    public function buildSignature($request, $consumer, $token)
+    public function buildSignature(Request $request, Consumer $consumer, Token $token)
     {
         $base_string = $request->getSignatureBaseString();
         $request->base_string = $base_string;

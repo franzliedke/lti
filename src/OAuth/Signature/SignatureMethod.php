@@ -1,6 +1,10 @@
 <?php
 
-namespace Franzl\Lti\OAuth;
+namespace Franzl\Lti\OAuth\Signature;
+
+use Franzl\Lti\OAuth\Consumer;
+use Franzl\Lti\OAuth\Request;
+use Franzl\Lti\OAuth\Token;
 
 /**
  * A class for implementing a Signature Method
@@ -24,7 +28,7 @@ abstract class SignatureMethod
      * @param Token $token
      * @return string
      */
-    abstract public function buildSignature($request, $consumer, $token);
+    abstract public function buildSignature(Request $request, Consumer $consumer, Token $token);
 
     /**
      * Verifies that a given signature is correct
@@ -34,7 +38,7 @@ abstract class SignatureMethod
      * @param string $signature
      * @return bool
      */
-    public function checkSignature($request, $consumer, $token, $signature)
+    public function checkSignature(Request $request, Consumer $consumer, Token $token, $signature)
     {
         $built = $this->buildSignature($request, $consumer, $token);
 
