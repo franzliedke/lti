@@ -12,7 +12,7 @@ use Franzl\Lti\OAuth\Util;
  * over a secure channel such as HTTPS. It does not use the Signature Base String.
  *   - Chapter 9.4 ("PLAINTEXT")
  */
-class SignatureMethodPlainText extends SignatureMethod
+class PlainText extends SignatureMethod
 {
     public function getName()
     {

@@ -14,7 +14,7 @@ use Franzl\Lti\OAuth\Token;
  * specification.
  *   - Chapter 9.3 ("RSA-SHA1")
  */
-abstract class SignatureMethodRsaSha1 extends SignatureMethod
+abstract class RsaSha1 extends SignatureMethod
 {
     public function getName()
     {

@@ -6,7 +6,7 @@ use Exception;
 use Franzl\Lti\OAuth\DataStore;
 use Franzl\Lti\OAuth\Request;
 use Franzl\Lti\OAuth\Server;
-use Franzl\Lti\OAuth\Signature\SignatureMethodHmacSha1;
+use Franzl\Lti\OAuth\Signature\HmacSha1;
 use Franzl\Lti\Storage\AbstractStorage;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -656,7 +656,7 @@ EOD;
 
         $store = new DataStore($this);
         $server = new Server($store);
-        $method = new SignatureMethodHmacSha1();
+        $method = new HmacSha1();
         $server->addSignatureMethod($method);
         $request = Request::fromPsrRequest($request);
         $server->verifyRequest($request);

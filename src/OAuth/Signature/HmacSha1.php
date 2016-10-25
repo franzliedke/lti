@@ -14,7 +14,7 @@ use Franzl\Lti\OAuth\Util;
  * character (ASCII code 38) even if empty.
  *   - Chapter 9.2 ("HMAC-SHA1")
  */
-class SignatureMethodHmacSha1 extends SignatureMethod
+class HmacSha1 extends SignatureMethod
 {
     public function getName()
     {
