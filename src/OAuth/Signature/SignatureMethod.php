@@ -5,6 +5,7 @@ namespace Franzl\Lti\OAuth\Signature;
 use Franzl\Lti\OAuth\Consumer;
 use Franzl\Lti\OAuth\Request;
 use Franzl\Lti\OAuth\Token;
+use Psr\Http\Message\RequestInterface;
 
 /**
  * A class for implementing a Signature Method
@@ -23,12 +24,13 @@ abstract class SignatureMethod
      * NOTE: The output of this function MUST NOT be urlencoded.
      * the encoding is handled in Request when the final
      * request is serialized
-     * @param Request $request
+     * @param RequestInterface $request
+     * @param array $params
      * @param Consumer $consumer
      * @param Token $token
      * @return string
      */
-    abstract public function buildSignature(Request $request, Consumer $consumer, Token $token);
+    abstract public function buildSignature(RequestInterface $request, array $params, Consumer $consumer, Token $token);
 
     /**
      * Verifies that a given signature is correct

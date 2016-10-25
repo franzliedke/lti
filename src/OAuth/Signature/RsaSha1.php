@@ -5,6 +5,7 @@ namespace Franzl\Lti\OAuth\Signature;
 use Franzl\Lti\OAuth\Consumer;
 use Franzl\Lti\OAuth\Request;
 use Franzl\Lti\OAuth\Token;
+use Psr\Http\Message\RequestInterface;
 
 /**
  * The RSA-SHA1 signature method uses the RSASSA-PKCS1-v1_5 signature algorithm as defined in
@@ -35,10 +36,9 @@ abstract class RsaSha1 extends SignatureMethod
     // Either way should return a string representation of the certificate
     abstract protected function fetchPrivateCert(&$request);
 
-    public function buildSignature(Request $request, Consumer $consumer, Token $token)
+    public function buildSignature(RequestInterface $request, array $params, Consumer $consumer, Token $token)
     {
-        $base_string = $request->getSignatureBaseString();
-        $request->base_string = $base_string;
+        $baseString = new BaseString($request, $params);
 
         // Fetch the private key cert based on the request
         $cert = $this->fetchPrivateCert($request);
@@ -47,7 +47,7 @@ abstract class RsaSha1 extends SignatureMethod
         $privatekeyid = openssl_get_privatekey($cert);
 
         // Sign using the key
-        $ok = openssl_sign($base_string, $signature, $privatekeyid);
+        $ok = openssl_sign((string) $baseString, $signature, $privatekeyid);
 
         // Release the key resource
         openssl_free_key($privatekeyid);

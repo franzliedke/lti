@@ -3,9 +3,9 @@
 namespace Franzl\Lti\OAuth\Signature;
 
 use Franzl\Lti\OAuth\Consumer;
-use Franzl\Lti\OAuth\Request;
 use Franzl\Lti\OAuth\Token;
 use Franzl\Lti\OAuth\Util;
+use Psr\Http\Message\RequestInterface;
 
 /**
  * The PLAINTEXT method does not provide any security protection and SHOULD only be used
@@ -28,17 +28,14 @@ class PlainText extends SignatureMethod
      * Please note that the second encoding MUST NOT happen in the SignatureMethod, as
      * Request handles this!
      */
-    public function buildSignature(Request $request, Consumer $consumer, Token $token)
+    public function buildSignature(RequestInterface $request, array $params, Consumer $consumer, Token $token)
     {
-        $key_parts = [
+        $keyParts = [
             $consumer->secret,
-            ($token) ? $token->secret : ""
+            $token ? $token->secret : ""
         ];
 
-        $key_parts = Util::urlencodeRfc3986($key_parts);
-        $key = implode('&', $key_parts);
-        $request->base_string = $key;
-
-        return $key;
+        $keyParts = Util::urlencodeRfc3986($keyParts);
+        return implode('&', $keyParts);
     }
 }
