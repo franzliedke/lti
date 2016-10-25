@@ -2,6 +2,7 @@
 
 namespace Franzl\Lti\OAuth;
 
+use Franzl\Lti\OAuth\Signature\SignatureMethod;
 use Psr\Http\Message\ServerRequestInterface;
 
 class Request
@@ -278,21 +279,19 @@ class Request
     }
 
 
-    public function signRequest($signature_method, $consumer, $token)
+    public function signRequest(SignatureMethod $signatureMethod, Consumer $consumer, Token $token)
     {
         $this->setParameter(
             "oauth_signature_method",
-            $signature_method->get_name(),
+            $signatureMethod->getName(),
             false
         );
-        $signature = $this->buildSignature($signature_method, $consumer, $token);
-        $this->setParameter("oauth_signature", $signature, false);
-    }
 
-    public function buildSignature($signature_method, $consumer, $token)
-    {
-        $signature = $signature_method->build_signature($this, $consumer, $token);
-        return $signature;
+        $this->setParameter(
+            "oauth_signature",
+            $signatureMethod->buildSignature($this, $consumer, $token),
+            false
+        );
     }
 
     /**
