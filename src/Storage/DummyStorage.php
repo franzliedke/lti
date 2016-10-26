@@ -8,7 +8,6 @@ namespace Franzl\Lti\Storage;
 
 class DummyStorage extends AbstractStorage
 {
-
     ###
     ###  ToolConsumer methods
     ###
@@ -18,14 +17,12 @@ class DummyStorage extends AbstractStorage
     ###
     public function toolConsumerLoad($consumer)
     {
-
         $consumer->secret = 'secret';
         $consumer->enabled = true;
         $now = time();
         $consumer->created = $now;
         $consumer->updated = $now;
         return true;
-
     }
 
     ###
@@ -33,10 +30,8 @@ class DummyStorage extends AbstractStorage
     ###
     public function toolConsumerSave($consumer)
     {
-
         $consumer->updated = time();
         return true;
-
     }
 
     ###
@@ -44,10 +39,8 @@ class DummyStorage extends AbstractStorage
     ###
     public function toolConsumerDelete($consumer)
     {
-
         $consumer->initialise();
         return true;
-
     }
 
     ###
@@ -55,9 +48,7 @@ class DummyStorage extends AbstractStorage
     ###
     public function toolConsumerList()
     {
-
         return [];
-
     }
 
     ###
@@ -69,12 +60,10 @@ class DummyStorage extends AbstractStorage
     ###
     public function resourceLinkLoad($resource_link)
     {
-
         $now = time();
         $resource_link->created = $now;
         $resource_link->updated = $now;
         return true;
-
     }
 
     ###
@@ -82,10 +71,8 @@ class DummyStorage extends AbstractStorage
     ###
     public function resourceLinkSave($resource_link)
     {
-
         $resource_link->updated = time();
         return true;
-
     }
 
     ###
@@ -93,10 +80,8 @@ class DummyStorage extends AbstractStorage
     ###
     public function resourceLinkDelete($resource_link)
     {
-
         $resource_link->initialise();
         return true;
-
     }
 
     ###
@@ -105,9 +90,7 @@ class DummyStorage extends AbstractStorage
     ###
     public function resourceLinkGetUserResultSourcedIDs($resource_link, $local_only, $id_scope)
     {
-
         return [];
-
     }
 
     ###
@@ -115,9 +98,7 @@ class DummyStorage extends AbstractStorage
     ###
     public function resourceLinkGetShares($resource_link)
     {
-
         return [];
-
     }
 
 
@@ -130,9 +111,7 @@ class DummyStorage extends AbstractStorage
     ###
     public function consumerNonceLoad($nonce)
     {
-
         return false;  // assume the nonce does not already exist
-
     }
 
     ###
@@ -140,9 +119,7 @@ class DummyStorage extends AbstractStorage
     ###
     public function consumerNonceSave($nonce)
     {
-
         return true;
-
     }
 
 
@@ -155,9 +132,7 @@ class DummyStorage extends AbstractStorage
     ###
     public function resourceLinkShareKeyLoad($share_key)
     {
-
         return true;
-
     }
 
     ###
@@ -165,9 +140,7 @@ class DummyStorage extends AbstractStorage
     ###
     public function resourceLinkShareKeySave($share_key)
     {
-
         return true;
-
     }
 
     ###
@@ -175,9 +148,7 @@ class DummyStorage extends AbstractStorage
     ###
     public function resourceLinkShareKeyDelete($share_key)
     {
-
         return true;
-
     }
 
 
@@ -191,12 +162,10 @@ class DummyStorage extends AbstractStorage
     ###
     public function userLoad($user)
     {
-
         $now = time();
         $user->created = $now;
         $user->updated = $now;
         return true;
-
     }
 
     ###
@@ -204,10 +173,8 @@ class DummyStorage extends AbstractStorage
     ###
     public function userSave($user)
     {
-
         $user->updated = time();
         return true;
-
     }
 
     ###
@@ -215,9 +182,7 @@ class DummyStorage extends AbstractStorage
     ###
     public function userDelete($user)
     {
-
         $user->initialise();
         return true;
-
     }
 }

@@ -14,7 +14,6 @@ use Franzl\Lti\User;
 
 class PDOStorage extends AbstractStorage
 {
-
     private $db = null;
     private $dbTableNamePrefix = '';
 
@@ -23,13 +22,11 @@ class PDOStorage extends AbstractStorage
     ###
     public function __construct($db, $dbTableNamePrefix = '')
     {
-
         $this->db = $db;
         $this->dbTableNamePrefix = $dbTableNamePrefix;
         if ($db->getAttribute(PDO::ATTR_DRIVER_NAME) == 'oci') {
             $this->date_format = 'd-M-Y';
         }
-
     }
 
 
@@ -42,7 +39,6 @@ class PDOStorage extends AbstractStorage
     ###
     public function toolConsumerLoad($consumer)
     {
-
         $sql = 'SELECT name, secret, lti_version, consumer_name, consumer_version, consumer_guid, css_path, protected, enabled, enable_from, enable_until, last_access, created, updated ' .
            'FROM ' .$this->dbTableNamePrefix . AbstractStorage::CONSUMER_TABLE_NAME . ' ' .
            'WHERE consumer_key = :key';
@@ -85,7 +81,6 @@ class PDOStorage extends AbstractStorage
         }
 
         return $ok;
-
     }
 
     ###
@@ -93,7 +88,6 @@ class PDOStorage extends AbstractStorage
     ###
     public function toolConsumerSave($consumer)
     {
-
         if ($consumer->protected) {
             $protected = 1;
         } else {
@@ -171,7 +165,6 @@ class PDOStorage extends AbstractStorage
         }
 
         return $ok;
-
     }
 
     ###
@@ -179,7 +172,6 @@ class PDOStorage extends AbstractStorage
     ###
     public function toolConsumerDelete($consumer)
     {
-
         $key = $consumer->getKey();
 // Delete any nonce values for this consumer
         $sql = 'DELETE FROM ' . $this->dbTableNamePrefix . AbstractStorage::NONCE_TABLE_NAME . ' WHERE consumer_key = :key';
@@ -224,7 +216,6 @@ class PDOStorage extends AbstractStorage
         }
 
         return $ok;
-
     }
 
     ###
@@ -232,7 +223,6 @@ class PDOStorage extends AbstractStorage
     ###
     public function toolConsumerList()
     {
-
         $consumers = [];
 
         $sql = 'SELECT consumer_key, name, secret, lti_version, consumer_name, consumer_version, consumer_guid, css_path, ' .
@@ -278,7 +268,6 @@ class PDOStorage extends AbstractStorage
         }
 
         return $consumers;
-
     }
 
     ###
@@ -290,7 +279,6 @@ class PDOStorage extends AbstractStorage
     ###
     public function resourceLinkLoad($resource_link)
     {
-
         $key = $resource_link->getKey();
         $id = $resource_link->getId();
         $sql = 'SELECT consumer_key, context_id, lti_context_id, lti_resource_id, title, settings, ' .
@@ -330,7 +318,6 @@ class PDOStorage extends AbstractStorage
         }
 
         return $ok;
-
     }
 
     ###
@@ -338,7 +325,6 @@ class PDOStorage extends AbstractStorage
     ###
     public function resourceLinkSave($resource_link)
     {
-
         $time = time();
         $now = date("{$this->date_format} {$this->time_format}", $time);
         $settingsValue = json_encode($resource_link->settings);
@@ -406,7 +392,6 @@ class PDOStorage extends AbstractStorage
         }
 
         return $ok;
-
     }
 
     ###
@@ -414,7 +399,6 @@ class PDOStorage extends AbstractStorage
     ###
     public function resourceLinkDelete($resource_link)
     {
-
         $key = $resource_link->getKey();
         $id = $resource_link->getId();
 // Delete any outstanding share keys for resource links for this consumer
@@ -461,7 +445,6 @@ class PDOStorage extends AbstractStorage
         }
 
         return $ok;
-
     }
 
     ###
@@ -470,7 +453,6 @@ class PDOStorage extends AbstractStorage
     ###
     public function resourceLinkGetUserResultSourcedIDs($resource_link, $local_only, $id_scope)
     {
-
         $users = [];
 
         if ($local_only) {
@@ -508,7 +490,6 @@ class PDOStorage extends AbstractStorage
         }
 
         return $users;
-
     }
 
     ###
@@ -516,7 +497,6 @@ class PDOStorage extends AbstractStorage
     ###
     public function resourceLinkGetShares($resource_link)
     {
-
         $shares = [];
 
         $key = $resource_link->getKey();
@@ -541,7 +521,6 @@ class PDOStorage extends AbstractStorage
         }
 
         return $shares;
-
     }
 
 
@@ -554,7 +533,6 @@ class PDOStorage extends AbstractStorage
     ###
     public function consumerNonceLoad($nonce)
     {
-
 // Delete any expired nonce values
         $now = date("{$this->date_format} {$this->time_format}", time());
         $sql = 'DELETE FROM ' . $this->dbTableNamePrefix . AbstractStorage::NONCE_TABLE_NAME . ' WHERE expires <= :now';
@@ -578,7 +556,6 @@ class PDOStorage extends AbstractStorage
         }
 
         return $ok;
-
     }
 
     ###
@@ -586,7 +563,6 @@ class PDOStorage extends AbstractStorage
     ###
     public function consumerNonceSave($nonce)
     {
-
         $key = $nonce->getKey();
         $value = $nonce->getValue();
         $expires = date("{$this->date_format} {$this->time_format}", $nonce->expires);
@@ -598,7 +574,6 @@ class PDOStorage extends AbstractStorage
         $ok = $query->execute();
 
         return $ok;
-
     }
 
 
@@ -611,7 +586,6 @@ class PDOStorage extends AbstractStorage
     ###
     public function resourceLinkShareKeyLoad($share_key)
     {
-
 // Clear expired share keys
         $now = date("{$this->date_format} {$this->time_format}", time());
         $sql = 'DELETE FROM ' . $this->dbTableNamePrefix . AbstractStorage::RESOURCE_LINK_SHARE_KEY_TABLE_NAME . ' WHERE expires <= :now';
@@ -641,7 +615,6 @@ class PDOStorage extends AbstractStorage
         }
 
         return $ok;
-
     }
 
     ###
@@ -649,7 +622,6 @@ class PDOStorage extends AbstractStorage
     ###
     public function resourceLinkShareKeySave($share_key)
     {
-
         if ($share_key->auto_approve) {
             $approve = 1;
         } else {
@@ -668,7 +640,6 @@ class PDOStorage extends AbstractStorage
         $query->bindValue('expires', $expires, PDO::PARAM_STR);
 
         return $query->execute();
-
     }
 
     ###
@@ -676,7 +647,6 @@ class PDOStorage extends AbstractStorage
     ###
     public function resourceLinkShareKeyDelete($share_key)
     {
-
         $id = $share_key->getId();
         $sql = 'DELETE FROM ' . $this->dbTableNamePrefix . AbstractStorage::RESOURCE_LINK_SHARE_KEY_TABLE_NAME . ' WHERE share_key_id = :id';
         $query = $this->db->prepare($sql);
@@ -687,7 +657,6 @@ class PDOStorage extends AbstractStorage
         }
 
         return $ok;
-
     }
 
 
@@ -700,7 +669,6 @@ class PDOStorage extends AbstractStorage
     ###
     public function userLoad($user)
     {
-
         $key = $user->getResourceLink()->getKey();
         $id = $user->getResourceLink()->getId();
         $userId = $user->getId(ToolProvider::ID_SCOPE_ID_ONLY);
@@ -725,7 +693,6 @@ class PDOStorage extends AbstractStorage
         }
 
         return $ok;
-
     }
 
     ###
@@ -733,7 +700,6 @@ class PDOStorage extends AbstractStorage
     ###
     public function userSave($user)
     {
-
         $time = time();
         $now = date("{$this->date_format} {$this->time_format}", $time);
         $key = $user->getResourceLink()->getKey();
@@ -763,7 +729,6 @@ class PDOStorage extends AbstractStorage
         }
 
         return $ok;
-
     }
 
     ###
@@ -771,7 +736,6 @@ class PDOStorage extends AbstractStorage
     ###
     public function userDelete($user)
     {
-
         $key = $user->getResourceLink()->getKey();
         $id = $user->getResourceLink()->getId();
         $userId = $user->getId(ToolProvider::ID_SCOPE_ID_ONLY);
@@ -788,6 +752,5 @@ class PDOStorage extends AbstractStorage
         }
 
         return $ok;
-
     }
 }

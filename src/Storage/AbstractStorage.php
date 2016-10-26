@@ -17,7 +17,6 @@ use Franzl\Lti\ResourceLink;
  */
 abstract class AbstractStorage
 {
-
     /**
      * Default name for database table used to store tool consumers.
      */
@@ -223,7 +222,6 @@ abstract class AbstractStorage
      */
     public static function getStorage($data_connector, $db = null, $type = null)
     {
-
         if (!is_null($data_connector)) {
             if (!is_object($data_connector) || !is_subclass_of($data_connector, get_class())) {
                 $prefix = null;
@@ -273,7 +271,6 @@ abstract class AbstractStorage
         }
 
         return $data_connector;
-
     }
 
     /**
@@ -287,7 +284,6 @@ abstract class AbstractStorage
      */
     public static function getRandomString($length = 8)
     {
-
         $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
         $value = '';
@@ -298,7 +294,6 @@ abstract class AbstractStorage
         }
 
         return $value;
-
     }
 
     /**
@@ -314,7 +309,6 @@ abstract class AbstractStorage
      */
     public static function quoted($value, $addQuotes = true)
     {
-
         if (is_null($value)) {
             $value = 'NULL';
         } else {
@@ -325,6 +319,5 @@ abstract class AbstractStorage
         }
 
         return $value;
-
     }
 }

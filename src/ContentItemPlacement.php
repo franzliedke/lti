@@ -11,7 +11,6 @@ namespace Franzl\Lti;
  */
 class ContentItemPlacement
 {
-
     /**
      * Class constructor.
      *
@@ -22,7 +21,6 @@ class ContentItemPlacement
      */
     public function __construct($displayWidth, $displayHeight, $documentTarget, $windowTarget)
     {
-
         if (!empty($displayWidth)) {
             $this->displayWidth = $displayWidth;
         }
@@ -35,6 +33,5 @@ class ContentItemPlacement
         if (!empty($windowTarget)) {
             $this->windowTarget = $windowTarget;
         }
-
     }
 }

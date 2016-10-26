@@ -384,7 +384,6 @@ EOD;
   <input type="hidden" name="{$key}" value="{$value}" />
 
 EOD;
-
         }
 
         $page .= <<< EOD

@@ -14,7 +14,6 @@ use Franzl\Lti\ToolProvider;
  */
 class DataStore
 {
-
     /**
      * @var ToolProvider Tool Provider object.
      */
@@ -27,9 +26,7 @@ class DataStore
      */
     public function __construct($tool_provider)
     {
-
         $this->tool_provider = $tool_provider;
-
     }
 
     /**
@@ -41,12 +38,10 @@ class DataStore
      */
     public function lookupConsumer($consumer_key)
     {
-
         return new Consumer(
             $this->tool_provider->consumer->getKey(),
             $this->tool_provider->consumer->secret
         );
-
     }
 
     /**
@@ -60,9 +55,7 @@ class DataStore
      */
     public function lookupToken($consumer, $token_type, $token)
     {
-
         return new Token($consumer, '');
-
     }
 
     /**
@@ -77,7 +70,6 @@ class DataStore
      */
     public function lookupNonce($consumer, $token, $value, $timestamp)
     {
-
         $nonce = new ConsumerNonce($this->tool_provider->consumer, $value);
         $ok = !$nonce->load();
         if ($ok) {
@@ -88,7 +80,6 @@ class DataStore
         }
 
         return !$ok;
-
     }
 
     /**
@@ -101,9 +92,7 @@ class DataStore
      */
     public function newRequestToken($consumer, $callback = null)
     {
-
         return null;
-
     }
 
     /**
@@ -117,8 +106,6 @@ class DataStore
      */
     public function newAccessToken($token, $consumer, $verifier = null)
     {
-
         return null;
-
     }
 }

@@ -11,7 +11,6 @@ namespace Franzl\Lti;
  */
 class ContentItemImage
 {
-
     /**
      * Class constructor.
      *
@@ -21,7 +20,6 @@ class ContentItemImage
      */
     public function __construct($id, $height = null, $width = null)
     {
-
         $this->{'@id'} = $id;
         if (!is_null($height)) {
             $this->height = $height;
@@ -29,6 +27,5 @@ class ContentItemImage
         if (!is_null($width)) {
             $this->width = $width;
         }
-
     }
 }

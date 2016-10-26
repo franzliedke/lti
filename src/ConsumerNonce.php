@@ -39,11 +39,9 @@ class ConsumerNonce
      */
     public function __construct($consumer, $value = null)
     {
-
         $this->consumer = $consumer;
         $this->value = $value;
         $this->expires = time() + (self::MAX_NONCE_AGE * 60);
-
     }
 
     /**
@@ -53,9 +51,7 @@ class ConsumerNonce
      */
     public function load()
     {
-
         return $this->consumer->getStorage()->consumerNonceLoad($this);
-
     }
 
     /**
@@ -65,9 +61,7 @@ class ConsumerNonce
      */
     public function save()
     {
-
         return $this->consumer->getStorage()->consumerNonceSave($this);
-
     }
 
     /**
@@ -77,9 +71,7 @@ class ConsumerNonce
      */
     public function getConsumer()
     {
-
         return $this->consumer;
-
     }
 
     /**
@@ -89,9 +81,7 @@ class ConsumerNonce
      */
     public function getKey()
     {
-
         return $this->consumer->getKey();
-
     }
 
     /**
@@ -101,8 +91,6 @@ class ConsumerNonce
      */
     public function getValue()
     {
-
         return $this->value;
-
     }
 }

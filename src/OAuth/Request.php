@@ -74,7 +74,6 @@ class Request
                 );
                 $parameters = array_merge($parameters, $header_parameters);
             }
-
         }
 
         return new Request($http_method, $http_url, $parameters);

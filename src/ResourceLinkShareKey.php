@@ -13,7 +13,6 @@ use Franzl\Lti\Storage\AbstractStorage;
  */
 class ResourceLinkShareKey
 {
-
     /**
      * Maximum permitted life for a share key value.
      */
@@ -73,7 +72,6 @@ class ResourceLinkShareKey
      */
     public function __construct($resource_link, $id = null)
     {
-
         $this->initialise();
         $this->data_connector = $resource_link->getConsumer()->getStorage();
         $this->id = $id;
@@ -84,7 +82,6 @@ class ResourceLinkShareKey
             $this->primary_consumer_key = $resource_link->getKey();
             $this->primary_resource_link_id = $resource_link->getId();
         }
-
     }
 
     /**
@@ -92,14 +89,12 @@ class ResourceLinkShareKey
      */
     public function initialise()
     {
-
         $this->primary_consumer_key = null;
         $this->primary_resource_link_id = null;
         $this->length = null;
         $this->life = null;
         $this->auto_approve = false;
         $this->expires = null;
-
     }
 
     /**
@@ -109,7 +104,6 @@ class ResourceLinkShareKey
      */
     public function save()
     {
-
         if (empty($this->life)) {
             $this->life = self::DEFAULT_SHARE_KEY_LIFE;
         } else {
@@ -126,7 +120,6 @@ class ResourceLinkShareKey
         }
 
         return $this->data_connector->resourceLinkShareKeySave($this);
-
     }
 
     /**
@@ -136,9 +129,7 @@ class ResourceLinkShareKey
      */
     public function delete()
     {
-
         return $this->data_connector->resourceLinkShareKeyDelete($this);
-
     }
 
     /**
@@ -148,9 +139,7 @@ class ResourceLinkShareKey
      */
     public function getId()
     {
-
         return $this->id;
-
     }
 
 ###
@@ -162,7 +151,6 @@ class ResourceLinkShareKey
      */
     private function load()
     {
-
         $this->initialise();
         $this->data_connector->resourceLinkShareKeyLoad($this);
         if (!is_null($this->id)) {
@@ -171,6 +159,5 @@ class ResourceLinkShareKey
         if (!is_null($this->expires)) {
             $this->life = ($this->expires - time()) / 60 / 60;
         }
-
     }
 }

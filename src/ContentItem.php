@@ -11,7 +11,6 @@ namespace Franzl\Lti;
  */
 class ContentItem
 {
-
     /**
      * Media type for LTI launch links.
      */
@@ -26,7 +25,6 @@ class ContentItem
      */
     public function __construct($type, $placementAdvice = null, $id = null)
     {
-
         $this->{'@type'} = $type;
         if (is_object($placementAdvice) && (count(get_object_vars($placementAdvice)) > 0)) {
             $this->placementAdvice = $placementAdvice;
@@ -34,7 +32,6 @@ class ContentItem
         if (!empty($id)) {
             $this->{'@id'} = $id;
         }
-
     }
 
     /**
@@ -44,13 +41,11 @@ class ContentItem
      */
     public function setUrl($url)
     {
-
         if (!empty($url)) {
             $this->url = $url;
         } else {
             unset($this->url);
         }
-
     }
 
     /**
@@ -60,13 +55,11 @@ class ContentItem
      */
     public function setMediaType($mediaType)
     {
-
         if (!empty($mediaType)) {
             $this->mediaType = $mediaType;
         } else {
             unset($this->mediaType);
         }
-
     }
 
     /**
@@ -76,13 +69,11 @@ class ContentItem
      */
     public function setTitle($title)
     {
-
         if (!empty($title)) {
             $this->title = $title;
         } else if (isset($this->title)) {
             unset($this->title);
         }
-
     }
 
     /**
@@ -92,13 +83,11 @@ class ContentItem
      */
     public function setText($text)
     {
-
         if (!empty($text)) {
             $this->text = $text;
         } else if (isset($this->text)) {
             unset($this->text);
         }
-
     }
 
     /**
@@ -108,7 +97,6 @@ class ContentItem
      */
     public static function toJson($items)
     {
-
         $data = [];
         if (!is_array($items)) {
             $data[] = json_encode($items);
@@ -120,6 +108,5 @@ class ContentItem
         $json = '{ "@context" : "http://purl.imsglobal.org/ctx/lti/v1/ContentItem", "@graph" : [' . implode(", ", $data) . '] }';
 
         return $json;
-
     }
 }
