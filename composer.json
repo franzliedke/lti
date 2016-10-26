@@ -24,5 +24,10 @@
     "phpspec/phpspec": "^2.2",
     "squizlabs/php_codesniffer": "2.*",
     "zendframework/zend-diactoros": "~1.3"
+  },
+  "scripts": {
+    "test": "phpspec --ansi run",
+    "cs": "phpcs --standard=PSR2 -np src",
+    "fix-cs": "phpcbf --standard=PSR2 -np src"
   }
 }
