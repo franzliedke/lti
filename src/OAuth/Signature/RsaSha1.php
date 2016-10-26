@@ -3,7 +3,6 @@
 namespace Franzl\Lti\OAuth\Signature;
 
 use Franzl\Lti\OAuth\Consumer;
-use Franzl\Lti\OAuth\Request;
 use Franzl\Lti\OAuth\Token;
 use Psr\Http\Message\RequestInterface;
 
@@ -28,13 +27,13 @@ abstract class RsaSha1 extends SignatureMethod
     // (3) some sort of specific discovery code based on request
     //
     // Either way should return a string representation of the certificate
-    abstract protected function fetchPublicCert(&$request);
+    abstract protected function fetchPublicCert(RequestInterface $request);
 
     // Up to the SP to implement this lookup of keys. Possible ideas are:
     // (1) do a lookup in a table of trusted certs keyed off of consumer
     //
     // Either way should return a string representation of the certificate
-    abstract protected function fetchPrivateCert(&$request);
+    abstract protected function fetchPrivateCert(RequestInterface $request);
 
     public function buildSignature(RequestInterface $request, array $params, Consumer $consumer, Token $token)
     {
@@ -47,7 +46,7 @@ abstract class RsaSha1 extends SignatureMethod
         $privatekeyid = openssl_get_privatekey($cert);
 
         // Sign using the key
-        $ok = openssl_sign((string) $baseString, $signature, $privatekeyid);
+        openssl_sign((string) $baseString, $signature, $privatekeyid);
 
         // Release the key resource
         openssl_free_key($privatekeyid);
@@ -55,7 +54,7 @@ abstract class RsaSha1 extends SignatureMethod
         return base64_encode($signature);
     }
 
-    public function checkSignature(Request $request, Consumer $consumer, Token $token, $signature)
+    public function checkSignature(RequestInterface $request, Consumer $consumer, Token $token, $signature)
     {
         $decoded_sig = base64_decode($signature);
 

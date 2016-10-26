@@ -3,7 +3,6 @@
 namespace Franzl\Lti\OAuth\Signature;
 
 use Franzl\Lti\OAuth\Consumer;
-use Franzl\Lti\OAuth\Request;
 use Franzl\Lti\OAuth\Token;
 use Psr\Http\Message\RequestInterface;
 
@@ -34,13 +33,13 @@ abstract class SignatureMethod
 
     /**
      * Verifies that a given signature is correct
-     * @param Request $request
+     * @param RequestInterface $request
      * @param Consumer $consumer
      * @param Token $token
      * @param string $signature
      * @return bool
      */
-    public function checkSignature(Request $request, Consumer $consumer, Token $token, $signature)
+    public function checkSignature(RequestInterface $request, Consumer $consumer, Token $token, $signature)
     {
         $built = $this->buildSignature($request, $consumer, $token);
 
