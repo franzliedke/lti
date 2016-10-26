@@ -22,7 +22,7 @@ class Signer
      */
     protected $token;
 
-    public function __construct(SignatureMethod $signatureMethod, Consumer $consumer, Token $token)
+    public function __construct(SignatureMethod $signatureMethod, Consumer $consumer, Token $token = null)
     {
         $this->signatureMethod = $signatureMethod;
         $this->consumer = $consumer;
@@ -57,13 +57,18 @@ class Signer
 
     private function getDefaultOAuthParams()
     {
-        return [
+        $params = [
             'oauth_nonce'        => md5(microtime() . mt_rand()),
             'oauth_timestamp'    => time(),
             'oauth_version'      => '1.0',
             'oauth_consumer_key' => $this->consumer->key,
-            'oauth_token'        => $this->token->key,
         ];
+
+        if ($this->token) {
+            $params['oauth_token'] = $this->token->key;
+        }
+
+        return $params;
     }
 
     private function buildAuthorizationHeader(array $params)
