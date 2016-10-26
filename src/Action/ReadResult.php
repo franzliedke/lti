@@ -35,11 +35,13 @@ class ReadResult extends LTI11Action implements Action
         $sourcedId = htmlentities($this->user->ltiResultSourcedId);
 
         $xml = <<<EOF
-<resultRecord>
-    <sourcedGUID>
-        <sourcedId>{$sourcedId}</sourcedId>
-    </sourcedGUID>
-</resultRecord>
+<readResultRequest>
+    <resultRecord>
+        <sourcedGUID>
+            <sourcedId>{$sourcedId}</sourcedId>
+        </sourcedGUID>
+    </resultRecord>
+</readResultRequest>
 EOF;
 
         return $this->wrapXML($xml);

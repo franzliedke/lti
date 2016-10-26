@@ -28,11 +28,13 @@ class DeleteResult extends LTI11Action implements Action
         $sourcedId = htmlentities($this->user->ltiResultSourcedId);
 
         $xml = <<<EOF
-<resultRecord>
-    <sourcedGUID>
-        <sourcedId>{$sourcedId}</sourcedId>
-    </sourcedGUID>
-</resultRecord>
+<deleteResultRequest>
+    <resultRecord>
+        <sourcedGUID>
+            <sourcedId>{$sourcedId}</sourcedId>
+        </sourcedGUID>
+    </resultRecord>
+</deleteResultRequest>
 EOF;
 
         return $this->wrapXML($xml);
