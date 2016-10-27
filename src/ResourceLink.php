@@ -2,12 +2,10 @@
 
 namespace Franzl\Lti;
 
-use DOMDocument;
-use DOMElement;
-use Exception;
 use Franzl\Lti\Action\Action;
 use Franzl\Lti\Http\ClientFactory;
 use Franzl\Lti\OAuth\Consumer;
+use Franzl\Lti\Parse\XML;
 
 /**
  * Class to represent a tool consumer resource link
@@ -647,14 +645,9 @@ class ResourceLink
             // Parse XML response
             if ($response->isSuccessful()) {
                 $response = $response->getWrappedResponse();
-                try {
-                    $extDoc = new DOMDocument();
-                    $extDoc->loadXML((string) $response->getBody());
-                    $this->extNodes = $this->domNodeToArray($extDoc->documentElement);
-                    if (isset($this->extNodes['statusinfo']['codemajor']) && ($this->extNodes['statusinfo']['codemajor'] == 'Success')) {
-                        $ok = true;
-                    }
-                } catch (Exception $e) {
+                $this->extNodes = XML::extractNodes((string) $response->getBody());
+                if (isset($this->extNodes['statusinfo']['codemajor']) && ($this->extNodes['statusinfo']['codemajor'] == 'Success')) {
+                    $ok = true;
                 }
             }
         }
@@ -689,15 +682,11 @@ class ResourceLink
         // Parse XML response
         if ($response->isSuccessful()) {
             $response = $response->getWrappedResponse();
-            try {
-                $extDoc = new DOMDocument();
-                $extDoc->loadXML((string) $response->getBody());
-                $this->extNodes = $this->domNodeToArray($extDoc->documentElement);
-                if (isset($this->extNodes['imsx_POXHeader']['imsx_POXResponseHeaderInfo']['imsx_statusInfo']['imsx_codeMajor']) &&
-                    ($this->extNodes['imsx_POXHeader']['imsx_POXResponseHeaderInfo']['imsx_statusInfo']['imsx_codeMajor'] == 'success')) {
-                    $ok = true;
-                }
-            } catch (Exception $e) {
+
+            $this->extNodes = XML::extractNodes((string) $response->getBody());
+            if (isset($this->extNodes['imsx_POXHeader']['imsx_POXResponseHeaderInfo']['imsx_statusInfo']['imsx_codeMajor']) &&
+                ($this->extNodes['imsx_POXHeader']['imsx_POXResponseHeaderInfo']['imsx_statusInfo']['imsx_codeMajor'] == 'success')) {
+                $ok = true;
             }
         }
 
@@ -714,65 +703,8 @@ class ResourceLink
 
         if ($call->isSuccessful()) {
             $response = (string) $call->getWrappedResponse()->getBody();
-            try {
-                $extDoc = new DOMDocument();
-                $extDoc->loadXML($response);
-                $action->handleResponse($this->domNodeToArray($extDoc->documentElement), $this);
-            } catch (Exception $e) {
-                // Pass
-            }
-        }
-    }
 
-    /**
-     * Convert DOM nodes to array.
-     *
-     * @param DOMElement $node XML element
-     *
-     * @return array Array of XML document elements
-     */
-    private function domNodeToArray(DOMElement $node)
-    {
-        $output = '';
-        switch ($node->nodeType) {
-            case XML_CDATA_SECTION_NODE:
-            case XML_TEXT_NODE:
-                $output = trim($node->textContent);
-                break;
-            case XML_ELEMENT_NODE:
-                for ($i = 0; $i < $node->childNodes->length; $i++) {
-                    $child = $node->childNodes->item($i);
-                    $v = $this->domNodeToArray($child);
-                    if (isset($child->tagName)) {
-                        $t = $child->tagName;
-                        if (!isset($output[$t])) {
-                            $output[$t] = [];
-                        }
-                        $output[$t][] = $v;
-                    } else {
-                        $s = (string) $v;
-                        if (strlen($s) > 0) {
-                            $output = $s;
-                        }
-                    }
-                }
-                if (is_array($output)) {
-                    if ($node->attributes->length) {
-                        $a = [];
-                        foreach ($node->attributes as $attrName => $attrNode) {
-                            $a[$attrName] = (string) $attrNode->value;
-                        }
-                        $output['@attributes'] = $a;
-                    }
-                    foreach ($output as $t => $v) {
-                        if (is_array($v) && count($v)==1 && $t!='@attributes') {
-                            $output[$t] = $v[0];
-                        }
-                    }
-                }
-                break;
+            $action->handleResponse(XML::extractNodes($response), $this);
         }
-
-        return $output;
     }
 }
