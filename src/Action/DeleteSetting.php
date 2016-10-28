@@ -2,21 +2,28 @@
 
 namespace Franzl\Lti\Action;
 
-use Franzl\Lti\ResourceLink;
-
-class DeleteSetting implements Action
+class DeleteSetting extends LTI1Action implements Action
 {
     public function getServiceName()
     {
         return 'basic-lti-deletesetting';
     }
 
-    public function asXML()
+    protected function getParams()
     {
-        // TODO: Implement asXML() method.
+        /*
+        $name = $action->getServiceName();
+
+        $url = $this->getSetting('ext_ims_lti_tool_setting_url');
+        $params = [
+            'id' => $this->getSetting('ext_ims_lti_tool_setting_id'),
+            'setting' => $value ?: '',
+        ];
+         */
+        return [];
     }
 
-    public function handleResponse(array $nodes, ResourceLink $link)
+    protected function handleNodes(array $nodes)
     {
         return true;
     }

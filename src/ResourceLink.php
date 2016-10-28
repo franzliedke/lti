@@ -3,9 +3,14 @@
 namespace Franzl\Lti;
 
 use Franzl\Lti\Action\Action;
+use Franzl\Lti\Action\Executor;
 use Franzl\Lti\Http\ClientFactory;
+use Franzl\Lti\Http\GuzzleClient;
 use Franzl\Lti\OAuth\Consumer;
+use Franzl\Lti\OAuth\Signature\HmacSha1;
+use Franzl\Lti\OAuth\Signer;
 use Franzl\Lti\Parse\XML;
+use GuzzleHttp\Client;
 
 /**
  * Class to represent a tool consumer resource link
@@ -14,7 +19,7 @@ use Franzl\Lti\Parse\XML;
  * @version 2.5.00
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3
  */
-class ResourceLink
+class ResourceLink implements Executor
 {
     /**
      * Decimal outcome type.
@@ -352,26 +357,6 @@ class ResourceLink
     }
 
     /**
-     * Perform an Outcomes service request.
-     *
-     * @param Action $action The action type constant
-     * @param User $user User object
-     * @return bool True if the request was successfully processed
-     */
-    public function doOutcomesService(Action $action, User $user)
-    {
-        // Lookup service details from the source resource link appropriate to the user (in case the destination is being shared)
-        $source_resource_link = $user->getResourceLink();
-        $url = $source_resource_link->getSetting('lis_outcome_service_url');
-
-        if ($this->doLTI11Service($action, $url)) {
-            return $action->handleResponse($this->extNodes, $this);
-        }
-
-        return false;
-    }
-
-    /**
      * Perform a Memberships service request.
      *
      * The user table is updated with the new list of user objects.
@@ -480,33 +465,6 @@ class ResourceLink
         }
 
         return $users;
-    }
-
-    /**
-     * Perform a Setting service request.
-     *
-     * @param Action $action The action
-     * @param string $value  The setting value (optional, default is null)
-     *
-     * @return mixed The setting value for a read action, true if a write or delete action was successful, otherwise false
-     */
-    public function doSettingService(Action $action, $value = null)
-    {
-        $response = false;
-
-        $name = $action->getServiceName();
-
-        $url = $this->getSetting('ext_ims_lti_tool_setting_url');
-        $params = [
-            'id' => $this->getSetting('ext_ims_lti_tool_setting_id'),
-            'setting' => $value ?: '',
-        ];
-
-        if ($this->doService($name, $url, $params)) {
-            $response = $action->handleResponse($this->extNodes, $this);
-        }
-
-        return $response;
     }
 
     /**
@@ -655,56 +613,12 @@ class ResourceLink
         return $ok;
     }
 
-    /**
-     * Send a service request to the tool consumer.
-     *
-     * @param Action $action
-     * @param string $url URL to send request to
-     * @return bool True if the request successfully obtained a response
-     */
-    private function doLTI11Service(Action $action, $url)
+    public function execute(Action $action)
     {
-        $ok = false;
-        $xmlRequest = $action->asXML();
-
-        // Calculate body hash
-        $hash = base64_encode(sha1($xmlRequest, true));
-        $params = ['oauth_body_hash' => $hash];
-
-        // Add OAuth signature
         $consumer = new Consumer($this->consumer->getKey(), $this->consumer->secret, null);
+        $signer = new Signer(new HmacSha1, $consumer); // TODO: We still need a token here
+        $httpClient = new GuzzleClient(new Client, $signer);
 
-        // Connect to tool consumer
-        $response = ClientFactory::make()->sendSigned($url, 'POST', $xmlRequest, [
-            'content-type' => 'application/xml',
-        ]);
-
-        // Parse XML response
-        if ($response->isSuccessful()) {
-            $response = $response->getWrappedResponse();
-
-            $this->extNodes = XML::extractNodes((string) $response->getBody());
-            if (isset($this->extNodes['imsx_POXHeader']['imsx_POXResponseHeaderInfo']['imsx_statusInfo']['imsx_codeMajor']) &&
-                ($this->extNodes['imsx_POXHeader']['imsx_POXResponseHeaderInfo']['imsx_statusInfo']['imsx_codeMajor'] == 'success')) {
-                $ok = true;
-            }
-        }
-
-        return $ok;
-    }
-
-    protected function doServiceCall(Action $action, $url)
-    {
-        $httpClient = ClientFactory::make();
-        $body = $action->asXML();
-        $headers = [];
-
-        $call = $httpClient->sendSigned($url, 'POST', $body, $headers);
-
-        if ($call->isSuccessful()) {
-            $response = (string) $call->getWrappedResponse()->getBody();
-
-            $action->handleResponse(XML::extractNodes($response), $this);
-        }
+        $action->run($httpClient);
     }
 }

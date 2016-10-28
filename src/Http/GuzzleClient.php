@@ -2,11 +2,12 @@
 
 namespace Franzl\Lti\Http;
 
+use Franzl\Lti\OAuth\Signer;
 use GuzzleHttp\ClientInterface as GuzzleContract;
-use GuzzleHttp\Exception\TransferException;
-use GuzzleHttp\Psr7\Request;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
-class GuzzleClient implements ClientInterface
+class GuzzleClient implements Client
 {
     /**
      * @var \GuzzleHttp\ClientInterface
@@ -14,50 +15,39 @@ class GuzzleClient implements ClientInterface
     protected $guzzle;
 
     /**
+     * @var Signer
+     */
+    protected $signer;
+
+    /**
      * Instantiate the client.
      *
      * @param \GuzzleHttp\ClientInterface $guzzle
+     * @param Signer $signer
      */
-    public function __construct(GuzzleContract $guzzle)
+    public function __construct(GuzzleContract $guzzle, Signer $signer)
     {
         $this->guzzle = $guzzle;
+        $this->signer = $signer;
     }
 
     /**
-     * Send a HTTP request.
-     *
-     * @param string $url
-     * @param string $method
-     * @param array|string $body
-     * @param array $headers
-     * @param array $options
+     * @param RequestInterface $request
      * @return ResponseInterface
      */
-    public function send($url, $method, $body, $headers = [], $options = [])
+    public function send(RequestInterface $request)
     {
-        if (is_array($body)) {
-            $body = http_build_query($body);
-        }
-        $request = new Request($method, $url, $headers, $body);
-
-        try {
-            return new HttpResponse($this->guzzle->send($request, $options));
-        } catch (TransferException $e) {
-            return new ErrorResponse;
-        }
+        return $this->guzzle->send($request);
     }
 
     /**
-     * Send a HTTP request, signed with OAuth.
-     *
-     * @param string $url
-     * @param string $method
-     * @param array|string $body
-     * @param array $headers
+     * @param RequestInterface $request
      * @return ResponseInterface
      */
-    public function sendSigned($url, $method, $body, $headers = [])
+    public function sendSigned(RequestInterface $request)
     {
-        return $this->send($url, $method, $body, $headers, ['auth' => 'oauth']);
+        return $this->guzzle->send(
+            $this->signer->sign($request)
+        );
     }
 }

@@ -2,7 +2,6 @@
 
 namespace Franzl\Lti\Action;
 
-use Franzl\Lti\ResourceLink;
 use Franzl\Lti\User;
 
 class DeleteResult extends LTI11Action implements Action
@@ -20,10 +19,15 @@ class DeleteResult extends LTI11Action implements Action
     public function getServiceName()
     {
         // if ($lti_outcome->type == self::EXT_TYPE_DECIMAL) {
+
+        // Lookup service details from the source resource link appropriate to the user (in case the destination is being shared)
+        //$source_resource_link = $user->getResourceLink();
+        //$url = $source_resource_link->getSetting('lis_outcome_service_url');
+
         return 'deleteResult';
     }
 
-    public function asXML()
+    public function getBody()
     {
         $sourcedId = htmlentities($this->user->ltiResultSourcedId);
 
@@ -37,10 +41,10 @@ class DeleteResult extends LTI11Action implements Action
 </deleteResultRequest>
 EOF;
 
-        return $this->wrapXML($xml);
+        return $xml;
     }
 
-    public function handleResponse(array $nodes, ResourceLink $link)
+    public function handleNodes(array $nodes)
     {
         return true;
     }

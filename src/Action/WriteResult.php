@@ -3,7 +3,6 @@
 namespace Franzl\Lti\Action;
 
 use Franzl\Lti\Outcome;
-use Franzl\Lti\ResourceLink;
 use Franzl\Lti\User;
 
 class WriteResult extends LTI11Action implements Action
@@ -27,10 +26,14 @@ class WriteResult extends LTI11Action implements Action
     public function getServiceName()
     {
         // if ($this->checkValueType($lti_outcome, [self::EXT_TYPE_DECIMAL])) {
+        // Lookup service details from the source resource link appropriate to the user (in case the destination is being shared)
+        //$source_resource_link = $user->getResourceLink();
+        //$url = $source_resource_link->getSetting('lis_outcome_service_url');
+
         return 'replaceResult';
     }
 
-    public function asXML()
+    public function getBody()
     {
         $sourcedId = htmlentities($this->user->ltiResultSourcedId);
         $language = $this->outcome->language;
@@ -52,10 +55,10 @@ class WriteResult extends LTI11Action implements Action
 </replaceResultRequest>
 EOF;
 
-        return $this->wrapXML($xml);
+        return $xml;
     }
 
-    public function handleResponse(array $nodes, ResourceLink $link)
+    public function handleNodes(array $nodes)
     {
         return true;
     }

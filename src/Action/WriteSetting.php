@@ -2,24 +2,31 @@
 
 namespace Franzl\Lti\Action;
 
-use Franzl\Lti\ResourceLink;
-
-class WriteSetting implements Action
+class WriteSetting extends LTI1Action implements Action
 {
     public function getServiceName()
     {
         return 'basic-lti-savesetting';
     }
 
-    public function asXML()
+    protected function getParams()
     {
-        // TODO: Implement asXML() method.
+        /*
+        $name = $action->getServiceName();
+
+        $url = $this->getSetting('ext_ims_lti_tool_setting_url');
+        $params = [
+            'id' => $this->getSetting('ext_ims_lti_tool_setting_id'),
+            'setting' => $value ?: '',
+        ];
+         */
+        return [];
     }
 
-    public function handleResponse(array $nodes, ResourceLink $link)
+    protected function handleNodes(array $nodes)
     {
-        $link->setSetting('ext_ims_lti_tool_setting', $this->getSetting());
-        $link->saveSettings();
+        //$link->setSetting('ext_ims_lti_tool_setting', $this->getSetting());
+        //$link->saveSettings();
 
         return true;
     }

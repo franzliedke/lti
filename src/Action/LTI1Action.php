@@ -7,7 +7,7 @@ use Franzl\Lti\Parse\XML;
 use GuzzleHttp\Psr7\Request;
 use Psr\Http\Message\ResponseInterface;
 
-abstract class LTI11Action implements Action
+abstract class LTI1Action implements Action
 {
     public function run(Client $client)
     {
@@ -20,44 +20,20 @@ abstract class LTI11Action implements Action
 
     protected function makeRequest()
     {
-        // TODO: Calculate body hash
-        //$hash = base64_encode(sha1($xmlRequest, true));
-        //$params = ['oauth_body_hash' => $hash];
         $request = new Request(
             'POST',
             'someUrlHere',
-            ['content-type' => 'application/xml']
+            ['content-type' => 'application/x-www-form-urlencoded']
         );
 
         $request->getBody()->write(
-            $this->wrapInEnvelope($this->getBody())
+            http_build_query($this->getParams())
         );
 
         return $request;
     }
 
-    abstract protected function getBody();
-
-    protected function wrapInEnvelope($xml)
-    {
-        $id = uniqid();
-        $envelope = <<< EOD
-<?xml version = "1.0" encoding = "UTF-8"?>
-<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
-  <imsx_POXHeader>
-    <imsx_POXRequestHeaderInfo>
-      <imsx_version>V1.0</imsx_version>
-      <imsx_messageIdentifier>{$id}</imsx_messageIdentifier>
-    </imsx_POXRequestHeaderInfo>
-  </imsx_POXHeader>
-  <imsx_POXBody>
-{$xml}
-  </imsx_POXBody>
-</imsx_POXEnvelopeRequest>
-EOD;
-
-        return $envelope;
-    }
+    abstract protected function getParams();
 
     protected function handleResponse(ResponseInterface $response)
     {

@@ -2,13 +2,9 @@
 
 namespace Franzl\Lti\Action;
 
-use Franzl\Lti\ResourceLink;
+use Franzl\Lti\Http\Client;
 
 interface Action
 {
-    public function getServiceName();
-
-    public function asXML();
-
-    public function handleResponse(array $nodes, ResourceLink $link);
+    public function run(Client $client);
 }
