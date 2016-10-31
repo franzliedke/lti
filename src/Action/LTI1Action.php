@@ -22,7 +22,7 @@ abstract class LTI1Action implements Action
     {
         $request = new Request(
             'POST',
-            'someUrlHere',
+            $this->getUrl(),
             ['content-type' => 'application/x-www-form-urlencoded']
         );
 
@@ -32,6 +32,8 @@ abstract class LTI1Action implements Action
 
         return $request;
     }
+
+    abstract protected function getUrl();
 
     abstract protected function getParams();
 

@@ -9,6 +9,11 @@ class WriteSetting extends LTI1Action implements Action
         return 'basic-lti-savesetting';
     }
 
+    protected function getUrl()
+    {
+        return ''; // TODO: $this->getSetting('ext_ims_lti_tool_setting_url');
+    }
+
     protected function getParams()
     {
         /*
