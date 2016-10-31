@@ -33,7 +33,12 @@ class WriteResult extends LTI11Action implements Action
         return 'replaceResult';
     }
 
-    public function getBody()
+    protected function getUrl()
+    {
+        return ''; // TODO: $this->getSetting('lis_outcome_service_url');
+    }
+
+    protected function getBody()
     {
         $sourcedId = htmlentities($this->user->ltiResultSourcedId);
         $language = $this->outcome->language;

@@ -25,7 +25,7 @@ abstract class LTI11Action implements Action
         //$params = ['oauth_body_hash' => $hash];
         $request = new Request(
             'POST',
-            'someUrlHere',
+            $this->getUrl(),
             ['content-type' => 'application/xml']
         );
 
@@ -35,6 +35,8 @@ abstract class LTI11Action implements Action
 
         return $request;
     }
+
+    abstract protected function getUrl();
 
     abstract protected function getBody();
 

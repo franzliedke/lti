@@ -27,7 +27,12 @@ class DeleteResult extends LTI11Action implements Action
         return 'deleteResult';
     }
 
-    public function getBody()
+    protected function getUrl()
+    {
+        return ''; // TODO: $this->getSetting('lis_outcome_service_url');
+    }
+
+    protected function getBody()
     {
         $sourcedId = htmlentities($this->user->ltiResultSourcedId);
 
