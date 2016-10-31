@@ -9,7 +9,6 @@ use Franzl\Lti\Http\GuzzleClient;
 use Franzl\Lti\OAuth\Consumer;
 use Franzl\Lti\OAuth\Signature\HmacSha1;
 use Franzl\Lti\OAuth\Signer;
-use Franzl\Lti\Parse\XML;
 use GuzzleHttp\Client;
 
 /**
@@ -160,13 +159,6 @@ class ResourceLink implements Executor
      * @var boolean
      */
     private $settingsChanged = false;
-
-    /**
-     * XML node array for the last extension service request.
-     *
-     * @var array
-     */
-    private $extNodes = null;
 
     /**
      * Class constructor.
@@ -464,37 +456,6 @@ class ResourceLink implements Executor
                             $lti_outcome->type = self::EXT_TYPE_DECIMAL;
                         }
                     }
-                }
-            }
-        }
-
-        return $ok;
-    }
-
-    /**
-     * Send a service request to the tool consumer.
-     *
-     * @param string $type   GuzzleClient type value
-     * @param string $url    URL to send request to
-     * @param array  $params Associative array of parameter values to be passed
-     *
-     * @return boolean True if the request successfully obtained a response
-     */
-    private function doService($type, $url, $params)
-    {
-        $ok = false;
-        if (!empty($url)) {
-            $params = $this->consumer->signParameters($url, $type, $this->consumer->ltiVersion, $params);
-
-            // Connect to tool consumer
-            $response = ClientFactory::make()->send($url, 'POST', $params);
-
-            // Parse XML response
-            if ($response->isSuccessful()) {
-                $response = $response->getWrappedResponse();
-                $this->extNodes = XML::extractNodes((string) $response->getBody());
-                if (isset($this->extNodes['statusinfo']['codemajor']) && ($this->extNodes['statusinfo']['codemajor'] == 'Success')) {
-                    $ok = true;
                 }
             }
         }
