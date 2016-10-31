@@ -21,41 +21,6 @@ use GuzzleHttp\Client;
 class ResourceLink implements Executor
 {
     /**
-     * Decimal outcome type.
-     */
-    const EXT_TYPE_DECIMAL = 'decimal';
-
-    /**
-     * Percentage outcome type.
-     */
-    const EXT_TYPE_PERCENTAGE = 'percentage';
-
-    /**
-     * Ratio outcome type.
-     */
-    const EXT_TYPE_RATIO = 'ratio';
-
-    /**
-     * Letter (A-F) outcome type.
-     */
-    const EXT_TYPE_LETTER_AF = 'letteraf';
-
-    /**
-     * Letter (A-F) with optional +/- outcome type.
-     */
-    const EXT_TYPE_LETTER_AF_PLUS = 'letterafplus';
-
-    /**
-     * Pass/fail outcome type.
-     */
-    const EXT_TYPE_PASS_FAIL = 'passfail';
-
-    /**
-     * Free text outcome type.
-     */
-    const EXT_TYPE_TEXT = 'freetext';
-
-    /**
      * Context ID as supplied in the last connection request.
      *
      * @var string
@@ -383,84 +348,6 @@ class ResourceLink implements Executor
     {
         $this->initialise();
         return $this->consumer->getStorage()->resourceLinkLoad($this);
-    }
-
-    /**
-     * Convert data type of value to a supported type if possible.
-     *
-     * @param Outcome $lti_outcome     Outcome object
-     * @param string[]    $supported_types Array of outcome types to be supported (optional, default is null to use supported types reported in the last launch for this resource link)
-     *
-     * @return boolean True if the type/value are valid and supported
-     */
-    private function checkValueType($lti_outcome, $supported_types = null)
-    {
-        if (empty($supported_types)) {
-            $supported_types = explode(',', str_replace(' ', '', strtolower($this->getSetting('ext_ims_lis_resultvalue_sourcedids', self::EXT_TYPE_DECIMAL))));
-        }
-        $type = $lti_outcome->type;
-        $value = $lti_outcome->getValue();
-
-        // Check whether the type is supported or there is no value
-        $ok = in_array($type, $supported_types) || (strlen($value) <= 0);
-
-        if (!$ok) {
-            // Convert numeric values to decimal
-            if ($type == self::EXT_TYPE_PERCENTAGE) {
-                if (substr($value, -1) == '%') {
-                    $value = substr($value, 0, -1);
-                }
-                $ok = is_numeric($value) && ($value >= 0) && ($value <= 100);
-                if ($ok) {
-                    $lti_outcome->setValue($value / 100);
-                    $lti_outcome->type = self::EXT_TYPE_DECIMAL;
-                }
-            } else if ($type == self::EXT_TYPE_RATIO) {
-                $parts = explode('/', $value, 2);
-                $ok = (count($parts) == 2) && is_numeric($parts[0]) && is_numeric($parts[1]) && ($parts[0] >= 0) && ($parts[1] > 0);
-                if ($ok) {
-                    $lti_outcome->setValue($parts[0] / $parts[1]);
-                    $lti_outcome->type = self::EXT_TYPE_DECIMAL;
-                }
-            } else if ($type == self::EXT_TYPE_LETTER_AF) {
-                // Convert letter_af to letter_af_plus or text
-                if (in_array(self::EXT_TYPE_LETTER_AF_PLUS, $supported_types)) {
-                    $ok = true;
-                    $lti_outcome->type = self::EXT_TYPE_LETTER_AF_PLUS;
-                } else if (in_array(self::EXT_TYPE_TEXT, $supported_types)) {
-                    $ok = true;
-                    $lti_outcome->type = self::EXT_TYPE_TEXT;
-                }
-            } else if ($type == self::EXT_TYPE_LETTER_AF_PLUS) {
-                // Convert letter_af_plus to letter_af or text
-                if (in_array(self::EXT_TYPE_LETTER_AF, $supported_types) && (strlen($value) == 1)) {
-                    $ok = true;
-                    $lti_outcome->type = self::EXT_TYPE_LETTER_AF;
-                } else if (in_array(self::EXT_TYPE_TEXT, $supported_types)) {
-                    $ok = true;
-                    $lti_outcome->type = self::EXT_TYPE_TEXT;
-                }
-            } else if ($type == self::EXT_TYPE_TEXT) {
-                // Convert text to decimal
-                $ok = is_numeric($value) && ($value >= 0) && ($value <=1);
-                if ($ok) {
-                    $lti_outcome->type = self::EXT_TYPE_DECIMAL;
-                } else if (substr($value, -1) == '%') {
-                    $value = substr($value, 0, -1);
-                    $ok = is_numeric($value) && ($value >= 0) && ($value <=100);
-                    if ($ok) {
-                        if (in_array(self::EXT_TYPE_PERCENTAGE, $supported_types)) {
-                            $lti_outcome->type = self::EXT_TYPE_PERCENTAGE;
-                        } else {
-                            $lti_outcome->setValue($value / 100);
-                            $lti_outcome->type = self::EXT_TYPE_DECIMAL;
-                        }
-                    }
-                }
-            }
-        }
-
-        return $ok;
     }
 
     public function execute(Action $action)

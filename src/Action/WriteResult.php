@@ -44,6 +44,8 @@ class WriteResult extends LTI11Action implements Action
         $language = $this->outcome->language;
         $value = $this->outcome->getValue() ?: '';
 
+        // TODO: Verify the value is a valid decimal (self::EXT_TYPE_DECIMAL)
+
         $xml = <<<EOF
 <replaceResultRequest>
     <resultRecord>
