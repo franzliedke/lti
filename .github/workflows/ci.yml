@@ -1,18 +1,26 @@
-name: phpspec
+name: CI
 
 on: [push]
 
 jobs:
-  test:
+	phpcs:
+		runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install Composer dependencies
+      run: composer install --prefer-dist
+    - name: Check code style
+      run: php vendor/bin/phpcs --standard=PSR2 -np src
 
+  phpspec:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         php: [7.1, 7.2, 7.3]
-    
     steps:
     - uses: actions/checkout@v1
     - name: Install Composer dependencies
       run: composer install --prefer-dist
     - name: Run tests
       run: php${{ matrix.php }} vendor/bin/phpspec run
+
