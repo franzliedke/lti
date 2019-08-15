@@ -3,7 +3,7 @@ name: phpspec
 on: [push]
 
 jobs:
-  build:
+  deps:
 
     runs-on: ubuntu-latest
     
