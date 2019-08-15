@@ -3,29 +3,15 @@ name: phpspec
 on: [push]
 
 jobs:
-  deps:
+  test:
 
     runs-on: ubuntu-latest
+    matrix:
+      php: [7.1, 7.2, 7.3]
     
     steps:
     - uses: actions/checkout@v1
     - name: Install Composer dependencies
       run: composer install --prefer-dist
-
-  php70:
-
-    runs-on: ubuntu-latest   
-    needs: deps
-
-    steps:
-    - name: Run tests
-      run: php7.0 vendor/bin/phpspec run
-  
-  php71:
-
-    runs-on: ubuntu-latest
-    needs: deps
-
-    steps:
     - name: Run tests
       run: php7.1 vendor/bin/phpspec run
