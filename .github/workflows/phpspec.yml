@@ -15,4 +15,4 @@ jobs:
     - name: Install Composer dependencies
       run: composer install --prefer-dist
     - name: Run tests
-      run: php7.1 vendor/bin/phpspec run
+      run: php${{ matrix.php }} vendor/bin/phpspec run
