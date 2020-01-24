@@ -2,7 +2,7 @@
   "name": "franzl/lti",
   "description": "An LTI Tool Provider library for PHP",
   "minimum-stability": "stable",
-  "license": "LGPL-3.0+",
+  "license": "LGPL-3.0-or-later",
   "authors": [
     {
       "name": "Franz Liedke",
